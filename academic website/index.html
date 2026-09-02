@@ -1,0 +1,675 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>When Redevelopment Transforms the Housing Stock</title>
+<meta name="description" content="Carrot & Stick Policy and the Affordability Puzzle: a forward-looking spatial model of parcel-level redevelopment, and why policies that increase construction can raise average rents." />
+<link rel="stylesheet" href="styles.css" />
+<script>
+  // Defined in <head>, ahead of any <img> in the body, so it exists before a
+  // same-origin 404 on a not-yet-exported figure can fire onerror. Swaps a
+  // failed figure image for a text label inside the same .figure-placeholder
+  // box (base.css), matching the dashed-border look used everywhere a figure
+  // hasn't been wired up yet. Once the real PNG lands in resources/figures/,
+  // it loads normally and this never runs for that figure.
+  function handleFigureImgError(img) {
+    var span = document.createElement("span");
+    span.textContent = img.alt;
+    img.replaceWith(span);
+  }
+</script>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="nav-container">
+    <a class="brand" href="#top">Carrot &amp; Stick</a>
+    <button class="nav-toggle" aria-label="Toggle navigation" aria-expanded="false">
+      <span></span><span></span><span></span>
+    </button>
+    <nav class="nav-links">
+      <a href="#idea">The idea</a>
+      <a href="#findings">Findings</a>
+      <a href="#model">Model</a>
+      <a href="#calibration">Calibration</a>
+      <a href="#explorer">Explorer</a>
+      <a href="#scope">Scope</a>
+      <a href="#resources">Resources</a>
+      <a href="#authors">Authors</a>
+    </nav>
+  </div>
+</header>
+
+<main id="top">
+
+  <!-- ============================== HERO ============================== -->
+  <section class="hero">
+    <p class="eyebrow">Cornell University &amp; ETH Zurich</p>
+    <h1>When Redevelopment Transforms the Housing Stock</h1>
+    <p class="subtitle">Carrot &amp; Stick Policy and the Affordability Puzzle</p>
+    <p class="contribution">
+      A forward-looking spatial model in which housing supply emerges from
+      parcel-level redevelopment decisions, showing why policies that increase
+      construction can raise average rents, and who bears the cost of
+      affordable-housing mandates.
+    </p>
+    <p class="byline">
+      Daniel Lebret (Cornell)<span class="sep">&middot;</span>
+      Crocker H. Liu (Cornell)<span class="sep">&middot;</span>
+      Maxence Valentin (ETH Zurich)
+    </p>
+    <p class="date-line">Working paper, 2026</p>
+    <div class="hero-actions">
+      <!-- Working Paper PDF URL pending, see Resources section -->
+      <a class="button button-primary" href="#resources">Read the Working Paper</a>
+      <a class="button button-secondary" href="#resources">Online Appendix</a>
+      <a class="button button-secondary" href="#resources">Slides</a>
+    </div>
+
+    <div class="figure-block">
+      <div class="figure-placeholder">
+        <img src="../resources/figures/figure-09-rent-decomposition.png" alt="Figure 9. Counterfactual results, expected rents (four-component decomposition). Pending final export." onerror="handleFigureImgError(this)" />
+      </div>
+      <p class="figure-caption">
+        Average expected rent change under each counterfactual, decomposed into
+        the affordable-share, citywide-supply, local-supply, and replacement
+        effects. Policies that raise construction raise average rents because
+        the replacement effect dominates the supply effect.
+      </p>
+    </div>
+  </section>
+
+  <!-- ============================== THE IDEA ============================== -->
+  <section id="idea">
+    <h2>Housing supply as the sum of redevelopment decisions</h2>
+
+    <p>
+      In mature cities, new housing arrives almost entirely through
+      redevelopment. In New York City between 2023 and 2025, roughly
+      two-thirds of private residential permits were filed on parcels that
+      already carried a building. New construction therefore means replacing
+      older, depreciated, lower-rent structures with newer, taller,
+      higher-rent ones. The supply that policy seeks to encourage is also the
+      mechanism by which the cheapest units disappear. (See the permit
+      patterns in Figure 1, in Calibration below.)
+    </p>
+
+    <p>
+      Quantitative urban models, the dominant tools for studying urban housing
+      markets, are not built to capture this. They resolve household and firm
+      location choices finely but treat housing supply through an aggregate
+      elasticity, with no individual parcel choosing when and how densely to
+      redevelop. In that setting, housing created by expanding the stock
+      cannot be distinguished from housing created by replacing existing
+      structures, so these models do not explain why policies that stimulate
+      construction simultaneously reduce the stock of inexpensive housing. We
+      address this gap by modeling housing supply as the aggregation of
+      parcel-level redevelopment decisions. We call these decisions the
+      redevelopment margin.
+    </p>
+
+    <p>
+      In our model, developers decide whether, when, and how intensively to
+      redevelop individual parcels, including development on empty parcels,
+      by comparing the value of immediate redevelopment with the option value
+      of waiting. The parcel-specific rent process each developer takes as
+      given must be consistent with the collective redevelopment decisions of
+      all developers. This fixed point defines a spatial equilibrium in which
+      the market clears through redevelopment, and the timing, intensity, and
+      location of redevelopment, and hence housing supply, emerge
+      endogenously. Housing policies that incentivize development (Carrots),
+      such as density bonuses and tax exemptions, and affordability mandates
+      (Sticks), affect supply not by shifting an exogenous aggregate supply
+      curve but by changing individual redevelopment decisions. Because these
+      decisions are made parcel by parcel, policy changes not only the
+      quantity of housing but also its composition, because redeveloped units
+      enter the stock without the depreciation carried by the units they
+      replace.
+    </p>
+
+    <div class="callout">
+      <h3>What is new</h3>
+      <ul>
+        <li>
+          <strong>The reframing.</strong> Housing supply is not an aggregate
+          curve that policy shifts. It is the sum of thousands of
+          parcel-level redevelopment decisions, each a timed choice under
+          uncertainty about whether a specific building is torn down, when,
+          and how big its replacement is. That is the redevelopment margin,
+          and the whole paper is built on it.
+        </li>
+        <li>
+          <strong>A model that does what neither existing approach can.</strong>
+          Quantitative urban models resolve location finely but treat supply
+          as a smooth aggregate; the city-growth literature models renewal
+          coarsely, without an individual parcel making a timed, density
+          decision under uncertainty. This framework does both, embedded in a
+          spatial equilibrium where the citywide and local rent effects those
+          decisions produce feed back into the rent process each developer is
+          reacting to.
+        </li>
+        <li>
+          <strong>The counterintuitive result it makes visible.</strong>
+          Because redevelopment replaces depreciated stock with new stock,
+          more construction can raise average rents, not despite standard
+          supply and demand but alongside it. See Finding 2.
+        </li>
+        <li>
+          <strong>Grounded in data, not assumed.</strong> The dominance of
+          redevelopment is shown in NYC permit records before the model
+          appears. See above and Calibration.
+        </li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- ============================== THREE FINDINGS ============================== -->
+  <section id="findings">
+    <h2>Three findings</h2>
+    <p class="section-intro">The calibrated model delivers three central results.</p>
+
+    <div class="finding">
+      <p class="finding-number">Finding 1</p>
+      <h3>Instruments that deliver similar supply work through different margins</h3>
+      <p>
+        Tax incentives and density bonuses can produce similar aggregate
+        supply, but through different channels. Tax exemptions act on the
+        extensive margin: by raising post-construction returns they lower the
+        redevelopment threshold and pull projects forward, accelerating
+        redevelopment across a broad set of parcels. Density bonuses act on
+        the intensive margin: they raise the value of redevelopment by
+        permitting height, but they also raise the option value of waiting,
+        so they can delay redevelopment on parcels near their threshold even
+        as they increase the size of projects that do proceed. Parcels near
+        their threshold (older, underbuilt) respond most to fiscal
+        incentives; high-rent locations respond most to density bonuses.
+        Because parcels differ, uniform policy produces heterogeneous effects
+        across space.
+      </p>
+      <div class="figure-block">
+        <p class="figure-group-title">Figure 3. Effects of policy instruments on property value and development probability.</p>
+        <div class="figure-stack">
+          <figure class="figure-sub">
+            <div class="figure-placeholder">
+              <img src="../resources/figures/figure-03a-policy-instrument-alpha.png" alt="Figure 3a. Mandatory share for affordable housing, alpha. Pending final export." onerror="handleFigureImgError(this)" />
+            </div>
+            <figcaption>(a) Mandatory share for affordable housing (&alpha;)</figcaption>
+          </figure>
+          <figure class="figure-sub">
+            <div class="figure-placeholder">
+              <img src="../resources/figures/figure-03b-policy-instrument-phi.png" alt="Figure 3b. Density bonuses, phi. Pending final export." onerror="handleFigureImgError(this)" />
+            </div>
+            <figcaption>(b) Density bonuses (&phi;)</figcaption>
+          </figure>
+          <figure class="figure-sub">
+            <div class="figure-placeholder">
+              <img src="../resources/figures/figure-03c-policy-instrument-tau.png" alt="Figure 3c. Length of tax exemptions, tau. Pending final export." onerror="handleFigureImgError(this)" />
+            </div>
+            <figcaption>(c) Length of tax exemptions (&tau;)</figcaption>
+          </figure>
+        </div>
+        <p class="figure-caption">Effects of policy instruments on property value and development probability, by instrument.</p>
+      </div>
+    </div>
+
+    <div class="finding">
+      <p class="finding-number">Finding 2</p>
+      <h3>The replacement effect: more construction, higher average rents</h3>
+      <p>
+        Because production occurs through replacement, policies that raise
+        construction shift both the quantity and the composition of the
+        stock. New units enter without the depreciation carried by the units
+        they replace, so average rents rise. We call this compositional shift
+        and its consequences for the rent distribution the replacement
+        effect.
+      </p>
+      <p>
+        Within our calibration the replacement effect dominates the supply
+        effect. Under upzoning, average expected rent rises by about 1.31%
+        even as supply expands. Decomposed per unit, replacement adds about
+        $60 per month while additional supply subtracts about $25. The result
+        holds across the credible range of demand elasticities; only a
+        closed-city elasticity would let the supply effect win.
+      </p>
+      <p class="scope-note">
+        These are rents across the occupied stock, not quality-adjusted
+        prices and not household-level outcomes. Controlling for quality,
+        prices fall as supply expands. The average rises because
+        redevelopment shifts the composition of the stock toward newer,
+        higher-rent units, not because any given tenant necessarily pays
+        more.
+      </p>
+      <p class="finding-figure-refs">Figure: Figure 9, the hero exhibit above.</p>
+    </div>
+
+    <div class="finding">
+      <p class="finding-number">Finding 3</p>
+      <h3>Mandates produce affordable units mainly by crowding out market-rate ones</h3>
+      <p>
+        Affordability mandates raise affordable production, but primarily by
+        displacing market-rate construction rather than by growing the stock.
+        A 30% mandate yields roughly 42,000 affordable units while reducing
+        market-rate construction by about 58,000. Because redevelopment under
+        a mandate is only profitable where rents are already high, the new
+        affordable units expand the middle of the rent distribution and leave
+        the bottom quintile largely unchanged. Mandated units are also
+        costly: holding total supply fixed, each affordable unit substituted
+        for a market-rate unit costs about $59,900 under density incentive
+        zoning and about $61,200 under fiscal incentive zoning. The incidence
+        depends on the paired instrument. Density bonuses split the burden
+        roughly evenly between landowners and the city; tax exemptions place
+        almost all of it on the public sector.
+      </p>
+      <div class="figure-block">
+        <div class="figure-placeholder">
+          <img src="../resources/figures/figure-06-production-counterfactuals.png" alt="Figure 6. Housing production counterfactuals: affordable vs. market-rate scatter. Pending final export." onerror="handleFigureImgError(this)" />
+        </div>
+        <p class="figure-caption">Affordable and market-rate production under each counterfactual policy. Only the combined incentive policy expands both.</p>
+      </div>
+      <div class="figure-block">
+        <p class="figure-group-title">Figure 12. Cost of mandated affordable housing.</p>
+        <div class="figure-grid">
+          <figure class="figure-sub">
+            <div class="figure-placeholder">
+              <img src="../resources/figures/figure-12a-required-incentives.png" alt="Figure 12a. Required incentives. Pending final export." onerror="handleFigureImgError(this)" />
+            </div>
+            <figcaption>(a) Required incentives</figcaption>
+          </figure>
+          <figure class="figure-sub">
+            <div class="figure-placeholder">
+              <img src="../resources/figures/figure-12b-cost-per-unit.png" alt="Figure 12b. Cost per unit. Pending final export." onerror="handleFigureImgError(this)" />
+            </div>
+            <figcaption>(b) Cost per unit</figcaption>
+          </figure>
+          <figure class="figure-sub">
+            <div class="figure-placeholder">
+              <img src="../resources/figures/figure-12c-public-share.png" alt="Figure 12c. Share borne by public sector. Pending final export." onerror="handleFigureImgError(this)" />
+            </div>
+            <figcaption>(c) Share borne by public sector</figcaption>
+          </figure>
+          <figure class="figure-sub">
+            <div class="figure-placeholder">
+              <img src="../resources/figures/figure-12d-rent-quintiles.png" alt="Figure 12d. Share of units in rent quintiles. Pending final export." onerror="handleFigureImgError(this)" />
+            </div>
+            <figcaption>(d) Share of units in rent quintiles</figcaption>
+          </figure>
+        </div>
+        <p class="figure-caption">
+          Supporting figure for Finding 3: per-unit cost and public/landowner
+          incidence, by paired instrument.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================== MODEL IN BRIEF ============================== -->
+  <section id="model">
+    <h2>The model in brief</h2>
+
+    <p>
+      Each developer holds a parcel with a current structure and an option to
+      redevelop. Redevelopment requires irreversible demolition and
+      construction while future rents follow a parcel-specific stochastic
+      process, so the developer does not build the moment redevelopment turns
+      marginally profitable. Investment occurs only once expected rent
+      crosses a threshold that compensates for the value of waiting
+      (Propositions 1 to 3). The developer chooses both timing and density.
+    </p>
+
+    <p>
+      The three policy instruments enter this decision directly. A mandate
+      (&alpha;) lowers post-development rental income and raises the
+      threshold. A density bonus (&phi;) raises the value of building and the
+      optimal density, but also the threshold. A tax exemption (&tau;) raises
+      post-construction returns and lowers the threshold.
+    </p>
+
+    <p>
+      Individual decisions aggregate to citywide supply, which feeds back
+      into rents through two estimated channels: a citywide supply effect
+      that lowers rent growth everywhere, and a local spillover that changes
+      rents near new construction. The rent process each developer faces must
+      be consistent with everyone's decisions, and that fixed point is the
+      spatial equilibrium. Expected rental income at each horizon is then
+      aggregated for policy evaluation (Corollary 1).
+    </p>
+
+    <p class="link-row">
+      <span>Full model, Section 2</span>
+      <span>Policy instruments, Section 3</span>
+      <span>Calibration, Section 4</span>
+    </p>
+  </section>
+
+  <!-- ============================== CALIBRATION AND VALIDATION ============================== -->
+  <section id="calibration">
+    <h2>Calibrated to New York City, validated out of sample</h2>
+
+    <p>
+      We calibrate the model to 765,305 New York City residential parcels
+      using parcel-level density and building age, rents from the American
+      Community Survey, and neighborhood rent dynamics from CoStar. Rental
+      income falls with building age and rises with height. Demolition costs
+      exhibit increasing returns to scale and construction costs are convex
+      in height.
+    </p>
+
+    <p>
+      The empirical patterns that motivate the model are visible directly in
+      the permit data. Redevelopment concentrates on parcels with unused
+      density and on older buildings: about 4.0% of parcels with more than
+      75% of their allowable density unused filed a permit, and buildings
+      over 100 years old redevelop at roughly 2.5 times the rate of those
+      under 40, renting for about 14% less. Development also tracks rents: a
+      10% higher rent per square foot is associated with 7.1% more permitted
+      units, and a one-point higher expected rent growth with 39% more.
+    </p>
+
+    <div class="figure-block">
+      <p class="figure-group-title">Figure 1. Permits by unused density and building age.</p>
+      <div class="figure-grid">
+        <figure class="figure-sub">
+          <div class="figure-placeholder">
+            <img src="../resources/figures/figure-01a-permits-unused-density.png" alt="Figure 1a. Unused density. Pending final export." onerror="handleFigureImgError(this)" />
+          </div>
+          <figcaption>(a) Unused density</figcaption>
+        </figure>
+        <figure class="figure-sub">
+          <div class="figure-placeholder">
+            <img src="../resources/figures/figure-01b-permits-building-age.png" alt="Figure 1b. Building age. Pending final export." onerror="handleFigureImgError(this)" />
+          </div>
+          <figcaption>(b) Building age</figcaption>
+        </figure>
+      </div>
+      <p class="figure-caption">Redevelopment concentrates on underbuilt, older parcels.</p>
+    </div>
+
+    <div class="figure-block">
+      <p class="figure-group-title">Figure 2. Permits and rent dynamics.</p>
+      <div class="figure-grid">
+        <figure class="figure-sub">
+          <div class="figure-placeholder">
+            <img src="../resources/figures/figure-02a-rent-vs-permits.png" alt="Figure 2a. Residential rents. Pending final export." onerror="handleFigureImgError(this)" />
+          </div>
+          <figcaption>(a) Residential rents</figcaption>
+        </figure>
+        <figure class="figure-sub">
+          <div class="figure-placeholder">
+            <img src="../resources/figures/figure-02b-rent-growth-vs-permits.png" alt="Figure 2b. Expected rent growth. Pending final export." onerror="handleFigureImgError(this)" />
+          </div>
+          <figcaption>(b) Expected rent growth</figcaption>
+        </figure>
+      </div>
+      <p class="figure-caption">Permitted units track rent per square foot and expected rent growth.</p>
+    </div>
+
+    <div class="named-result">
+      <h3>Named result: separating the citywide and local effects of supply on rents</h3>
+      <p>
+        How new supply feeds back into rents runs through two distinct
+        channels that the literature has often conflated, and we separate
+        them. The citywide channel governs how aggregate supply moves rents
+        everywhere; we derive it from household demand theory (migration plus
+        floorspace consumption) rather than borrow a reduced-form number,
+        giving an inverse demand elasticity of &minus;0.66, robust across
+        &minus;0.91 to &minus;0.43.
+      </p>
+      <p>
+        The local channel is the one under debate, because nearby
+        construction pushes rents two ways at once: new units compete with
+        the incumbent stock and pull rents down, while they can raise local
+        amenities and pull rents up. The sign is therefore an empirical
+        question, and we estimate it directly. Using building-level rental
+        income from NYC Notices of Property Value and a staggered
+        difference-in-differences event study (Callaway and Sant'Anna, 2021),
+        we compare buildings that experience a nearby completion of a
+        50-plus unit building within 500 feet against otherwise similar
+        buildings not yet exposed, so identification comes from the timing of
+        completion rather than proximity to redevelopment. A completion
+        raises the surrounding stock by about 10% (ATT 0.102, significant at
+        1%) and holds it there, a large and durable local supply shock, yet
+        rents do not respond significantly at any horizon. The implied local
+        elasticity is essentially zero (&minus;0.01), robust across radii,
+        samples, and specifications. The near-zero is not a modeling
+        convenience: it reflects local competition and local amenity gains
+        roughly offsetting.
+      </p>
+      <div class="figure-block">
+        <p class="figure-group-title">Figure 4. Local effects of a nearby building completion on supply and rents.</p>
+        <div class="figure-grid">
+          <figure class="figure-sub">
+            <div class="figure-placeholder">
+              <img src="../resources/figures/figure-04a-local-supply-effect.png" alt="Figure 4a. Change in neighboring supply. Pending final export." onerror="handleFigureImgError(this)" />
+            </div>
+            <figcaption>(a) Change in neighboring supply</figcaption>
+          </figure>
+          <figure class="figure-sub">
+            <div class="figure-placeholder">
+              <img src="../resources/figures/figure-04b-local-rent-effect.png" alt="Figure 4b. Change in rents. Pending final export." onerror="handleFigureImgError(this)" />
+            </div>
+            <figcaption>(b) Change in rents</figcaption>
+          </figure>
+        </div>
+        <p class="figure-caption">Local supply and rent response to a nearby 50-plus unit completion.</p>
+      </div>
+    </div>
+
+    <h3>Two validation checks</h3>
+    <div class="validation-checks">
+      <div class="validation-check">
+        <div class="stat">0.89</div>
+        <div class="stat-label">Correlation between the calibrated model's cross-neighborhood property values and CoStar transactions.</div>
+      </div>
+      <div class="validation-check">
+        <div class="stat">211,521 vs. 199,992</div>
+        <div class="stat-label">Predicted vs. actual net new units citywide, 2016 to 2025, matching the cross-sectional distribution across community districts.</div>
+      </div>
+    </div>
+    <div class="figure-block">
+      <p class="figure-group-title">Figure 5. Model validation.</p>
+      <div class="figure-grid">
+        <figure class="figure-sub">
+          <div class="figure-placeholder">
+            <img src="../resources/figures/figure-05a-model-fit-value.png" alt="Figure 5a. Real estate value. Pending final export." onerror="handleFigureImgError(this)" />
+          </div>
+          <figcaption>(a) Real estate value</figcaption>
+        </figure>
+        <figure class="figure-sub">
+          <div class="figure-placeholder">
+            <img src="../resources/figures/figure-05b-model-fit-construction.png" alt="Figure 5b. Construction activity. Pending final export." onerror="handleFigureImgError(this)" />
+          </div>
+          <figcaption>(b) Construction activity</figcaption>
+        </figure>
+      </div>
+      <p class="figure-caption">Out-of-sample model validation against CoStar transactions and observed construction.</p>
+    </div>
+  </section>
+
+  <!-- ============================== INTERACTIVE POLICY EXPLORER ============================== -->
+  <section id="explorer">
+    <h2>Explore the policy space</h2>
+    <p class="section-intro">
+      Move the instruments and see how the model's outcomes respond across
+      the policy space. The tool reads the same simulation grid behind the
+      counterfactuals; the printed figures are points on these surfaces.
+    </p>
+
+    <div id="explorer-root" class="explorer" aria-label="Policy explorer">
+      <!-- Populated by resources/explorer/explorer.js via explorer-config.js -->
+      <noscript>The interactive explorer requires JavaScript. The same policy points are reported as figures throughout this page.</noscript>
+    </div>
+  </section>
+
+  <!-- ============================== SCOPE AND BOUNDARY CONDITIONS ============================== -->
+  <section id="scope">
+    <h2>When the replacement effect dominates</h2>
+    <p>
+      The replacement effect is a feature of mature housing markets, where
+      new construction requires demolishing existing structures. It weakens
+      where development occurs on vacant or underused land, because there is
+      little lower-rent stock to replace. In the model, targeting the
+      least-utilized parcels produces the smallest rent increase of any
+      scenario, the cleanest internal check on the mechanism. The effect also
+      weakens when housing demand is more elastic, though across the
+      empirically credible range the replacement effect still dominates;
+      only a closed-city elasticity of about &minus;1.43 flips the sign. And
+      because redevelopment and rents are jointly determined, the parameter
+      regions that would deliver a dominant supply effect are the same ones
+      that weaken redevelopment, so no region lets developers build without
+      regard to the rents their construction will support. The result is a
+      statement about redevelopment-driven markets, not about every city.
+    </p>
+    <div class="figure-block">
+      <div class="figure-placeholder">
+        <img src="../resources/figures/figure-10-demand-elasticity.png" alt="Figure 10. Citywide demand elasticity and average expected rents. Pending final export." onerror="handleFigureImgError(this)" />
+      </div>
+      <p class="figure-caption">Average expected rent response across the credible range of citywide demand elasticities.</p>
+    </div>
+  </section>
+
+  <!-- ============================== RESOURCES ============================== -->
+  <section id="resources">
+    <h2>Paper and materials</h2>
+
+    <ul class="resource-list">
+      <li>
+        <span>Working Paper (PDF)</span>
+        <span class="resource-status">Link pending</span>
+      </li>
+      <li>
+        <span>Online Appendix (PDF)</span>
+        <span class="resource-status">Link pending</span>
+      </li>
+      <li>
+        <span>Slides</span>
+        <span class="resource-status">Live after the Purdue presentation</span>
+      </li>
+    </ul>
+
+    <h3>BibTeX</h3>
+    <pre class="bibtex-block">@techreport{LebretLiuValentin2026,
+  author = {Lebret, Daniel and Liu, Crocker H. and Valentin, Maxence},
+  title  = {When Redevelopment Transforms the Housing Stock: Carrot \&amp; Stick Policy and
+            the Affordability Puzzle},
+  year   = {2026},
+  type   = {Working Paper}
+}</pre>
+    <button type="button" class="copy-button" id="copy-bibtex">Copy BibTeX</button>
+
+    <p class="replication-note">This version supersedes a previous version entitled "Carrot &amp; Stick Zoning."</p>
+
+    <p class="replication-note">Data and replication code will be posted upon publication.</p>
+
+    <div class="cross-links">
+      <a href="../policy/index.html">For policy audiences &rarr; policy site</a>
+      <a href="../developer/index.html">For development professionals &rarr; developer site</a>
+    </div>
+  </section>
+
+  <!-- ============================== AUTHORS AND DISSEMINATION ============================== -->
+  <section id="authors">
+    <h2>Authors and dissemination</h2>
+
+    <ul class="authors-list">
+      <li><strong>Daniel Lebret</strong>, Cornell University</li>
+      <li><strong>Crocker H. Liu</strong>, Cornell University</li>
+      <li><strong>Maxence Valentin</strong>, ETH Zurich</li>
+    </ul>
+
+    <h3>Presented at / forthcoming</h3>
+    <ul class="venue-list">
+      <li>Purdue University (upcoming)</li>
+      <li>2026 Pre-WFA Real Estate Symposium</li>
+      <li>IEB 8th Workshop on Urban Economics</li>
+      <li>Seminar of the Institute of Economic Research, University of Neuch&acirc;tel</li>
+      <li>19th North American Meeting of the Urban Economics Association</li>
+      <li>4th Workshop on Residential Housing in Zurich</li>
+      <li>Economic Research Group Workshop, University of North Texas</li>
+      <li>Barriers to Homeownership, Land-Use, and Urban Dynamics Workshop, Chicago Fed</li>
+      <li>14th European Meeting of the Urban Economics Association</li>
+      <li>2025 FSU-UF Critical Issues in Real Estate Symposium</li>
+      <li>Penn State Real Estate Brownbag Seminar</li>
+      <li>2024 CRED-MIT Workshop in Real Estate Economics</li>
+      <li>13th European Meeting of the Urban Economics Association</li>
+      <li>2024 AREUEA National Conference</li>
+      <li>15th ReCapNet Conference</li>
+      <li>2023 AREUEA-International Conference</li>
+    </ul>
+
+    <h3>Acknowledgments</h3>
+    <p>
+      We thank Boaz Abramson (discussant), Francisco Amaral, Nathaniel
+      Baum-Snow, Tom Cui (discussant), Tricia Dietz, Jefferson Duarte
+      (discussant), Antoine Dubus, Gilles Duranton, Pierre-Antoine Erny,
+      Sonia Gilbukh (discussant), Hanchen Jiang, Hans Koster (discussant),
+      Jake Krimmel, Yubei Li, Gabriel Loumeau, John Mangin, Michael
+      Manville, Paavo Monkkonen, Daniel Moran, Shane Phillips, Vincent
+      Rollet, Albert Saiz (discussant), Jaehee Song (discussant), Axel
+      Werwatz (discussant), and Michael Wiebe for insightful discussions
+      and feedback.
+    </p>
+    <p>
+      NOPV data provided by the NYU Furman Center (Rohun Iyer).
+    </p>
+
+    <h3>Contact</h3>
+    <p>Corresponding author: Daniel Lebret, Cornell University.</p>
+  </section>
+
+</main>
+
+<footer class="site-footer">
+  <div class="footer-inner">
+    <div class="footer-left">
+      <p class="footer-brand">Carrot &amp; Stick</p>
+      <p class="footer-small">
+        When Redevelopment Transforms the Housing Stock: Carrot &amp; Stick
+        Policy and the Affordability Puzzle. Lebret, Liu, and Valentin, 2026.
+        Working paper under review.
+      </p>
+    </div>
+    <div class="footer-right">
+      <a class="footer-link" href="../policy/index.html">Policy site</a><br />
+      <a class="footer-link" href="../developer/index.html">Developer site</a>
+    </div>
+  </div>
+  <p class="footer-note">Cornell University &amp; ETH Zurich, 2026</p>
+</footer>
+
+<script>
+  // Mobile nav toggle
+  (function () {
+    var toggle = document.querySelector(".nav-toggle");
+    var links = document.querySelector(".nav-links");
+    var header = document.querySelector(".site-header");
+    if (toggle && links) {
+      toggle.addEventListener("click", function () {
+        var open = links.classList.toggle("open");
+        toggle.setAttribute("aria-expanded", open ? "true" : "false");
+      });
+    }
+    window.addEventListener("scroll", function () {
+      if (header) header.classList.toggle("scrolled", window.scrollY > 4);
+    });
+  })();
+
+  // Copy BibTeX
+  (function () {
+    var btn = document.getElementById("copy-bibtex");
+    var block = document.querySelector(".bibtex-block");
+    if (!btn || !block) return;
+    btn.addEventListener("click", function () {
+      navigator.clipboard.writeText(block.textContent).then(function () {
+        var original = btn.textContent;
+        btn.textContent = "Copied";
+        setTimeout(function () { btn.textContent = original; }, 1500);
+      });
+    });
+  })();
+</script>
+<script src="../resources/explorer/explorer.js"></script>
+<script src="explorer-config.js"></script>
+
+</body>
+</html>

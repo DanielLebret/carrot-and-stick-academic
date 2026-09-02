@@ -1,0 +1,102 @@
+/*
+  Shared design tokens for the Carrot & Stick sites (academic, developer, policy).
+  Values below are taken directly from the existing policy and developer sites
+  (see reference-policy-styles.css and reference-developer-styles.css in this same
+  folder), so the academic site matches the established brand exactly rather than
+  approximating it.
+
+  Each site's own styles.css should @import this file first (and base.css, if using
+  the shared chrome components), then layer its own layout and section styling on
+  top. Do not duplicate these values into a site's own stylesheet; change them once
+  here and all three sites pick it up.
+*/
+
+:root {
+  /* Color */
+  --red: #B31B1B;
+  --red-hover: #8f1616;
+  --white: #FFFFFF;
+  --gray-100: #F5F5F5;
+  --gray-200: #E8E8E8;
+  --gray-300: #CCCCCC;
+  --text-dark: #1A1A1A;
+  --text-mid: #555555;
+  --text-light: #888888;
+  --border-light: #E0E0E0;
+
+  /* Type */
+  --font-body: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --font-size-base: 18px;
+  --line-height-body: 1.7;
+
+  /* Real heading sizes in use across the sites */
+  --font-size-h1: clamp(36px, 5vw, 48px);
+  --font-size-h2: 32px;
+  --font-size-h3: 22px;
+  --font-size-eyebrow: 13px;
+  --font-size-small: 14px;
+
+  /* Layout */
+  --content-max-width: 860px;
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-pill: 20px;
+
+  /* Spacing, matched to real padding values in use rather than an abstract scale */
+  --space-1: 8px;
+  --space-2: 16px;
+  --space-3: 24px;
+  --space-4: 32px;
+  --space-5: 48px;
+  --space-6: 80px;
+  --space-7: 120px;
+
+  --transition-fast: 0.2s ease;
+  --transition-base: 0.25s ease;
+
+  /* Focus visibility, keep visible everywhere, never remove */
+  --focus-ring: 2px solid var(--red);
+  --focus-ring-offset: 2px;
+}
+
+/* Baseline reset kept minimal and shared; site-specific overrides belong in each
+   site's own styles.css, not here. */
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  font-family: var(--font-body);
+  font-size: var(--font-size-base);
+  line-height: var(--line-height-body);
+  color: var(--text-dark);
+  background: var(--white);
+}
+
+img {
+  max-width: 100%;
+  display: block;
+}
+
+a {
+  color: var(--red);
+}
+
+:focus-visible {
+  outline: var(--focus-ring);
+  outline-offset: var(--focus-ring-offset);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}

@@ -1,0 +1,263 @@
+/*
+  Shared chrome components, common to all three Carrot & Stick sites: header/nav,
+  footer, buttons, and the figure-placeholder pattern. Extracted from the existing
+  policy and developer sites so all three look like the same family.
+
+  Import order in each site's own styles.css: tokens.css, then this file, then the
+  site's own section styling.
+
+  Deliberately NOT included here (policy/developer-specific persuasion patterns that
+  the academic site's quieter register should not adopt by default): .key-finding,
+  .implication-grid/.implication-card, .targeting-cards/.targeting-card/.targeting-table,
+  .section-badge, .quote-block. If a site wants one of these, build it in that site's
+  own styles.css using the tokens above, rather than importing it from here.
+*/
+
+/* Header / nav */
+
+.site-header {
+  position: sticky;
+  top: 0;
+  width: 100%;
+  background: var(--white);
+  z-index: 20;
+  border-bottom: 1px solid var(--border-light);
+}
+
+.nav-container {
+  max-width: var(--content-max-width);
+  margin: 0 auto;
+  padding: 18px var(--space-3);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  transition: box-shadow var(--transition-base);
+}
+
+.site-header.scrolled .nav-container {
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+}
+
+.brand {
+  color: var(--red);
+  font-weight: 700;
+  text-decoration: none;
+  font-size: 18px;
+}
+
+.nav-links {
+  display: flex;
+  gap: var(--space-3);
+  flex-wrap: wrap;
+}
+
+.nav-links a {
+  color: var(--text-mid);
+  text-decoration: none;
+  font-size: var(--font-size-small);
+  font-weight: 500;
+}
+
+.nav-links a:hover,
+.nav-links a:focus {
+  color: var(--red);
+}
+
+.nav-toggle {
+  display: none;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  padding: var(--space-1);
+}
+
+.nav-toggle span {
+  display: block;
+  width: 24px;
+  height: 2px;
+  background: var(--text-dark);
+  margin: 5px 0;
+  transition: transform var(--transition-base);
+}
+
+@media (max-width: 768px) {
+  .nav-container {
+    flex-wrap: wrap;
+    justify-content: space-between;
+  }
+  .nav-toggle {
+    display: block;
+  }
+  .nav-links {
+    width: 100%;
+    display: none;
+    flex-direction: column;
+    gap: var(--space-2);
+    margin-top: var(--space-2);
+  }
+  .nav-links.open {
+    display: flex;
+  }
+}
+
+/* Buttons */
+
+.button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 14px 28px;
+  border-radius: var(--radius-sm);
+  text-decoration: none;
+  font-weight: 600;
+  transition: background-color var(--transition-fast), color var(--transition-fast),
+    border-color var(--transition-fast);
+}
+
+.button-primary {
+  background: var(--red);
+  color: var(--white);
+  border: 2px solid var(--red);
+}
+
+.button-primary:hover,
+.button-primary:focus {
+  background: var(--red-hover);
+  border-color: var(--red-hover);
+}
+
+.button-secondary {
+  background: var(--white);
+  color: var(--red);
+  border: 2px solid var(--red);
+}
+
+.button-secondary:hover,
+.button-secondary:focus {
+  background: #f9ecec;
+}
+
+/* Eyebrow / section label. Use sparingly, on the hero only, not on every section
+   heading (see frontend-design guidance: a tracked-out all-caps label above every
+   heading is a generic tell). */
+
+.eyebrow {
+  color: var(--red);
+  font-size: var(--font-size-eyebrow);
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  margin: 0 0 var(--space-3);
+}
+
+/* Figure placeholder pattern. Use this for any figure not yet exported from the
+   final draft; swap the <img> in once the real export lands in resources/figures/. */
+
+.figure-block {
+  position: relative;
+  margin-top: var(--space-4);
+  margin-bottom: var(--space-3);
+  overflow: visible;
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+.figure-block img {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+.figure-placeholder {
+  display: flex;
+  min-height: 400px;
+  background: var(--gray-200);
+  border: 2px dashed var(--gray-300);
+  color: var(--text-light);
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: var(--space-3);
+}
+
+.figure-placeholder span {
+  font-size: 16px;
+  line-height: var(--line-height-body);
+}
+
+.figure-caption {
+  color: var(--text-light);
+  font-size: var(--font-size-small);
+  font-style: italic;
+  margin-top: var(--space-1);
+  text-align: center;
+}
+
+.figure-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--space-3);
+  margin-bottom: var(--space-3);
+}
+
+@media (max-width: 640px) {
+  .figure-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Footer */
+
+.site-footer {
+  background: var(--text-dark);
+  color: var(--white);
+  padding: 60px var(--space-3) 40px;
+}
+
+.footer-inner {
+  max-width: var(--content-max-width);
+  margin: 0 auto;
+  display: flex;
+  justify-content: space-between;
+  gap: var(--space-4);
+  flex-wrap: wrap;
+}
+
+.footer-left,
+.footer-right {
+  flex: 1 1 280px;
+}
+
+.footer-brand {
+  color: var(--red);
+  font-weight: 700;
+  font-size: 18px;
+  margin: 0 0 var(--space-2);
+}
+
+.footer-small {
+  color: var(--text-light);
+  margin: var(--space-2) 0 0;
+}
+
+.footer-link {
+  display: inline-block;
+  color: var(--text-light);
+  text-decoration: none;
+  margin-bottom: 14px;
+}
+
+.footer-link:hover,
+.footer-link:focus {
+  color: var(--white);
+}
+
+.footer-note {
+  max-width: var(--content-max-width);
+  margin: var(--space-3) auto 0;
+  border-top: 1px solid #333333;
+  padding-top: var(--space-3);
+  text-align: center;
+  color: #666666;
+  font-size: var(--font-size-small);
+}

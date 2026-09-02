@@ -1,0 +1,334 @@
+@import url("../resources/tokens.css");
+@import url("../resources/base.css");
+@import url("../resources/explorer/explorer.css");
+
+/*
+  Academic site layout and section styling. Register: restrained, findings-first.
+  Deliberately not using the policy/developer persuasion components (see
+  resources/base.css header comment and academic/CLAUDE.md).
+*/
+
+main {
+  max-width: var(--content-max-width);
+  margin: 0 auto;
+  padding: 0 var(--space-3);
+}
+
+section {
+  padding: var(--space-6) 0;
+  border-bottom: 1px solid var(--border-light);
+}
+
+section:last-of-type {
+  border-bottom: none;
+}
+
+section h2 {
+  font-size: var(--font-size-h2);
+  margin: 0 0 var(--space-3);
+}
+
+section h3 {
+  font-size: var(--font-size-h3);
+  margin: var(--space-4) 0 var(--space-1);
+}
+
+section > .section-intro {
+  color: var(--text-mid);
+  margin: 0 0 var(--space-4);
+}
+
+/* Hero */
+
+.hero {
+  padding: var(--space-6) 0 var(--space-5);
+  border-bottom: 1px solid var(--border-light);
+}
+
+.hero .eyebrow {
+  margin-bottom: var(--space-2);
+}
+
+.hero h1 {
+  font-size: var(--font-size-h1);
+  line-height: 1.15;
+  margin: 0 0 var(--space-2);
+}
+
+.hero .subtitle {
+  font-size: 20px;
+  color: var(--text-mid);
+  margin: 0 0 var(--space-3);
+}
+
+.hero .contribution {
+  font-size: 19px;
+  margin: 0 0 var(--space-3);
+  max-width: 720px;
+}
+
+.hero .byline {
+  color: var(--text-mid);
+  font-size: var(--font-size-small);
+  margin: 0 0 var(--space-4);
+}
+
+.hero .byline .sep {
+  margin: 0 8px;
+  color: var(--text-light);
+}
+
+.hero .date-line {
+  color: var(--text-light);
+  font-size: var(--font-size-small);
+  margin: -12px 0 var(--space-4);
+}
+
+.hero-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  margin-bottom: var(--space-5);
+}
+
+/* Multi-part figure exhibits. Side-by-side and 2x2 pairs reuse .figure-grid
+   (from resources/base.css); Figure 3's three full-width panels stack via
+   .figure-stack. Each subfigure is a plain <figure>/<figcaption> pair inside
+   the shared .figure-placeholder box, so resources/base.css's figure-block
+   img sizing rule (width 100%, height auto) still applies unmodified. */
+
+.figure-group-title {
+  font-weight: 600;
+  font-size: var(--font-size-small);
+  color: var(--text-dark);
+  margin: 0 0 var(--space-2);
+}
+
+.figure-sub {
+  margin: 0;
+}
+
+.figure-sub figcaption {
+  font-size: var(--font-size-small);
+  color: var(--text-light);
+  text-align: center;
+  margin-top: 6px;
+}
+
+.figure-stack .figure-sub {
+  margin-bottom: var(--space-3);
+}
+
+.figure-stack .figure-sub:last-child {
+  margin-bottom: 0;
+}
+
+/* Findings */
+
+.finding {
+  margin-bottom: var(--space-5);
+}
+
+.finding:last-child {
+  margin-bottom: 0;
+}
+
+.finding-number {
+  display: inline-block;
+  color: var(--red);
+  font-weight: 700;
+  font-size: var(--font-size-small);
+  margin-bottom: 6px;
+}
+
+.finding-figure-refs {
+  font-size: var(--font-size-small);
+  color: var(--text-light);
+  margin-top: var(--space-1);
+}
+
+.scope-note {
+  border-left: 3px solid var(--gray-300);
+  padding-left: var(--space-2);
+  color: var(--text-mid);
+  font-size: var(--font-size-small);
+  margin-top: var(--space-2);
+}
+
+/* What is new callout, restrained: a plain bordered list, not a shadowed card */
+
+.callout {
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-md);
+  padding: var(--space-3) var(--space-4);
+  margin-top: var(--space-4);
+}
+
+.callout h3 {
+  margin-top: 0;
+}
+
+.callout ul {
+  margin: 0;
+  padding-left: 1.1em;
+}
+
+.callout li {
+  margin-bottom: var(--space-2);
+}
+
+.callout li:last-child {
+  margin-bottom: 0;
+}
+
+/* Link row, model section */
+
+.link-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-1) var(--space-3);
+  font-size: var(--font-size-small);
+  color: var(--text-mid);
+  margin-top: var(--space-3);
+}
+
+/* Named result panel inside calibration */
+
+.named-result {
+  background: var(--gray-100);
+  border-radius: var(--radius-md);
+  padding: var(--space-3) var(--space-4);
+  margin-top: var(--space-4);
+}
+
+.named-result h3 {
+  margin-top: 0;
+}
+
+.validation-checks {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-3);
+  margin-top: var(--space-3);
+}
+
+@media (max-width: 640px) {
+  .validation-checks {
+    grid-template-columns: 1fr;
+  }
+}
+
+.validation-check {
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-sm);
+  padding: var(--space-2) var(--space-3);
+}
+
+.validation-check .stat {
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--text-dark);
+}
+
+.validation-check .stat-label {
+  font-size: var(--font-size-small);
+  color: var(--text-mid);
+}
+
+/* Resources */
+
+.resource-list {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 var(--space-4);
+}
+
+.resource-list li {
+  padding: 14px 0;
+  border-bottom: 1px solid var(--border-light);
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-2);
+}
+
+.resource-list li:last-child {
+  border-bottom: none;
+}
+
+.resource-list .resource-status {
+  font-size: var(--font-size-small);
+  color: var(--text-light);
+}
+
+.bibtex-block {
+  background: var(--gray-100);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-sm);
+  padding: var(--space-3);
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 13px;
+  line-height: 1.6;
+  overflow-x: auto;
+  white-space: pre;
+  margin: 0 0 var(--space-2);
+}
+
+.copy-button {
+  background: transparent;
+  border: 1px solid var(--gray-300);
+  border-radius: var(--radius-sm);
+  padding: 6px 14px;
+  font-size: var(--font-size-small);
+  color: var(--text-mid);
+  cursor: pointer;
+}
+
+.copy-button:hover,
+.copy-button:focus {
+  border-color: var(--red);
+  color: var(--red);
+}
+
+.replication-note {
+  color: var(--text-mid);
+  font-size: var(--font-size-small);
+  margin-top: var(--space-3);
+}
+
+.cross-links {
+  margin-top: var(--space-4);
+  padding-top: var(--space-3);
+  border-top: 1px solid var(--border-light);
+  font-size: var(--font-size-small);
+  display: flex;
+  gap: var(--space-4);
+  flex-wrap: wrap;
+}
+
+/* Authors */
+
+.authors-list {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 var(--space-4);
+}
+
+.authors-list li {
+  margin-bottom: var(--space-1);
+}
+
+.venue-list {
+  margin: 0 0 var(--space-4);
+  padding-left: 1.1em;
+}
+
+.venue-list li {
+  margin-bottom: 4px;
+}
+
+/* Explorer section wrapper */
+
+#explorer-root {
+  margin-top: var(--space-3);
+}
