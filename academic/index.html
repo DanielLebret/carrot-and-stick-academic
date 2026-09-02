@@ -315,33 +315,29 @@
           </label>
           <input type="range" id="incidence-alpha" min="0" max="57" step="1" value="30" />
         </div>
-        <p class="incidence-caveat">Approximate scale, pending exact conversion from the simulation grid.</p>
-        <p class="incidence-units-note" data-out="units-note">≈ 42,000 affordable units substituted</p>
+        <p class="incidence-caveat">
+          Approximate scale, pending exact conversion from the simulation grid.
+          <span data-out="units-note">≈ 42,000 affordable units substituted</span>
+        </p>
 
-        <div class="incidence-metric">
-          <p class="incidence-metric-label">Cost per affordable unit</p>
-          <div class="incidence-pair">
-            <div class="incidence-stat">
-              <div class="incidence-stat-value" data-out="cost-density">$59,070</div>
-              <div class="incidence-stat-label">Density incentive zoning</div>
-            </div>
-            <div class="incidence-stat">
-              <div class="incidence-stat-value" data-out="cost-fiscal">$61,760</div>
-              <div class="incidence-stat-label">Fiscal incentive zoning</div>
+        <!-- Reuses the main explorer's dot-legend pattern (resources/explorer/
+             explorer.css: .explorer-legend, .dot.affordable = red, .dot.market
+             = black) rather than introducing new styling. Here the colors map
+             to density/fiscal (matching the red/black convention already used
+             in the Figure 12 legend above), not affordable/market-rate units. -->
+        <div class="incidence-card">
+          <div class="incidence-row">
+            <div class="incidence-row-label">Cost per affordable unit</div>
+            <div class="explorer-legend">
+              <span><span class="dot affordable"></span>Density incentive zoning, <span data-out="cost-density">$59,070</span></span>
+              <span><span class="dot market"></span>Fiscal incentive zoning, <span data-out="cost-fiscal">$61,760</span></span>
             </div>
           </div>
-        </div>
-
-        <div class="incidence-metric">
-          <p class="incidence-metric-label">Share of cost borne by public sector</p>
-          <div class="incidence-pair">
-            <div class="incidence-stat">
-              <div class="incidence-stat-value" data-out="share-density">46%</div>
-              <div class="incidence-stat-label">Density incentive zoning</div>
-            </div>
-            <div class="incidence-stat">
-              <div class="incidence-stat-value" data-out="share-fiscal">89%</div>
-              <div class="incidence-stat-label">Fiscal incentive zoning</div>
+          <div class="incidence-row">
+            <div class="incidence-row-label">Share borne by public sector</div>
+            <div class="explorer-legend">
+              <span><span class="dot affordable"></span>Density incentive zoning, <span data-out="share-density">46%</span></span>
+              <span><span class="dot market"></span>Fiscal incentive zoning, <span data-out="share-fiscal">89%</span></span>
             </div>
           </div>
         </div>

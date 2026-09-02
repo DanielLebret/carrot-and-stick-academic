@@ -244,56 +244,37 @@ section > .section-intro {
   font-size: var(--font-size-small);
   color: var(--text-light);
   font-style: italic;
-  margin: 0 0 4px;
+  margin: 0 0 var(--space-2);
 }
 
-.incidence-units-note {
-  font-size: var(--font-size-small);
-  color: var(--text-light);
-  margin: 0 0 var(--space-3);
+/* One compact card, two label+dot-legend rows, replacing four separate
+   stat cards. .explorer-legend/.dot (resources/explorer/explorer.css)
+   supply the dot markers and inline layout; only the card shell and row
+   label are new here. */
+.incidence-card {
+  background: var(--white);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-md);
+  padding: var(--space-2) var(--space-3);
 }
 
-.incidence-metric {
-  margin-top: var(--space-3);
+.incidence-row {
+  padding: 6px 0;
+  border-bottom: 1px solid var(--border-light);
 }
 
-.incidence-metric-label {
+.incidence-row:last-child {
+  border-bottom: none;
+}
+
+.incidence-row-label {
   font-size: var(--font-size-small);
   font-weight: 600;
   color: var(--text-dark);
-  margin: 0 0 var(--space-1);
 }
 
-.incidence-pair {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: var(--space-2);
-}
-
-@media (max-width: 480px) {
-  .incidence-pair {
-    grid-template-columns: 1fr;
-  }
-}
-
-.incidence-stat {
-  background: var(--white);
-  border: 1px solid var(--border-light);
-  border-radius: var(--radius-sm);
-  padding: var(--space-2);
-}
-
-.incidence-stat-value {
-  font-size: 20px;
-  font-weight: 700;
-  color: var(--text-dark);
-  white-space: nowrap;
-}
-
-.incidence-stat-label {
-  font-size: var(--font-size-small);
-  color: var(--text-mid);
-  margin-top: 2px;
+.incidence-row .explorer-legend {
+  margin-top: 4px;
 }
 
 .scope-note {

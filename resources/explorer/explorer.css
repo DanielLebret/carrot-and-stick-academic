@@ -272,10 +272,15 @@
    the number itself reserves worst-case width (a signed 6-digit number with
    a comma, e.g. "-100,000"). Without this, a longer number squeezes into a
    flex item narrower than its content and wraps to a second line, changing
-   the card's height as slider values change. */
+   the card's height as slider values change.
+
+   Deliberately plain inline (not inline-flex): a flex container trims
+   trailing whitespace at the end of an anonymous text flex item, which
+   swallowed the space after "Affordable, " / "Density incentive zoning, "
+   before the number. Plain inline flow keeps the dot, label text, and
+   number in one formatting context, where that space is preserved; .dot's
+   vertical-align handles the icon alignment instead of align-items. */
 .explorer-legend > span {
-  display: inline-flex;
-  align-items: center;
   flex-shrink: 0;
   white-space: nowrap;
 }
@@ -292,6 +297,7 @@
   height: 9px;
   border-radius: 50%;
   margin-right: 5px;
+  vertical-align: middle;
 }
 
 .explorer-legend .dot.affordable {
