@@ -17,12 +17,72 @@
   Max's simulation output. See the PLACEHOLDER_GRID flag below and the on-page
   banner. When the real CSVs land in this folder with the same column headers,
   no code change is needed here; only the flag and banner copy should be updated.
+
+  Heatmap panels (top of the explorer, above the mode toggle): these are the
+  real paper figures (11a/b for Density Incentive Zoning, D10a/b for Fiscal
+  Incentive Zoning), not placeholders, read from config.figuresPath. Each is
+  a static 2400x1350 image with a marker overlaid at the current slider
+  position via a fixed pixel calibration (HEATMAP_CONFIG / Y_CALIBRATION
+  below), converted to percentages of image width/height so it tracks
+  correctly regardless of the image's rendered size. The mandate share (α),
+  density bonus (φ), and tax-exemption (τ) sliders are capped to match the
+  real plotted range in these figures (75%, 100%, 30 years) rather than the
+  narrower range of the placeholder DIZ/FIZ grid (40%, 60%, 25 years); the
+  net-units/rent-change readouts still clamp to the grid's actual support
+  (interpolate() below never extrapolates), so they hold flat past the
+  grid's edge until the real simulation grid lands.
 */
 
 (function (global) {
   "use strict";
 
   var PLACEHOLDER_GRID = true;
+
+  var IMG_WIDTH = 2400;
+  var IMG_HEIGHT = 1350;
+
+  // Shared y-axis (alpha, mandate share) calibration, identical across all
+  // four heatmap images. alpha is a fraction (0.25 = 25%); the calibration
+  // itself is expressed in percentage points because that's how the paper
+  // labeled the axis. Linear, extrapolated beyond the alpha=60% anchor for
+  // the slider's 75% max.
+  var Y_CALIBRATION = { alpha0Pct: 0, y0: 1130, alpha1Pct: 60, y1: 289 };
+
+  var ALPHA_UI_MAX = 0.75; // was 0.4 (placeholder grid's max); see explorer.js header comment
+  var PHI_UI_MAX = 1.0;    // was 0.6
+  var TAU_UI_MAX = 30;     // was 25
+
+  // axisMax must be in the same unit as the slider value it pairs with
+  // (phi is a 0-1 fraction, tau is already in years), so value/axisMax is a
+  // plain 0-1 ratio regardless of which unit is in play.
+  var HEATMAP_CONFIG = {
+    diz: {
+      axisMax: PHI_UI_MAX,
+      units: { file: "figure-11a-explorer-phi-units.png", x0: 294, x1: 1930 },
+      rent: { file: "figure-11b-explorer-phi-rent.png", x0: 292, x1: 1890 }
+    },
+    fiz: {
+      axisMax: TAU_UI_MAX,
+      units: { file: "figure-d10a-explorer-tau-units.png", x0: 294, x1: 1930 },
+      rent: { file: "figure-d10b-explorer-tau-rent.png", x0: 292, x1: 1890 }
+    }
+  };
+
+  function calibratedPixel(x0, x1, value, axisMax) {
+    return x0 + (value / axisMax) * (x1 - x0);
+  }
+
+  function alphaToYPercent(alpha) {
+    var alphaPct = alpha * 100;
+    var t = (alphaPct - Y_CALIBRATION.alpha0Pct) / (Y_CALIBRATION.alpha1Pct - Y_CALIBRATION.alpha0Pct);
+    var yPx = Y_CALIBRATION.y0 + t * (Y_CALIBRATION.y1 - Y_CALIBRATION.y0);
+    return (yPx / IMG_HEIGHT) * 100;
+  }
+
+  function xValueToXPercent(x0, x1, value, axisMax) {
+    var xPx = calibratedPixel(x0, x1, value, axisMax);
+    return (xPx / IMG_WIDTH) * 100;
+  }
 
   function parseCSV(text) {
     var lines = text.trim().split(/\r?\n/);
@@ -138,6 +198,7 @@
   function init(container, config) {
     config = config || {};
     var dataPath = config.dataPath || "./";
+    var figuresPath = config.figuresPath || "./";
     var labels = Object.assign({
       diz: "Density Incentive Zoning",
       fiz: "Fiscal Incentive Zoning",
@@ -154,6 +215,11 @@
 
     container.innerHTML =
       '<div class="explorer-banner" role="note">' + bannerText + "</div>" +
+      '<div class="explorer-heatmaps">' +
+      heatmapPanel("units", "Net new units") +
+      heatmapPanel("rent", "Average expected rent change") +
+      "</div>" +
+      '<p class="explorer-heatmap-caption" data-out="heatmap-caption">—</p>' +
       '<div class="explorer-modes" role="tablist" aria-label="Policy mode">' +
       '<button type="button" class="explorer-mode-btn" data-mode="diz" ' +
       'role="tab" aria-pressed="true">' + labels.diz + "</button>" +
@@ -205,16 +271,25 @@
         "</div>";
     }
 
+    function heatmapPanel(kind, label) {
+      return '<div class="explorer-heatmap">' +
+        '<img data-heatmap="' + kind + '" alt="' + label + ', by mandate share and policy instrument" />' +
+        '<div class="explorer-heatmap-marker" data-marker="' + kind + '">' +
+        '<span class="line-h"></span><span class="line-v"></span><span class="dot"></span>' +
+        "</div>" +
+        "</div>";
+    }
+
     var state = { mode: "diz", dizGrid: null, fizGrid: null };
 
     var modeButtons = container.querySelectorAll(".explorer-mode-btn");
     var dizFieldset = container.querySelector('[data-fieldset="diz"]');
     var fizFieldset = container.querySelector('[data-fieldset="fiz"]');
 
-    function setupSlider(id, axisVals, step) {
+    function setupSlider(id, axisVals, step, maxOverride) {
       var input = container.querySelector("#explorer-" + id);
       input.min = axisVals[0];
-      input.max = axisVals[axisVals.length - 1];
+      input.max = maxOverride != null ? maxOverride : axisVals[axisVals.length - 1];
       input.step = step;
       input.value = axisVals[0];
       return input;
@@ -229,21 +304,54 @@
       return Math.min.apply(null, diffs);
     }
 
+    function renderHeatmaps(alpha, xValue) {
+      var cfg = HEATMAP_CONFIG[state.mode];
+      var yPercent = alphaToYPercent(alpha);
+
+      ["units", "rent"].forEach(function (kind) {
+        var panelCfg = cfg[kind];
+        var img = container.querySelector('[data-heatmap="' + kind + '"]');
+        if (img.dataset.file !== panelCfg.file) {
+          img.src = figuresPath + panelCfg.file;
+          img.dataset.file = panelCfg.file;
+        }
+        var xPercent = xValueToXPercent(panelCfg.x0, panelCfg.x1, xValue, cfg.axisMax);
+        var marker = container.querySelector('[data-marker="' + kind + '"]');
+        marker.style.left = xPercent + "%";
+        marker.style.top = yPercent + "%";
+      });
+
+      var captionEl = container.querySelector('[data-out="heatmap-caption"]');
+      var alphaText = "α = " + Math.round(alpha * 100) + "%";
+      var xText = state.mode === "diz"
+        ? "φ = " + Math.round(xValue * 100) + "%"
+        : "τ = " + Math.round(xValue) + " years";
+      captionEl.textContent = alphaText + ", " + xText;
+    }
+
     function render() {
+      // switchMode("diz") below runs synchronously, before the CSV fetch
+      // resolves; skip until both grids are actually built (the fetch's own
+      // .then() calls render() again once they are).
+      if (!state.dizGrid || !state.fizGrid) return;
+
       var out;
+      var alpha, xValue;
       if (state.mode === "diz") {
-        var alpha = parseFloat(container.querySelector("#explorer-alpha-diz").value);
-        var phi = parseFloat(container.querySelector("#explorer-phi").value);
+        alpha = parseFloat(container.querySelector("#explorer-alpha-diz").value);
+        xValue = parseFloat(container.querySelector("#explorer-phi").value);
         container.querySelector("#explorer-alpha-diz-out").textContent = alpha.toFixed(2);
-        container.querySelector("#explorer-phi-out").textContent = phi.toFixed(2);
-        out = interpolate(state.dizGrid, alpha, phi);
+        container.querySelector("#explorer-phi-out").textContent = xValue.toFixed(2);
+        out = interpolate(state.dizGrid, alpha, xValue);
       } else {
-        var alpha2 = parseFloat(container.querySelector("#explorer-alpha-fiz").value);
-        var tau = parseFloat(container.querySelector("#explorer-tau").value);
-        container.querySelector("#explorer-alpha-fiz-out").textContent = alpha2.toFixed(2);
-        container.querySelector("#explorer-tau-out").textContent = tau.toFixed(0) + " yrs";
-        out = interpolate(state.fizGrid, alpha2, tau);
+        alpha = parseFloat(container.querySelector("#explorer-alpha-fiz").value);
+        xValue = parseFloat(container.querySelector("#explorer-tau").value);
+        container.querySelector("#explorer-alpha-fiz-out").textContent = alpha.toFixed(2);
+        container.querySelector("#explorer-tau-out").textContent = xValue.toFixed(0) + " yrs";
+        out = interpolate(state.fizGrid, alpha, xValue);
       }
+
+      renderHeatmaps(alpha, xValue);
 
       var netEl = container.querySelector('[data-out="net"]');
       netEl.textContent = fmtUnits(out.d_units_net);
@@ -290,10 +398,15 @@
       state.dizGrid = buildGrid(dizRows, "alpha", "phi", VALUE_KEYS);
       state.fizGrid = buildGrid(fizRows, "alpha", "tau", VALUE_KEYS);
 
-      var dizAlphaInput = setupSlider("alpha-diz", state.dizGrid.aVals, axisStep(state.dizGrid.aVals));
-      var phiInput = setupSlider("phi", state.dizGrid.bVals, axisStep(state.dizGrid.bVals));
-      var fizAlphaInput = setupSlider("alpha-fiz", state.fizGrid.aVals, axisStep(state.fizGrid.aVals));
-      var tauInput = setupSlider("tau", state.fizGrid.bVals, axisStep(state.fizGrid.bVals));
+      // Sliders are capped to ALPHA_UI_MAX/PHI_UI_MAX/TAU_UI_MAX (the real
+      // heatmap figures' plotted range), wider than the placeholder grid's
+      // own support (state.*Grid.aVals/bVals); interpolate() clamps to the
+      // grid's edge for anything past it, so the readouts hold flat rather
+      // than extrapolating.
+      var dizAlphaInput = setupSlider("alpha-diz", state.dizGrid.aVals, axisStep(state.dizGrid.aVals), ALPHA_UI_MAX);
+      var phiInput = setupSlider("phi", state.dizGrid.bVals, axisStep(state.dizGrid.bVals), PHI_UI_MAX);
+      var fizAlphaInput = setupSlider("alpha-fiz", state.fizGrid.aVals, axisStep(state.fizGrid.aVals), ALPHA_UI_MAX);
+      var tauInput = setupSlider("tau", state.fizGrid.bVals, axisStep(state.fizGrid.bVals), TAU_UI_MAX);
 
       // Start on an illustrative non-baseline point so the readouts are legible
       // immediately rather than showing an all-zero baseline on load.

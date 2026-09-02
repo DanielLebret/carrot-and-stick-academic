@@ -23,6 +23,84 @@
   margin-bottom: var(--space-3);
 }
 
+.explorer-heatmaps {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-3);
+  margin-bottom: var(--space-2);
+}
+
+@media (max-width: 640px) {
+  .explorer-heatmaps {
+    grid-template-columns: 1fr;
+  }
+}
+
+.explorer-heatmap {
+  position: relative;
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+  background: var(--white);
+  line-height: 0; /* no inline-image gap at the bottom of the box */
+}
+
+.explorer-heatmap img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+/* Positioned via left/top (%) in JS; zero-size anchor, children offset from
+   it so the crosshair and dot stay centered on the exact calibrated point
+   regardless of the image's rendered size. */
+.explorer-heatmap-marker {
+  position: absolute;
+  width: 0;
+  height: 0;
+  pointer-events: none;
+}
+
+.explorer-heatmap-marker .line-h,
+.explorer-heatmap-marker .line-v {
+  position: absolute;
+  background: rgba(255, 255, 255, 0.95);
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.35);
+}
+
+.explorer-heatmap-marker .line-h {
+  left: -13px;
+  top: -1px;
+  width: 26px;
+  height: 2px;
+}
+
+.explorer-heatmap-marker .line-v {
+  left: -1px;
+  top: -13px;
+  width: 2px;
+  height: 26px;
+}
+
+.explorer-heatmap-marker .dot {
+  position: absolute;
+  left: -5px;
+  top: -5px;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--red);
+  border: 2px solid var(--white);
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.4);
+}
+
+.explorer-heatmap-caption {
+  font-size: var(--font-size-small);
+  color: var(--text-mid);
+  text-align: center;
+  margin: 0 0 var(--space-4);
+}
+
 .explorer-modes {
   display: inline-flex;
   border: 1px solid var(--gray-300);

@@ -12,6 +12,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
   window.CarrotStickExplorer.init(root, {
     dataPath: "../resources/explorer/",
+    figuresPath: "../resources/figures/",
     leadReadout: "percent",
     bannerText: "Illustrative data, pending final simulation grid.",
     labels: {
