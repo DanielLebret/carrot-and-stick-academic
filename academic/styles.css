@@ -91,36 +91,44 @@ section > .section-intro {
   margin-bottom: var(--space-5);
 }
 
-/* Figures break out past the 860px text column: these are dense multi-panel
-   econometric charts with small tick labels and legends that need the room.
-   Body text stays at --content-max-width; only the figure containers widen,
-   centered on the page independent of <main>'s own centering. figure-grid
-   and figure-stack are always nested inside a figure-block, so widening
-   figure-block alone widens them too; giving all three the same rule would
-   just cancel out on the nested ones. */
+/* Figures are capped at the same --content-max-width as body text (860px)
+   and centered, same as <main>; they never exceed the text column. Explicit
+   max-width here (rather than relying only on inheriting <main>'s width)
+   means figure-block still can't overflow even if it's ever used somewhere
+   with a wider ancestor. figure-grid and figure-stack are always nested
+   inside a figure-block, so capping figure-block alone caps them too, but
+   both get the same explicit max-width for defense in depth. */
+
+.figure-block,
+.figure-grid,
+.figure-stack {
+  max-width: var(--content-max-width);
+}
 
 .figure-block {
-  width: calc(100vw - 64px); /* 64px = 2 x --space-4, a gutter on each side */
-  max-width: 1160px;
-  margin-left: 50%;
-  transform: translateX(-50%);
+  margin-left: auto;
+  margin-right: auto;
 }
 
-@media (max-width: 640px) {
-  .figure-block {
-    width: 100%;
-    max-width: 100%;
-    margin-left: 0;
-    transform: none;
-  }
+/* Belt and suspenders on top of resources/base.css's `.figure-block img {
+   width: 100% }`: an image can never render wider than its immediate
+   container regardless of the image's own intrinsic pixel dimensions. */
+.figure-block img {
+  max-width: 100%;
 }
 
-/* Adjacent figures (e.g. Figure 6 -> Figure 12 in Finding 3, Figure 1 ->
-   Figure 2 in Calibration) collapse to the smaller of their two margins by
-   default (32px). Widen the gap between stacked figures so each one reads
-   as its own exhibit. */
+/* Adjacent figures (e.g. Figure 1 -> Figure 2 in Calibration) collapse to
+   the smaller of their two margins by default (32px). Widen the gap between
+   stacked figures so each one reads as its own exhibit. */
 .figure-block + .figure-block {
   margin-top: var(--space-6);
+}
+
+/* Figure 12 sits right after Figure 6 in Finding 3; the general adjacent-
+   figure gap above wasn't enough separation between two full exhibits here,
+   so it gets its own larger, dedicated gap. */
+#figure-12 {
+  margin-top: var(--space-7);
 }
 
 /* A loaded figure image sits in a plain box: no border, background, or
