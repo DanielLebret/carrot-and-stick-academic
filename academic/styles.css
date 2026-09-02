@@ -202,6 +202,100 @@ section > .section-intro {
   margin-top: var(--space-1);
 }
 
+/* Explore the incidence: a compact companion widget after Figure 12
+   (Finding 3), not the shared policy explorer. One slider, no mode toggle,
+   numbers only, deliberately simpler than resources/explorer/. */
+
+.incidence-widget {
+  margin-top: var(--space-4);
+  padding: var(--space-3) var(--space-4);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-md);
+  background: var(--gray-100);
+}
+
+.incidence-widget h3 {
+  margin-top: 0;
+}
+
+.incidence-slider-row {
+  margin-bottom: var(--space-2);
+}
+
+.incidence-slider-row label {
+  display: flex;
+  justify-content: space-between;
+  font-size: var(--font-size-small);
+  color: var(--text-mid);
+  margin-bottom: 6px;
+}
+
+.incidence-slider-row output {
+  font-weight: 600;
+  color: var(--text-dark);
+}
+
+.incidence-slider-row input[type="range"] {
+  width: 100%;
+  accent-color: var(--red);
+}
+
+.incidence-caveat {
+  font-size: var(--font-size-small);
+  color: var(--text-light);
+  font-style: italic;
+  margin: 0 0 4px;
+}
+
+.incidence-units-note {
+  font-size: var(--font-size-small);
+  color: var(--text-light);
+  margin: 0 0 var(--space-3);
+}
+
+.incidence-metric {
+  margin-top: var(--space-3);
+}
+
+.incidence-metric-label {
+  font-size: var(--font-size-small);
+  font-weight: 600;
+  color: var(--text-dark);
+  margin: 0 0 var(--space-1);
+}
+
+.incidence-pair {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-2);
+}
+
+@media (max-width: 480px) {
+  .incidence-pair {
+    grid-template-columns: 1fr;
+  }
+}
+
+.incidence-stat {
+  background: var(--white);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-sm);
+  padding: var(--space-2);
+}
+
+.incidence-stat-value {
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--text-dark);
+  white-space: nowrap;
+}
+
+.incidence-stat-label {
+  font-size: var(--font-size-small);
+  color: var(--text-mid);
+  margin-top: 2px;
+}
+
 .scope-note {
   border-left: 3px solid var(--gray-300);
   padding-left: var(--space-2);

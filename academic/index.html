@@ -306,6 +306,46 @@
           incidence, by paired instrument.
         </p>
       </div>
+
+      <div class="incidence-widget">
+        <h3>Explore the incidence</h3>
+        <div class="incidence-slider-row">
+          <label for="incidence-alpha">Affordability mandate (α)
+            <output id="incidence-alpha-out">30%</output>
+          </label>
+          <input type="range" id="incidence-alpha" min="0" max="57" step="1" value="30" />
+        </div>
+        <p class="incidence-caveat">Approximate scale, pending exact conversion from the simulation grid.</p>
+        <p class="incidence-units-note" data-out="units-note">≈ 42,000 affordable units substituted</p>
+
+        <div class="incidence-metric">
+          <p class="incidence-metric-label">Cost per affordable unit</p>
+          <div class="incidence-pair">
+            <div class="incidence-stat">
+              <div class="incidence-stat-value" data-out="cost-density">$59,070</div>
+              <div class="incidence-stat-label">Density incentive zoning</div>
+            </div>
+            <div class="incidence-stat">
+              <div class="incidence-stat-value" data-out="cost-fiscal">$61,760</div>
+              <div class="incidence-stat-label">Fiscal incentive zoning</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="incidence-metric">
+          <p class="incidence-metric-label">Share of cost borne by public sector</p>
+          <div class="incidence-pair">
+            <div class="incidence-stat">
+              <div class="incidence-stat-value" data-out="share-density">46%</div>
+              <div class="incidence-stat-label">Density incentive zoning</div>
+            </div>
+            <div class="incidence-stat">
+              <div class="incidence-stat-value" data-out="share-fiscal">89%</div>
+              <div class="incidence-stat-label">Fiscal incentive zoning</div>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   </section>
 
@@ -682,6 +722,62 @@
         setTimeout(function () { btn.textContent = original; }, 1500);
       });
     });
+  })();
+
+  // Explore the incidence (Finding 3 companion widget, after Figure 12).
+  // One slider driving four numbers: cost per affordable unit (density and
+  // fiscal, linearly interpolated between two reported anchors each) and
+  // the public-sector cost share (flat for both, not slider-dependent in
+  // the source data). Deliberately no chart: a direct side-by-side number
+  // comparison, matching how Figure 12's own Panels B and C already plot
+  // density vs. fiscal on one axis.
+  (function () {
+    var slider = document.getElementById("incidence-alpha");
+    if (!slider) return;
+
+    var ALPHA_MAX = 57; // %, an approximation; see the caveat note in the markup
+    var UNITS_AT_30PCT = 42000; // Finding 3: "a 30% mandate yields roughly 42,000 affordable units"
+
+    // Anchors are [value at alpha=0%, value at alpha=ALPHA_MAX%].
+    var COST_DENSITY = [57750, 60250];
+    var COST_FISCAL = [61500, 62000];
+    var SHARE_DENSITY = 46;
+    var SHARE_FISCAL = 89;
+
+    function lerp(anchors, t) {
+      return anchors[0] + (anchors[1] - anchors[0]) * t;
+    }
+
+    // Rounded to the nearest $10: these are interpolated approximations,
+    // not the model's exact output, so dollar-level precision would be
+    // misleading.
+    function fmtDollar(n) {
+      return "$" + (Math.round(n / 10) * 10).toLocaleString("en-US");
+    }
+
+    var out = document.getElementById("incidence-alpha-out");
+    var costDensityEl = document.querySelector('[data-out="cost-density"]');
+    var costFiscalEl = document.querySelector('[data-out="cost-fiscal"]');
+    var shareDensityEl = document.querySelector('[data-out="share-density"]');
+    var shareFiscalEl = document.querySelector('[data-out="share-fiscal"]');
+    var unitsNoteEl = document.querySelector('[data-out="units-note"]');
+
+    function render() {
+      var alphaPct = parseFloat(slider.value);
+      var t = alphaPct / ALPHA_MAX;
+
+      out.textContent = alphaPct.toFixed(0) + "%";
+      costDensityEl.textContent = fmtDollar(lerp(COST_DENSITY, t));
+      costFiscalEl.textContent = fmtDollar(lerp(COST_FISCAL, t));
+      shareDensityEl.textContent = SHARE_DENSITY + "%";
+      shareFiscalEl.textContent = SHARE_FISCAL + "%";
+
+      var units = Math.round((alphaPct / 30 * UNITS_AT_30PCT) / 500) * 500;
+      unitsNoteEl.textContent = "≈ " + units.toLocaleString("en-US") + " affordable units substituted";
+    }
+
+    slider.addEventListener("input", render);
+    render();
   })();
 </script>
 <script src="../resources/explorer/explorer.js"></script>
