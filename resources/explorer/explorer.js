@@ -215,26 +215,29 @@
 
     container.innerHTML =
       '<div class="explorer-banner" role="note">' + bannerText + "</div>" +
-      '<div class="explorer-heatmaps">' +
-      heatmapPanel("units", "Net new units") +
-      heatmapPanel("rent", "Average expected rent change") +
-      "</div>" +
-      '<p class="explorer-heatmap-caption" data-out="heatmap-caption">—</p>' +
       '<div class="explorer-modes" role="tablist" aria-label="Policy mode">' +
       '<button type="button" class="explorer-mode-btn" data-mode="diz" ' +
       'role="tab" aria-pressed="true">' + labels.diz + "</button>" +
       '<button type="button" class="explorer-mode-btn" data-mode="fiz" ' +
       'role="tab" aria-pressed="false">' + labels.fiz + "</button>" +
       "</div>" +
+      '<div class="explorer-heatmaps">' +
+      heatmapPanel("units", "Net new units") +
+      heatmapPanel("rent", "Average expected rent change") +
+      "</div>" +
+      '<p class="explorer-heatmap-caption" data-out="heatmap-caption">—</p>' +
       '<div class="explorer-body">' +
       '<div class="explorer-controls">' +
       '<fieldset data-fieldset="diz">' +
-      '<legend>' + labels.diz + '</legend>' +
+      /* The mode toggle above already shows which mode is active; the
+         legend stays for screen readers (fieldset semantics) without
+         repeating the heading visually. */
+      '<legend class="sr-only">' + labels.diz + '</legend>' +
       sliderRow("alpha-diz", labels.alpha) +
       sliderRow("phi", labels.phi) +
       "</fieldset>" +
       '<fieldset data-fieldset="fiz" hidden>' +
-      '<legend>' + labels.fiz + '</legend>' +
+      '<legend class="sr-only">' + labels.fiz + '</legend>' +
       sliderRow("alpha-fiz", labels.alpha) +
       sliderRow("tau", labels.tau) +
       "</fieldset>" +

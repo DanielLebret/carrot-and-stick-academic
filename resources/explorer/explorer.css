@@ -155,6 +155,20 @@
   padding: 0;
 }
 
+/* Visually hidden but still announced by screen readers: the mode toggle
+   above already shows Density/Fiscal Incentive Zoning, so the fieldset
+   legend (kept for its accessible-name semantics) shouldn't repeat it on
+   screen. */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
 .explorer-slider-row {
   margin-bottom: var(--space-3);
 }
@@ -203,6 +217,11 @@
   font-weight: 700;
   color: var(--text-dark);
   line-height: 1.2;
+  white-space: nowrap;
+  /* Reserve width for the largest plausible value (a signed 6-digit number
+     with a thousands comma, e.g. "-100,000") so the card's width doesn't
+     shift as slider values change length. */
+  min-width: 8ch;
 }
 
 .explorer-readout-value.positive {
@@ -242,10 +261,29 @@
 
 .explorer-legend {
   display: flex;
+  flex-wrap: nowrap;
   gap: var(--space-3);
   font-size: var(--font-size-small);
   color: var(--text-mid);
   margin-top: 6px;
+}
+
+/* Each "[dot] Affordable, N" item never shrinks or wraps its own text, and
+   the number itself reserves worst-case width (a signed 6-digit number with
+   a comma, e.g. "-100,000"). Without this, a longer number squeezes into a
+   flex item narrower than its content and wraps to a second line, changing
+   the card's height as slider values change. */
+.explorer-legend > span {
+  display: inline-flex;
+  align-items: center;
+  flex-shrink: 0;
+  white-space: nowrap;
+}
+
+.explorer-legend [data-out="affordable-num"],
+.explorer-legend [data-out="market-num"] {
+  display: inline-block;
+  min-width: 8ch;
 }
 
 .explorer-legend .dot {
