@@ -115,6 +115,14 @@ section > .section-intro {
   }
 }
 
+/* Adjacent figures (e.g. Figure 6 -> Figure 12 in Finding 3, Figure 1 ->
+   Figure 2 in Calibration) collapse to the smaller of their two margins by
+   default (32px). Widen the gap between stacked figures so each one reads
+   as its own exhibit. */
+.figure-block + .figure-block {
+  margin-top: var(--space-6);
+}
+
 /* A loaded figure image sits in a plain box: no border, background, or
    min-height, so it renders edge to edge at full width. handleFigureImgError
    (index.html, in <head>) adds .figure-placeholder (resources/base.css:
@@ -220,15 +228,33 @@ section > .section-intro {
   margin-bottom: 0;
 }
 
-/* Link row, model section */
+/* Section-reference row (model-in-brief): pointers to where a topic is
+   covered in the paper ("see Section X"), not links to anything on this
+   page. The top border, italics, and light color set it apart as a citation
+   line rather than body text or an unexplained row of fragments. */
 
-.link-row {
+.section-refs {
   display: flex;
   flex-wrap: wrap;
-  gap: var(--space-1) var(--space-3);
-  font-size: var(--font-size-small);
-  color: var(--text-mid);
+  align-items: baseline;
+  gap: var(--space-1) 10px;
   margin-top: var(--space-3);
+  padding-top: var(--space-2);
+  border-top: 1px solid var(--border-light);
+  font-size: var(--font-size-small);
+  font-style: italic;
+  color: var(--text-light);
+}
+
+.section-refs-label {
+  font-style: normal;
+  font-weight: 600;
+  color: var(--text-mid);
+}
+
+.section-refs .sep {
+  font-style: normal;
+  color: var(--gray-300);
 }
 
 /* Named result panel inside calibration */
