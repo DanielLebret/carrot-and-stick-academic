@@ -8,12 +8,17 @@
 <link rel="stylesheet" href="styles.css" />
 <script>
   // Defined in <head>, ahead of any <img> in the body, so it exists before a
-  // same-origin 404 on a not-yet-exported figure can fire onerror. Swaps a
-  // failed figure image for a text label inside the same .figure-placeholder
-  // box (base.css), matching the dashed-border look used everywhere a figure
-  // hasn't been wired up yet. Once the real PNG lands in resources/figures/,
-  // it loads normally and this never runs for that figure.
+  // same-origin 404 on a not-yet-exported figure can fire onerror. The
+  // wrapping div is a plain .figure-media box by default (no border, no
+  // background) so a loaded image renders edge to edge. On failure, this
+  // adds .figure-placeholder to that wrapper (base.css: dashed border, gray
+  // fill, min-height) and swaps the image for a centered text label, so a
+  // missing figure looks the same as one that was never wired up. Once the
+  // real PNG lands in resources/figures/, it loads normally and this never
+  // runs for that figure.
   function handleFigureImgError(img) {
+    var wrapper = img.parentElement;
+    if (wrapper) wrapper.classList.add("figure-placeholder");
     var span = document.createElement("span");
     span.textContent = img.alt;
     img.replaceWith(span);
@@ -68,7 +73,7 @@
     </div>
 
     <div class="figure-block">
-      <div class="figure-placeholder">
+      <div class="figure-media">
         <img src="../resources/figures/figure-09-rent-decomposition.png" alt="Figure 9. Counterfactual results, expected rents (four-component decomposition). Pending final export." onerror="handleFigureImgError(this)" />
       </div>
       <p class="figure-caption">
@@ -191,19 +196,19 @@
         <p class="figure-group-title">Figure 3. Effects of policy instruments on property value and development probability.</p>
         <div class="figure-stack">
           <figure class="figure-sub">
-            <div class="figure-placeholder">
+            <div class="figure-media">
               <img src="../resources/figures/figure-03a-policy-instrument-alpha.png" alt="Figure 3a. Mandatory share for affordable housing, alpha. Pending final export." onerror="handleFigureImgError(this)" />
             </div>
             <figcaption>(a) Mandatory share for affordable housing (&alpha;)</figcaption>
           </figure>
           <figure class="figure-sub">
-            <div class="figure-placeholder">
+            <div class="figure-media">
               <img src="../resources/figures/figure-03b-policy-instrument-phi.png" alt="Figure 3b. Density bonuses, phi. Pending final export." onerror="handleFigureImgError(this)" />
             </div>
             <figcaption>(b) Density bonuses (&phi;)</figcaption>
           </figure>
           <figure class="figure-sub">
-            <div class="figure-placeholder">
+            <div class="figure-media">
               <img src="../resources/figures/figure-03c-policy-instrument-tau.png" alt="Figure 3c. Length of tax exemptions, tau. Pending final export." onerror="handleFigureImgError(this)" />
             </div>
             <figcaption>(c) Length of tax exemptions (&tau;)</figcaption>
@@ -262,7 +267,7 @@
         almost all of it on the public sector.
       </p>
       <div class="figure-block">
-        <div class="figure-placeholder">
+        <div class="figure-media">
           <img src="../resources/figures/figure-06-production-counterfactuals.png" alt="Figure 6. Housing production counterfactuals: affordable vs. market-rate scatter. Pending final export." onerror="handleFigureImgError(this)" />
         </div>
         <p class="figure-caption">Affordable and market-rate production under each counterfactual policy. Only the combined incentive policy expands both.</p>
@@ -271,25 +276,25 @@
         <p class="figure-group-title">Figure 12. Cost of mandated affordable housing.</p>
         <div class="figure-grid">
           <figure class="figure-sub">
-            <div class="figure-placeholder">
+            <div class="figure-media">
               <img src="../resources/figures/figure-12a-required-incentives.png" alt="Figure 12a. Required incentives. Pending final export." onerror="handleFigureImgError(this)" />
             </div>
             <figcaption>(a) Required incentives</figcaption>
           </figure>
           <figure class="figure-sub">
-            <div class="figure-placeholder">
+            <div class="figure-media">
               <img src="../resources/figures/figure-12b-cost-per-unit.png" alt="Figure 12b. Cost per unit. Pending final export." onerror="handleFigureImgError(this)" />
             </div>
             <figcaption>(b) Cost per unit</figcaption>
           </figure>
           <figure class="figure-sub">
-            <div class="figure-placeholder">
+            <div class="figure-media">
               <img src="../resources/figures/figure-12c-public-share.png" alt="Figure 12c. Share borne by public sector. Pending final export." onerror="handleFigureImgError(this)" />
             </div>
             <figcaption>(c) Share borne by public sector</figcaption>
           </figure>
           <figure class="figure-sub">
-            <div class="figure-placeholder">
+            <div class="figure-media">
               <img src="../resources/figures/figure-12d-rent-quintiles.png" alt="Figure 12d. Share of units in rent quintiles. Pending final export." onerror="handleFigureImgError(this)" />
             </div>
             <figcaption>(d) Share of units in rent quintiles</figcaption>
@@ -370,13 +375,13 @@
       <p class="figure-group-title">Figure 1. Permits by unused density and building age.</p>
       <div class="figure-grid">
         <figure class="figure-sub">
-          <div class="figure-placeholder">
+          <div class="figure-media">
             <img src="../resources/figures/figure-01a-permits-unused-density.png" alt="Figure 1a. Unused density. Pending final export." onerror="handleFigureImgError(this)" />
           </div>
           <figcaption>(a) Unused density</figcaption>
         </figure>
         <figure class="figure-sub">
-          <div class="figure-placeholder">
+          <div class="figure-media">
             <img src="../resources/figures/figure-01b-permits-building-age.png" alt="Figure 1b. Building age. Pending final export." onerror="handleFigureImgError(this)" />
           </div>
           <figcaption>(b) Building age</figcaption>
@@ -389,13 +394,13 @@
       <p class="figure-group-title">Figure 2. Permits and rent dynamics.</p>
       <div class="figure-grid">
         <figure class="figure-sub">
-          <div class="figure-placeholder">
+          <div class="figure-media">
             <img src="../resources/figures/figure-02a-rent-vs-permits.png" alt="Figure 2a. Residential rents. Pending final export." onerror="handleFigureImgError(this)" />
           </div>
           <figcaption>(a) Residential rents</figcaption>
         </figure>
         <figure class="figure-sub">
-          <div class="figure-placeholder">
+          <div class="figure-media">
             <img src="../resources/figures/figure-02b-rent-growth-vs-permits.png" alt="Figure 2b. Expected rent growth. Pending final export." onerror="handleFigureImgError(this)" />
           </div>
           <figcaption>(b) Expected rent growth</figcaption>
@@ -439,13 +444,13 @@
         <p class="figure-group-title">Figure 4. Local effects of a nearby building completion on supply and rents.</p>
         <div class="figure-grid">
           <figure class="figure-sub">
-            <div class="figure-placeholder">
+            <div class="figure-media">
               <img src="../resources/figures/figure-04a-local-supply-effect.png" alt="Figure 4a. Change in neighboring supply. Pending final export." onerror="handleFigureImgError(this)" />
             </div>
             <figcaption>(a) Change in neighboring supply</figcaption>
           </figure>
           <figure class="figure-sub">
-            <div class="figure-placeholder">
+            <div class="figure-media">
               <img src="../resources/figures/figure-04b-local-rent-effect.png" alt="Figure 4b. Change in rents. Pending final export." onerror="handleFigureImgError(this)" />
             </div>
             <figcaption>(b) Change in rents</figcaption>
@@ -470,13 +475,13 @@
       <p class="figure-group-title">Figure 5. Model validation.</p>
       <div class="figure-grid">
         <figure class="figure-sub">
-          <div class="figure-placeholder">
+          <div class="figure-media">
             <img src="../resources/figures/figure-05a-model-fit-value.png" alt="Figure 5a. Real estate value. Pending final export." onerror="handleFigureImgError(this)" />
           </div>
           <figcaption>(a) Real estate value</figcaption>
         </figure>
         <figure class="figure-sub">
-          <div class="figure-placeholder">
+          <div class="figure-media">
             <img src="../resources/figures/figure-05b-model-fit-construction.png" alt="Figure 5b. Construction activity. Pending final export." onerror="handleFigureImgError(this)" />
           </div>
           <figcaption>(b) Construction activity</figcaption>
@@ -521,7 +526,7 @@
       statement about redevelopment-driven markets, not about every city.
     </p>
     <div class="figure-block">
-      <div class="figure-placeholder">
+      <div class="figure-media">
         <img src="../resources/figures/figure-10-demand-elasticity.png" alt="Figure 10. Citywide demand elasticity and average expected rents. Pending final export." onerror="handleFigureImgError(this)" />
       </div>
       <p class="figure-caption">Average expected rent response across the credible range of citywide demand elasticities.</p>

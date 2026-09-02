@@ -91,11 +91,43 @@ section > .section-intro {
   margin-bottom: var(--space-5);
 }
 
+/* Figures break out past the 860px text column: these are dense multi-panel
+   econometric charts with small tick labels and legends that need the room.
+   Body text stays at --content-max-width; only the figure containers widen,
+   centered on the page independent of <main>'s own centering. figure-grid
+   and figure-stack are always nested inside a figure-block, so widening
+   figure-block alone widens them too; giving all three the same rule would
+   just cancel out on the nested ones. */
+
+.figure-block {
+  width: calc(100vw - 64px); /* 64px = 2 x --space-4, a gutter on each side */
+  max-width: 1160px;
+  margin-left: 50%;
+  transform: translateX(-50%);
+}
+
+@media (max-width: 640px) {
+  .figure-block {
+    width: 100%;
+    max-width: 100%;
+    margin-left: 0;
+    transform: none;
+  }
+}
+
+/* A loaded figure image sits in a plain box: no border, background, or
+   min-height, so it renders edge to edge at full width. handleFigureImgError
+   (index.html, in <head>) adds .figure-placeholder (resources/base.css:
+   dashed border, gray fill, centered label) to this same element only when
+   the image actually fails to load, so a missing figure looks like one that
+   was never wired up, and a loaded one looks like nothing extra is there. */
+.figure-media {
+}
+
 /* Multi-part figure exhibits. Side-by-side and 2x2 pairs reuse .figure-grid
    (from resources/base.css); Figure 3's three full-width panels stack via
    .figure-stack. Each subfigure is a plain <figure>/<figcaption> pair inside
-   the shared .figure-placeholder box, so resources/base.css's figure-block
-   img sizing rule (width 100%, height auto) still applies unmodified. */
+   its own .figure-media box. */
 
 .figure-group-title {
   font-weight: 600;
@@ -133,12 +165,19 @@ section > .section-intro {
   margin-bottom: 0;
 }
 
+/* Larger and bolder than .eyebrow (13px, tracked-out caps, used once in the
+   hero): these read as section markers introducing each finding, not as a
+   repeated all-caps label pattern. */
 .finding-number {
-  display: inline-block;
+  display: block;
   color: var(--red);
-  font-weight: 700;
-  font-size: var(--font-size-small);
-  margin-bottom: 6px;
+  font-weight: 800;
+  font-size: 26px;
+  margin: 0 0 4px;
+}
+
+.finding h3 {
+  margin-top: 0;
 }
 
 .finding-figure-refs {
