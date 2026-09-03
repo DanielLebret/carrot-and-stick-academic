@@ -240,10 +240,9 @@ section > .section-intro {
   accent-color: var(--red);
 }
 
-.incidence-caveat {
+.incidence-note {
   font-size: var(--font-size-small);
   color: var(--text-light);
-  font-style: italic;
   margin: 0 0 var(--space-2);
 }
 

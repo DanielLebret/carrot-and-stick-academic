@@ -14,7 +14,6 @@ document.addEventListener("DOMContentLoaded", function () {
     dataPath: "../resources/explorer/",
     figuresPath: "../resources/figures/",
     leadReadout: "percent",
-    bannerText: "Illustrative data, pending final simulation grid.",
     labels: {
       diz: "Density Incentive Zoning",
       fiz: "Fiscal Incentive Zoning",

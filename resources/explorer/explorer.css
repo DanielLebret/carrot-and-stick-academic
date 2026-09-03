@@ -23,6 +23,14 @@
   margin-bottom: var(--space-3);
 }
 
+/* Shown only on a data-load error (explorer.js sets hidden = false in its
+   fetch .catch); the class's own display:flex above would otherwise beat
+   the [hidden] attribute's display:none, since both are equal specificity
+   and this rule comes first in source order. */
+.explorer-banner[hidden] {
+  display: none;
+}
+
 .explorer-heatmaps {
   display: grid;
   grid-template-columns: 1fr 1fr;

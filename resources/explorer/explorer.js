@@ -13,30 +13,24 @@
   All d_* values are deltas versus the no-policy baseline (alpha=0, phi=0, tau=0),
   which is 0 net units and 0% rent change by construction.
 
-  STATUS: the CSVs currently shipped are an illustrative placeholder grid, not
-  Max's simulation output. See the PLACEHOLDER_GRID flag below and the on-page
-  banner. When the real CSVs land in this folder with the same column headers,
-  no code change is needed here; only the flag and banner copy should be updated.
+  STATUS: real simulation output from Max, as of 2026-09-03, replacing the
+  earlier illustrative placeholder grid. Alpha/phi/tau now natively cover the
+  same 0-75%/0-100%/0-30yr range as the heatmap figures below (see
+  ALPHA_UI_MAX etc.), so the slider caps and the interpolate() clamp are no
+  longer masking any gap between the grid and the sliders; they're kept as
+  defensive floors in case a future grid update is narrower again.
 
   Heatmap panels (top of the explorer, above the mode toggle): these are the
   real paper figures (11a/b for Density Incentive Zoning, D10a/b for Fiscal
-  Incentive Zoning), not placeholders, read from config.figuresPath. Each is
-  a static 2400x1350 image with a marker overlaid at the current slider
-  position via a fixed pixel calibration (HEATMAP_CONFIG / Y_CALIBRATION
-  below), converted to percentages of image width/height so it tracks
-  correctly regardless of the image's rendered size. The mandate share (α),
-  density bonus (φ), and tax-exemption (τ) sliders are capped to match the
-  real plotted range in these figures (75%, 100%, 30 years) rather than the
-  narrower range of the placeholder DIZ/FIZ grid (40%, 60%, 25 years); the
-  net-units/rent-change readouts still clamp to the grid's actual support
-  (interpolate() below never extrapolates), so they hold flat past the
-  grid's edge until the real simulation grid lands.
+  Incentive Zoning), read from config.figuresPath. Each is a static
+  2400x1350 image with a marker overlaid at the current slider position via
+  a fixed pixel calibration (HEATMAP_CONFIG / Y_CALIBRATION below),
+  converted to percentages of image width/height so it tracks correctly
+  regardless of the image's rendered size.
 */
 
 (function (global) {
   "use strict";
-
-  var PLACEHOLDER_GRID = true;
 
   var IMG_WIDTH = 2400;
   var IMG_HEIGHT = 1350;
@@ -210,11 +204,11 @@
       whoPays: "Public / landowner cost split"
     }, config.labels || {});
     var leadReadout = config.leadReadout || "percent"; // 'percent' | 'whoPays'
-    var bannerText = config.bannerText ||
-      "Illustrative data, pending final simulation grid.";
 
     container.innerHTML =
-      '<div class="explorer-banner" role="note">' + bannerText + "</div>" +
+      /* Hidden unless a data-load error occurs (see the fetch .catch below);
+         no default "illustrative data" text now that real data backs this. */
+      '<div class="explorer-banner" role="note" hidden></div>' +
       '<div class="explorer-modes" role="tablist" aria-label="Policy mode">' +
       '<button type="button" class="explorer-mode-btn" data-mode="diz" ' +
       'role="tab" aria-pressed="true">' + labels.diz + "</button>" +
@@ -401,11 +395,11 @@
       state.dizGrid = buildGrid(dizRows, "alpha", "phi", VALUE_KEYS);
       state.fizGrid = buildGrid(fizRows, "alpha", "tau", VALUE_KEYS);
 
-      // Sliders are capped to ALPHA_UI_MAX/PHI_UI_MAX/TAU_UI_MAX (the real
-      // heatmap figures' plotted range), wider than the placeholder grid's
-      // own support (state.*Grid.aVals/bVals); interpolate() clamps to the
-      // grid's edge for anything past it, so the readouts hold flat rather
-      // than extrapolating.
+      // Sliders are capped to ALPHA_UI_MAX/PHI_UI_MAX/TAU_UI_MAX, matching
+      // the heatmap figures' plotted range; the real grid now covers that
+      // same range natively (state.*Grid.aVals/bVals), so this cap and
+      // interpolate()'s own clamp-to-grid-edge are just defensive floors,
+      // not live constraints, unless a future grid update is narrower.
       var dizAlphaInput = setupSlider("alpha-diz", state.dizGrid.aVals, axisStep(state.dizGrid.aVals), ALPHA_UI_MAX);
       var phiInput = setupSlider("phi", state.dizGrid.bVals, axisStep(state.dizGrid.bVals), PHI_UI_MAX);
       var fizAlphaInput = setupSlider("alpha-fiz", state.fizGrid.aVals, axisStep(state.fizGrid.aVals), ALPHA_UI_MAX);
@@ -424,7 +418,9 @@
 
       render();
     }).catch(function (err) {
-      container.querySelector(".explorer-banner").textContent =
+      var banner = container.querySelector(".explorer-banner");
+      banner.hidden = false;
+      banner.textContent =
         "Explorer data failed to load (" + err.message + "). If you opened this " +
         "file directly, serve the site over http:// instead of file:// so the " +
         "CSV grids can be fetched.";
@@ -434,7 +430,6 @@
   }
 
   global.CarrotStickExplorer = {
-    init: init,
-    PLACEHOLDER_GRID: PLACEHOLDER_GRID
+    init: init
   };
 })(window);

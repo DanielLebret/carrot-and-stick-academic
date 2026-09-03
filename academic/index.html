@@ -313,11 +313,10 @@
           <label for="incidence-alpha">Affordability mandate (α)
             <output id="incidence-alpha-out">30%</output>
           </label>
-          <input type="range" id="incidence-alpha" min="0" max="57" step="1" value="30" />
+          <input type="range" id="incidence-alpha" min="0" max="50" step="1" value="30" />
         </div>
-        <p class="incidence-caveat">
-          Approximate scale, pending exact conversion from the simulation grid.
-          <span data-out="units-note">≈ 42,000 affordable units substituted</span>
+        <p class="incidence-note">
+          <span data-out="units-note">≈ 48,125 affordable units substituted</span>
         </p>
 
         <!-- Reuses the main explorer's dot-legend pattern (resources/explorer/
@@ -329,15 +328,15 @@
           <div class="incidence-row">
             <div class="incidence-row-label">Cost per affordable unit</div>
             <div class="explorer-legend">
-              <span><span class="dot affordable"></span>Density incentive zoning, <span data-out="cost-density">$59,070</span></span>
-              <span><span class="dot market"></span>Fiscal incentive zoning, <span data-out="cost-fiscal">$61,760</span></span>
+              <span><span class="dot affordable"></span>Density incentive zoning, <span data-out="cost-density">$59,860</span></span>
+              <span><span class="dot market"></span>Fiscal incentive zoning, <span data-out="cost-fiscal">$61,130</span></span>
             </div>
           </div>
           <div class="incidence-row">
             <div class="incidence-row-label">Share borne by public sector</div>
             <div class="explorer-legend">
               <span><span class="dot affordable"></span>Density incentive zoning, <span data-out="share-density">46%</span></span>
-              <span><span class="dot market"></span>Fiscal incentive zoning, <span data-out="share-fiscal">89%</span></span>
+              <span><span class="dot market"></span>Fiscal incentive zoning, <span data-out="share-fiscal">91%</span></span>
             </div>
           </div>
         </div>
@@ -720,32 +719,52 @@
   })();
 
   // Explore the incidence (Finding 3 companion widget, after Figure 12).
-  // One slider driving four numbers: cost per affordable unit (density and
-  // fiscal, linearly interpolated between two reported anchors each) and
-  // the public-sector cost share (flat for both, not slider-dependent in
-  // the source data). Deliberately no chart: a direct side-by-side number
-  // comparison, matching how Figure 12's own Panels B and C already plot
-  // density vs. fiscal on one axis.
+  // One slider driving four numbers: cost per affordable unit and the
+  // public-sector cost share, density and fiscal side by side, each looked
+  // up from Max's real incidence-diz.csv/incidence-fiz.csv (alpha, 0-50% in
+  // 1% steps) with linear interpolation between the two adjacent rows.
+  // Deliberately no chart: a direct side-by-side number comparison, matching
+  // how Figure 12's own Panels B and C already plot density vs. fiscal on
+  // one axis. The units-substituted note uses incidence-diz.csv's
+  // affordable_units directly (density is the primary instrument elsewhere
+  // on this page); fiscal's own affordable_units is close but not always
+  // identical at the same alpha.
   (function () {
     var slider = document.getElementById("incidence-alpha");
     if (!slider) return;
 
-    var ALPHA_MAX = 57; // %, an approximation; see the caveat note in the markup
-    var UNITS_AT_30PCT = 42000; // Finding 3: "a 30% mandate yields roughly 42,000 affordable units"
+    var dataPath = "../resources/explorer/";
 
-    // Anchors are [value at alpha=0%, value at alpha=ALPHA_MAX%].
-    var COST_DENSITY = [57750, 60250];
-    var COST_FISCAL = [61500, 62000];
-    var SHARE_DENSITY = 46;
-    var SHARE_FISCAL = 89;
-
-    function lerp(anchors, t) {
-      return anchors[0] + (anchors[1] - anchors[0]) * t;
+    function parseCSV(text) {
+      var lines = text.trim().split(/\r?\n/);
+      var headers = lines[0].split(",").map(function (h) { return h.trim(); });
+      return lines.slice(1).filter(Boolean).map(function (line) {
+        var cells = line.split(",");
+        var row = {};
+        headers.forEach(function (h, i) { row[h] = parseFloat(cells[i]); });
+        return row;
+      }).sort(function (a, b) { return a.alpha - b.alpha; });
     }
 
-    // Rounded to the nearest $10: these are interpolated approximations,
-    // not the model's exact output, so dollar-level precision would be
-    // misleading.
+    // Linear interpolation between the two rows straddling alphaPct/100;
+    // clamped to the table's own ends rather than extrapolating past them.
+    function lookup(rows, alphaPct, key) {
+      var alpha = alphaPct / 100;
+      var first = rows[0], last = rows[rows.length - 1];
+      if (alpha <= first.alpha) return first[key];
+      if (alpha >= last.alpha) return last[key];
+      for (var i = 0; i < rows.length - 1; i++) {
+        var r0 = rows[i], r1 = rows[i + 1];
+        if (alpha >= r0.alpha && alpha <= r1.alpha) {
+          var t = r1.alpha === r0.alpha ? 0 : (alpha - r0.alpha) / (r1.alpha - r0.alpha);
+          return r0[key] + (r1[key] - r0[key]) * t;
+        }
+      }
+      return last[key];
+    }
+
+    // Rounded to the nearest $10 for a clean read; the underlying value is
+    // already exact (interpolated, not approximated).
     function fmtDollar(n) {
       return "$" + (Math.round(n / 10) * 10).toLocaleString("en-US");
     }
@@ -757,22 +776,35 @@
     var shareFiscalEl = document.querySelector('[data-out="share-fiscal"]');
     var unitsNoteEl = document.querySelector('[data-out="units-note"]');
 
+    var dizRows = null;
+    var fizRows = null;
+
     function render() {
+      if (!dizRows || !fizRows) return;
       var alphaPct = parseFloat(slider.value);
-      var t = alphaPct / ALPHA_MAX;
-
       out.textContent = alphaPct.toFixed(0) + "%";
-      costDensityEl.textContent = fmtDollar(lerp(COST_DENSITY, t));
-      costFiscalEl.textContent = fmtDollar(lerp(COST_FISCAL, t));
-      shareDensityEl.textContent = SHARE_DENSITY + "%";
-      shareFiscalEl.textContent = SHARE_FISCAL + "%";
 
-      var units = Math.round((alphaPct / 30 * UNITS_AT_30PCT) / 500) * 500;
+      costDensityEl.textContent = fmtDollar(lookup(dizRows, alphaPct, "cost_per_unit"));
+      costFiscalEl.textContent = fmtDollar(lookup(fizRows, alphaPct, "cost_per_unit"));
+      shareDensityEl.textContent = Math.round(lookup(dizRows, alphaPct, "public_share_pct")) + "%";
+      shareFiscalEl.textContent = Math.round(lookup(fizRows, alphaPct, "public_share_pct")) + "%";
+
+      var units = Math.round(lookup(dizRows, alphaPct, "affordable_units"));
       unitsNoteEl.textContent = "≈ " + units.toLocaleString("en-US") + " affordable units substituted";
     }
 
     slider.addEventListener("input", render);
-    render();
+
+    Promise.all([
+      fetch(dataPath + "incidence-diz.csv").then(function (r) { return r.text(); }),
+      fetch(dataPath + "incidence-fiz.csv").then(function (r) { return r.text(); })
+    ]).then(function (results) {
+      dizRows = parseCSV(results[0]);
+      fizRows = parseCSV(results[1]);
+      render();
+    }).catch(function (err) {
+      console.error("Incidence widget data failed to load:", err);
+    });
   })();
 </script>
 <script src="../resources/explorer/explorer.js"></script>
