@@ -6,6 +6,12 @@
 <title>When Redevelopment Transforms the Housing Stock</title>
 <meta name="description" content="Carrot & Stick Policy and the Affordability Puzzle: a forward-looking spatial model of parcel-level redevelopment, and why policies that increase construction can raise average rents." />
 <link rel="stylesheet" href="styles.css" />
+<!-- Umami analytics. Tracks base pageviews automatically; custom events
+     (data-umami-event attributes below, and umami.track() calls at the
+     bottom of this file) are all prefixed "academic_" since this Umami
+     property will eventually be shared across the academic, developer, and
+     policy sites on one domain. -->
+<script defer src="https://cloud.umami.is/script.js" data-website-id="394d1bdc-4a93-44ba-962a-d291e82db58c"></script>
 <script>
   // Defined in <head>, ahead of any <img> in the body, so it exists before a
   // same-origin 404 on a not-yet-exported figure can fire onerror. The
@@ -66,10 +72,10 @@
     </p>
     <p class="date-line">Working paper, 2026</p>
     <div class="hero-actions">
-      <a class="button button-primary" href="../resources/papers/Carrot_and_Stick_Policy.pdf" target="_blank" rel="noopener">Read the Working Paper</a>
-      <a class="button button-secondary" href="../resources/papers/Carrot_and_Stick_Policy.pdf#page=61" target="_blank" rel="noopener">Online Appendix</a>
+      <a class="button button-primary" href="../resources/papers/Carrot_and_Stick_Policy.pdf" target="_blank" rel="noopener" data-umami-event="academic_download_working_paper">Read the Working Paper</a>
+      <a class="button button-secondary" href="../resources/papers/Carrot_and_Stick_Policy.pdf#page=61" target="_blank" rel="noopener" data-umami-event="academic_download_appendix">Online Appendix</a>
       <!-- Slides URL pending, live after the Purdue presentation -->
-      <a class="button button-secondary" href="#resources">Slides</a>
+      <a class="button button-secondary" href="#resources" data-umami-event="academic_download_slides">Slides</a>
     </div>
 
     <div class="figure-block">
@@ -560,10 +566,10 @@
 
     <ul class="resource-list">
       <li>
-        <a href="../resources/papers/Carrot_and_Stick_Policy.pdf" target="_blank" rel="noopener">Working Paper (PDF)</a>
+        <a href="../resources/papers/Carrot_and_Stick_Policy.pdf" target="_blank" rel="noopener" data-umami-event="academic_download_working_paper">Working Paper (PDF)</a>
       </li>
       <li>
-        <a href="../resources/papers/Carrot_and_Stick_Policy.pdf#page=61" target="_blank" rel="noopener">Online Appendix (PDF)</a>
+        <a href="../resources/papers/Carrot_and_Stick_Policy.pdf#page=61" target="_blank" rel="noopener" data-umami-event="academic_download_appendix">Online Appendix (PDF)</a>
         <span class="resource-status">Same document, starts at page 61</span>
       </li>
       <li>
@@ -790,6 +796,65 @@
       console.error("Incidence widget data failed to load:", err);
     });
   })();
+
+  // Umami: fire once, the first time a visitor moves any slider in either
+  // the main explorer (its sliders are created dynamically by explorer.js,
+  // hence delegation on document rather than binding each one directly) or
+  // the incidence widget above.
+  (function () {
+    var fired = false;
+    document.addEventListener("input", function (e) {
+      if (fired) return;
+      var el = e.target;
+      if (!el || el.tagName !== "INPUT" || el.type !== "range") return;
+      var id = el.id || "";
+      if (id.indexOf("explorer-") !== 0 && id !== "incidence-alpha") return;
+      fired = true;
+      if (typeof umami !== "undefined") {
+        umami.track("academic_explorer_interaction");
+      }
+    }, true);
+  })();
+
+  // Umami: track each major section scrolling into view, once per page load
+  // per section. "50% visibility" is measured against the viewport's own
+  // center line (rootMargin -50%/-50%, threshold 0) rather than 50% of each
+  // section's own bounding box: several sections here (Calibration, for
+  // instance) are taller than any viewport, so a literal 50%-of-target
+  // threshold would never be reachable and that section would silently
+  // never fire. Deferred to DOMContentLoaded so the umami.track guard below
+  // sees the real global rather than racing the <script defer> Umami tag in
+  // <head>, which executes just before DOMContentLoaded fires.
+  document.addEventListener("DOMContentLoaded", function () {
+    if (!("IntersectionObserver" in window)) return;
+
+    var sectionEvents = {
+      idea: "academic_view_the_idea",
+      findings: "academic_view_findings",
+      model: "academic_view_model",
+      calibration: "academic_view_calibration",
+      explorer: "academic_view_explorer",
+      scope: "academic_view_scope",
+      resources: "academic_view_resources",
+      authors: "academic_view_authors"
+    };
+
+    var observer = new IntersectionObserver(function (entries) {
+      entries.forEach(function (entry) {
+        if (!entry.isIntersecting) return;
+        observer.unobserve(entry.target);
+        var eventName = sectionEvents[entry.target.id];
+        if (eventName && typeof umami !== "undefined") {
+          umami.track(eventName);
+        }
+      });
+    }, { rootMargin: "-50% 0px -50% 0px", threshold: 0 });
+
+    Object.keys(sectionEvents).forEach(function (id) {
+      var el = document.getElementById(id);
+      if (el) observer.observe(el);
+    });
+  });
 </script>
 <script src="../resources/explorer/explorer.js"></script>
 <script src="explorer-config.js"></script>
