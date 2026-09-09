@@ -84,7 +84,10 @@ New for this site:
    term in body copy — flagged as too technical for this audience). The existing
    targeting-mechanics content (Table D2, the three target-group breakdown, Fig D5)
    follows this lead-in, unchanged.
-10. Policy implications (three takeaways).
+10. Policy implications (three takeaways). Takeaway 2 updated this session to close
+    the loop on the subhead's targeting claim: now covers both production matching
+    (original point) and the new rent-targeting angle (directing redevelopment toward
+    specific districts lowers rents broadly elsewhere), not just production alone.
 11. Footer: authors, PDF links, cross-link to academic site ("full paper and technical
     appendix") and to developer site once built.
 

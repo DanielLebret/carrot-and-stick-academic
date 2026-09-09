@@ -398,9 +398,11 @@ these corrected numbers. Use figure-placeholder until the file lands.]
 01 Stack the tools. The largest gains in both market-rate and affordable units come from
 combining tax exemptions, density bonuses, and mandates. Each acts on a different margin.
 
-02 Design for the margin. Parcels near their threshold respond to tax incentives but
-weakly to density bonuses; high-value parcels respond to density bonuses. Target the
-right instrument at the right parcel.
+02 Target deliberately, for both production and rents. Parcels near their threshold
+respond to tax incentives but weakly to density bonuses; high-value parcels respond to
+density bonuses. And because the rent effect is local, not just the production effect,
+directing redevelopment toward specific districts can lower rents broadly elsewhere in
+the city, not only shift where units get built.
 
 03 Do not expect mandates to reach the lowest-rent households. Mandated units cluster in
 new buildings on higher-value sites, above the bottom quintile. Reaching the lowest
