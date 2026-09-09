@@ -1,0 +1,372 @@
+@import url("../resources/tokens.css");
+@import url("../resources/base.css");
+@import url("../resources/explorer/explorer.css");
+
+/*
+  Policy site layout and section styling. Register: direct, concrete, "here
+  is what this costs and who pays," not hedged academic caveating (see
+  policy/CLAUDE.md). Persuasion-register components (.section-badge,
+  .key-finding, .quote-block, .implication-grid/.implication-card,
+  .targeting-table) are deliberately not in resources/base.css (see its
+  header comment) and are built here using the shared tokens. There is no
+  reference-policy-styles.css in resources/ despite root CLAUDE.md
+  mentioning one; these were designed fresh against the class names that
+  file's absence implies (base.css's own "deliberately excluded" comment
+  names them), not copied from a source file.
+*/
+
+main {
+  max-width: var(--content-max-width);
+  margin: 0 auto;
+  padding: 0 var(--space-3);
+}
+
+section {
+  padding: var(--space-6) 0;
+  border-bottom: 1px solid var(--border-light);
+}
+
+section:last-of-type {
+  border-bottom: none;
+}
+
+section h2 {
+  font-size: var(--font-size-h2);
+  margin: 0 0 var(--space-3);
+}
+
+section h3 {
+  font-size: var(--font-size-h3);
+  margin: var(--space-4) 0 var(--space-1);
+}
+
+section > .section-intro {
+  color: var(--text-mid);
+  margin: 0 0 var(--space-4);
+}
+
+/* Hero: text and buttons only, no hero figure (Figure 9 runs in Mechanism
+   instead, per content-draft.md; unlike academic, which leads with it). */
+
+.hero {
+  padding: var(--space-6) 0 var(--space-5);
+  border-bottom: 1px solid var(--border-light);
+}
+
+.hero .eyebrow {
+  margin-bottom: var(--space-2);
+}
+
+.hero h1 {
+  font-size: var(--font-size-h1);
+  line-height: 1.15;
+  margin: 0 0 var(--space-2);
+}
+
+.hero .subtitle {
+  font-size: 19px;
+  color: var(--text-mid);
+  margin: 0 0 var(--space-3);
+  max-width: 680px;
+}
+
+.hero .byline {
+  color: var(--text-mid);
+  font-size: var(--font-size-small);
+  margin: 0 0 var(--space-4);
+}
+
+.hero-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+/* Figures: same treatment as the academic site (capped at the text column,
+   centered, images render edge to edge with no placeholder chrome unless
+   handleFigureImgError actually fires). */
+
+.figure-block,
+.figure-grid,
+.figure-stack {
+  max-width: var(--content-max-width);
+}
+
+.figure-block {
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.figure-block img {
+  max-width: 100%;
+}
+
+.figure-block + .figure-block {
+  margin-top: var(--space-6);
+}
+
+.figure-media {
+}
+
+.figure-group-title {
+  font-weight: 600;
+  font-size: var(--font-size-small);
+  color: var(--text-dark);
+  margin: 0 0 var(--space-2);
+}
+
+.figure-sub {
+  margin: 0;
+}
+
+.figure-sub figcaption {
+  font-size: var(--font-size-small);
+  color: var(--text-light);
+  text-align: center;
+  margin-top: 6px;
+}
+
+.figure-stack .figure-sub {
+  margin-bottom: var(--space-3);
+}
+
+.figure-stack .figure-sub:last-child {
+  margin-bottom: 0;
+}
+
+/* Section badge: a numbered pill above each major heading (01-08), matching
+   content-draft.md's own numbering. The one deliberately "generic tell"
+   pattern the academic site avoids on purpose; here it's appropriate: this
+   register is meant to read as a structured briefing, not a paper. */
+
+.section-badge {
+  display: inline-block;
+  background: var(--red);
+  color: var(--white);
+  font-size: var(--font-size-small);
+  font-weight: 700;
+  padding: 4px 12px;
+  border-radius: var(--radius-pill);
+  margin-bottom: var(--space-2);
+}
+
+/* Key finding: a highlighted callout around one standout number or claim.
+   Used sparingly (Puzzle, The Cost), not on every section. */
+
+.key-finding {
+  background: var(--gray-100);
+  border-left: 4px solid var(--red);
+  border-radius: var(--radius-sm);
+  padding: var(--space-3) var(--space-4);
+  margin: var(--space-4) 0;
+}
+
+.key-finding p {
+  margin: 0;
+}
+
+.key-finding strong {
+  color: var(--red);
+}
+
+/* Quote block: muted pull-quote, visually distinct from body text. Used for
+   the unit-size robustness callout in Mechanism. */
+
+.quote-block {
+  border-left: 3px solid var(--gray-300);
+  padding: var(--space-2) 0 var(--space-2) var(--space-3);
+  margin: var(--space-4) 0;
+  font-style: italic;
+  color: var(--text-mid);
+}
+
+.quote-block p {
+  margin: 0 0 var(--space-1);
+}
+
+.quote-block p:last-child {
+  margin-bottom: 0;
+}
+
+/* Wrinkle subsection (inside Sticks): a plain bordered aside, not a shadowed
+   card, so it reads as "part of Sticks" rather than a competing section. */
+
+.aside {
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-md);
+  padding: var(--space-3) var(--space-4);
+  margin-top: var(--space-4);
+}
+
+.aside h3 {
+  margin-top: 0;
+}
+
+/* Implication cards: 3-up grid for Policy Implications. */
+
+.implication-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--space-3);
+  margin-top: var(--space-4);
+}
+
+@media (max-width: 768px) {
+  .implication-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.implication-card {
+  background: var(--white);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-md);
+  padding: var(--space-3);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.implication-card .implication-number {
+  display: block;
+  color: var(--red);
+  font-weight: 800;
+  font-size: 22px;
+  margin-bottom: var(--space-1);
+}
+
+.implication-card h3 {
+  margin: 0 0 var(--space-1);
+  font-size: 18px;
+}
+
+.implication-card p {
+  margin: 0;
+  color: var(--text-mid);
+  font-size: var(--font-size-small);
+}
+
+/* Targeting table (Where to Target). Scrolls horizontally on narrow screens
+   rather than squeezing five columns of numbers. */
+
+.targeting-table-wrap {
+  overflow-x: auto;
+  margin: var(--space-4) 0;
+}
+
+.targeting-table {
+  width: 100%;
+  min-width: 560px;
+  border-collapse: collapse;
+  font-size: var(--font-size-small);
+}
+
+.targeting-table th,
+.targeting-table td {
+  padding: 10px var(--space-2);
+  text-align: left;
+  border-bottom: 1px solid var(--border-light);
+}
+
+.targeting-table thead th {
+  background: var(--gray-100);
+  font-weight: 600;
+  color: var(--text-dark);
+}
+
+.targeting-table tbody tr:hover {
+  background: var(--gray-100);
+}
+
+.targeting-table td:not(:first-child),
+.targeting-table th:not(:first-child) {
+  text-align: right;
+}
+
+.targeting-table tbody tr:first-child {
+  font-weight: 600;
+}
+
+/* Explore the incidence widget: identical pattern to the academic site's
+   (resources/explorer/explorer.css supplies .explorer-legend/.dot; only the
+   card shell and row label are defined here), reused rather than rebuilt as
+   separate cards, per policy/CLAUDE.md. */
+
+.incidence-widget {
+  margin-top: var(--space-4);
+  padding: var(--space-3) var(--space-4);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-md);
+  background: var(--gray-100);
+}
+
+.incidence-widget h3 {
+  margin-top: 0;
+}
+
+.incidence-slider-row {
+  margin-bottom: var(--space-2);
+}
+
+.incidence-slider-row label {
+  display: flex;
+  justify-content: space-between;
+  font-size: var(--font-size-small);
+  color: var(--text-mid);
+  margin-bottom: 6px;
+}
+
+.incidence-slider-row output {
+  font-weight: 600;
+  color: var(--text-dark);
+}
+
+.incidence-slider-row input[type="range"] {
+  width: 100%;
+  accent-color: var(--red);
+}
+
+.incidence-note {
+  font-size: var(--font-size-small);
+  color: var(--text-light);
+  margin: 0 0 var(--space-2);
+}
+
+.incidence-card {
+  background: var(--white);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-md);
+  padding: var(--space-2) var(--space-3);
+}
+
+.incidence-row {
+  padding: 6px 0;
+  border-bottom: 1px solid var(--border-light);
+}
+
+.incidence-row:last-child {
+  border-bottom: none;
+}
+
+.incidence-row-label {
+  font-size: var(--font-size-small);
+  font-weight: 600;
+  color: var(--text-dark);
+}
+
+.incidence-row .explorer-legend {
+  margin-top: 4px;
+}
+
+/* Explorer section wrapper */
+
+#explorer-root {
+  margin-top: var(--space-3);
+}
+
+/* Footer links (Working Paper, Appendix, cross-links to academic/developer) */
+
+.footer-links-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-1) var(--space-3);
+  margin-top: var(--space-2);
+}

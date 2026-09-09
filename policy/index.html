@@ -1,0 +1,831 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>When Redevelopment Transforms the Housing Stock: A Policy Brief</title>
+<meta name="description" content="Why building more does not always lower rents in NYC: what tax exemptions, density bonuses, and affordability mandates each cost, who pays, and where to target them." />
+<link rel="stylesheet" href="styles.css" />
+<!-- Umami analytics. Same property as the academic site; custom events here
+     are prefixed "policy_" (academic uses "academic_") since this property
+     is shared across the academic, developer, and policy sites. -->
+<script defer src="https://cloud.umami.is/script.js" data-website-id="394d1bdc-4a93-44ba-962a-d291e82db58c"></script>
+<script>
+  // Defined in <head>, ahead of any <img> in the body, so it exists before a
+  // same-origin 404 on a figure can fire onerror. Same pattern as the
+  // academic site: the wrapping div is a plain .figure-media box by default
+  // (no border, no background) so a loaded image renders edge to edge; on
+  // failure this adds .figure-placeholder (base.css: dashed border, gray
+  // fill, min-height) and swaps the image for a centered text label. Every
+  // figure this site references already exists in resources/figures/ as of
+  // this build, so this is defensive, not currently load-bearing.
+  function handleFigureImgError(img) {
+    var wrapper = img.parentElement;
+    if (wrapper) wrapper.classList.add("figure-placeholder");
+    var span = document.createElement("span");
+    span.textContent = img.alt;
+    img.replaceWith(span);
+  }
+</script>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="nav-container">
+    <a class="brand" href="#top">Carrot &amp; Stick</a>
+    <button class="nav-toggle" aria-label="Toggle navigation" aria-expanded="false">
+      <span></span><span></span><span></span>
+    </button>
+    <nav class="nav-links">
+      <a href="#puzzle">The puzzle</a>
+      <a href="#mechanism">Mechanism</a>
+      <a href="#carrots">Carrots</a>
+      <a href="#sticks">Sticks</a>
+      <a href="#explorer">Explorer</a>
+      <a href="#cost">The cost</a>
+      <a href="#target">Where to target</a>
+      <a href="#implications">Implications</a>
+    </nav>
+  </div>
+</header>
+
+<main id="top">
+
+  <!-- ============================== HERO ============================== -->
+  <section class="hero">
+    <p class="eyebrow">Cornell University, Housing Policy Research</p>
+    <h1>When Redevelopment Transforms the Housing Stock: Why Building More Does Not Always Lower Rents in NYC</h1>
+    <p class="subtitle">
+      New research on how housing incentives and affordability mandates work
+      through the redevelopment of existing buildings, what each policy
+      costs, and who pays.
+    </p>
+    <p class="byline">Daniel Lebret, Crocker H. Liu &amp; Maxence Valentin, Cornell University &amp; ETH Zurich, 2026</p>
+    <div class="hero-actions">
+      <a class="button button-primary" href="../resources/papers/Carrot_and_Stick_Policy.pdf" target="_blank" rel="noopener" data-umami-event="policy_download_working_paper">Read the Working Paper (PDF)</a>
+      <a class="button button-secondary" href="../resources/papers/Carrot_and_Stick_Policy.pdf#page=61" target="_blank" rel="noopener" data-umami-event="policy_download_appendix">Online Appendix (PDF)</a>
+    </div>
+  </section>
+
+  <!-- ============================== 01 THE PUZZLE ============================== -->
+  <section id="puzzle">
+    <p class="section-badge">01</p>
+    <h2>Housing production is up. So are rents. Why?</h2>
+
+    <p>
+      New York City has added tens of thousands of units over the past
+      decade, yet rents keep climbing. The standard story, that more supply
+      lowers prices, looks like it is failing. It is not failing. It is
+      incomplete.
+    </p>
+
+    <p>
+      In a mature city there is no empty margin to build on. Between 2023
+      and 2025, roughly two-thirds of private residential permits were
+      filed on parcels that already carried a building. Only on Staten
+      Island, where vacant land remains, does that share fall, to about
+      34%. New housing in New York is mostly redevelopment: tearing down
+      older, depreciated stock and replacing it with newer, taller,
+      higher-rent construction.
+    </p>
+
+    <div class="key-finding">
+      <p>
+        <strong>About two-thirds</strong> of private residential permits
+        filed citywide between 2023 and 2025 were on parcels that already
+        carried a building, not vacant land.
+      </p>
+    </div>
+
+    <p>
+      The parcels that redevelop are predictable. Buildings over 100 years
+      old redevelop at roughly 2.5 times the rate of buildings under 40,
+      and they rent for about 14% less. Parcels with unused zoning
+      capacity redevelop far more often than those built to their limit:
+      about 4.0% of parcels with more than 75% of their allowable density
+      unused filed a permit. Rents pull development too. A 10% higher rent
+      per square foot is associated with 7.1% more permitted units, and a
+      one point higher expected rent growth with 39% more.
+    </p>
+
+    <div class="figure-block">
+      <p class="figure-group-title">Figure 1. Residential permits and built environment.</p>
+      <div class="figure-grid">
+        <figure class="figure-sub">
+          <div class="figure-media">
+            <img src="../resources/figures/figure-01a-permits-unused-density.png" alt="Figure 1a. Redevelopment by unused zoning capacity." onerror="handleFigureImgError(this)" />
+          </div>
+          <figcaption>(a) Unused density</figcaption>
+        </figure>
+        <figure class="figure-sub">
+          <div class="figure-media">
+            <img src="../resources/figures/figure-01b-permits-building-age.png" alt="Figure 1b. Redevelopment by building age." onerror="handleFigureImgError(this)" />
+          </div>
+          <figcaption>(b) Building age</figcaption>
+        </figure>
+      </div>
+      <p class="figure-caption">Redevelopment concentrates on underbuilt, older parcels.</p>
+    </div>
+
+    <div class="figure-block">
+      <p class="figure-group-title">Figure 2. Residential permits and rent dynamics.</p>
+      <div class="figure-grid">
+        <figure class="figure-sub">
+          <div class="figure-media">
+            <img src="../resources/figures/figure-02a-rent-vs-permits.png" alt="Figure 2a. Permitted units and residential rents." onerror="handleFigureImgError(this)" />
+          </div>
+          <figcaption>(a) Residential rents</figcaption>
+        </figure>
+        <figure class="figure-sub">
+          <div class="figure-media">
+            <img src="../resources/figures/figure-02b-rent-growth-vs-permits.png" alt="Figure 2b. Permitted units and expected rent growth." onerror="handleFigureImgError(this)" />
+          </div>
+          <figcaption>(b) Expected rent growth</figcaption>
+        </figure>
+      </div>
+      <p class="figure-caption">Permitted units track rent per square foot and expected rent growth.</p>
+    </div>
+  </section>
+
+  <!-- ============================== 02 THE MECHANISM ============================== -->
+  <section id="mechanism">
+    <p class="section-badge">02</p>
+    <h2>Replacement, not expansion</h2>
+
+    <p>
+      When a developer tears down a rent-discounted walk-up and builds a
+      new 12-story building, what looks like a supply increase is also a
+      composition shift. The new units enter without accumulated
+      depreciation, at higher rents than what they replaced. More units,
+      but higher average rents. We call this the replacement effect.
+    </p>
+
+    <p>
+      Housing supply here is not a curve that policy slides along. It is
+      the sum of individual parcel decisions about whether, when, and how
+      intensively to redevelop. Because each decision is made parcel by
+      parcel, policy changes not only how much housing exists but what
+      kind.
+    </p>
+
+    <p>
+      Within our calibration, policies that raise construction raise
+      average rents, because the replacement effect dominates the downward
+      pull of added supply. Under a representative upzoning
+      counterfactual, average rent rises about 1.31%, even as supply
+      expands. Per unit, replacement adds about $60 per month while added
+      supply subtracts about $25. The net is positive because the mix of
+      the stock shifts toward newer, higher-rent units.
+    </p>
+
+    <p>
+      This is not an argument against building. It sharpens the question
+      from "build more or less" to which parcels redevelop, when, at what
+      density, and under what conditions. Those are exactly the levers
+      housing policy controls.
+    </p>
+
+    <div class="figure-block">
+      <div class="figure-media">
+        <img src="../resources/figures/figure-09-rent-decomposition.png" alt="Figure 9. Expected rent decomposition, by counterfactual policy." onerror="handleFigureImgError(this)" />
+      </div>
+      <p class="figure-caption">
+        Average expected rent change under each counterfactual policy,
+        decomposed into the affordable-share, citywide-supply, local-supply,
+        and replacement effects.
+      </p>
+    </div>
+
+    <div class="quote-block">
+      <p>
+        "This holds even measured per square foot rather than per unit, and
+        even if new construction runs 20% smaller than the existing stock.
+        Newly built units have in fact grown about 7% smaller over the past
+        decade, well within the range we test. The result is about the
+        composition of the housing stock, not the size of individual
+        apartments."
+      </p>
+    </div>
+
+    <div class="figure-block">
+      <div class="figure-media">
+        <img src="../resources/figures/figure-d7-unit-size-trend.png" alt="Figure D7. Citywide unit-size trend, new construction." onerror="handleFigureImgError(this)" />
+      </div>
+      <p class="figure-caption">Citywide trend in new-construction unit size.</p>
+    </div>
+  </section>
+
+  <!-- ============================== 03 CARROTS ============================== -->
+  <section id="carrots">
+    <p class="section-badge">03</p>
+    <h2>Tax exemptions and density bonuses are not interchangeable</h2>
+
+    <p>
+      NYC's incentive toolkit has two main instruments: property tax
+      exemptions (like the former 421-a) and density bonuses (upzoning,
+      higher allowable FAR). Both expand supply. They do not work the same
+      way.
+    </p>
+
+    <p>
+      Tax exemptions work on timing. By cutting post-construction tax
+      liability, they make redevelopment profitable sooner and pull
+      forward projects that would otherwise sit on the margin. The
+      response is broad, concentrated in areas with older buildings and
+      unused density. Western Brooklyn and Queens respond most. The
+      tradeoff is fiscal: the city gives up tax revenue during the
+      exemption window.
+    </p>
+
+    <p>
+      Density bonuses work on scale. Allowing taller buildings raises the
+      value of redevelopment but also raises the value of waiting. A
+      developer who can build 15 stories instead of 10 may rationally hold
+      off until rents justify the larger project. So density bonuses can
+      delay construction on parcels near the redevelopment threshold even
+      as they raise the size of projects that do get built. High-value
+      locations gain most; some marginal parcels see lower near-term
+      redevelopment.
+    </p>
+
+    <p>
+      The two are not substitutes. Tax incentives act on whether and when
+      a parcel redevelops; density bonuses act on how big. A city that
+      uses only one leaves a lever untouched. Stacking both produces the
+      largest supply expansion.
+    </p>
+
+    <div class="figure-block">
+      <p class="figure-group-title">Figure 3. Effects of policy instruments on property value and development probability.</p>
+      <div class="figure-stack">
+        <figure class="figure-sub">
+          <div class="figure-media">
+            <img src="../resources/figures/figure-03a-policy-instrument-alpha.png" alt="Figure 3a. Mandatory share for affordable housing, alpha." onerror="handleFigureImgError(this)" />
+          </div>
+          <figcaption>(a) Mandatory share for affordable housing (&alpha;)</figcaption>
+        </figure>
+        <figure class="figure-sub">
+          <div class="figure-media">
+            <img src="../resources/figures/figure-03b-policy-instrument-phi.png" alt="Figure 3b. Density bonuses, phi." onerror="handleFigureImgError(this)" />
+          </div>
+          <figcaption>(b) Density bonuses (&phi;)</figcaption>
+        </figure>
+        <figure class="figure-sub">
+          <div class="figure-media">
+            <img src="../resources/figures/figure-03c-policy-instrument-tau.png" alt="Figure 3c. Length of tax exemptions, tau." onerror="handleFigureImgError(this)" />
+          </div>
+          <figcaption>(c) Length of tax exemptions (&tau;)</figcaption>
+        </figure>
+      </div>
+      <p class="figure-caption">Effects of policy instruments on property value and development probability, by instrument.</p>
+    </div>
+
+    <p>
+      Where each instrument concentrates development: tax exemptions
+      produce a broad, diffuse response across older neighborhoods
+      citywide; upzoning concentrates in a narrower set of high-value
+      locations. Choosing between them is a choice about which
+      neighborhoods benefit, not only how much gets built.
+    </p>
+
+    <div class="figure-block">
+      <p class="figure-group-title">Figure 7. Housing production heterogeneity, by instrument.</p>
+      <div class="figure-grid">
+        <figure class="figure-sub">
+          <div class="figure-media">
+            <img src="../resources/figures/figure-07a-upzoning.png" alt="Figure 7a. Housing production heterogeneity, upzoning." onerror="handleFigureImgError(this)" />
+          </div>
+          <figcaption>(a) Upzoning</figcaption>
+        </figure>
+        <figure class="figure-sub">
+          <div class="figure-media">
+            <img src="../resources/figures/figure-07b-tax-exemption.png" alt="Figure 7b. Housing production heterogeneity, tax exemption." onerror="handleFigureImgError(this)" />
+          </div>
+          <figcaption>(b) Tax exemption</figcaption>
+        </figure>
+      </div>
+      <p class="figure-caption">Where development concentrates under each instrument, map and decile heatmap combined.</p>
+    </div>
+  </section>
+
+  <!-- ============================== 04 STICKS ============================== -->
+  <section id="sticks">
+    <p class="section-badge">04</p>
+    <h2>What affordability mandates actually deliver</h2>
+
+    <p>
+      Mandates, requirements that a share of new units rent below market,
+      are the most direct tool for producing affordable units and the most
+      misunderstood.
+    </p>
+
+    <p>
+      What they do: they reallocate access to new construction. A 30%
+      mandate produces roughly 42,000 affordable units that genuinely
+      reach households otherwise priced out of new buildings.
+    </p>
+
+    <p>
+      What they do not do: they do not expand the bottom of the rent
+      distribution. Those same 42,000 affordable units come with about
+      56,000 fewer market-rate units, because a mandate lowers the return
+      to redevelopment and some marginal parcels no longer pencil out. And
+      because redevelopment with a mandate is only profitable where rents
+      are already high, mandated affordable units land in the middle of
+      the distribution, not the bottom. The share of units in the lowest
+      rent quintile barely moves. The cheapest housing in NYC keeps coming
+      from the aging existing stock, not from mandated units in new
+      buildings.
+    </p>
+
+    <p>
+      This is why mandates work best paired with incentives: the carrot
+      offsets the supply-dampening effect of the stick.
+    </p>
+
+    <div class="figure-block">
+      <div class="figure-media">
+        <img src="../resources/figures/figure-06-production-counterfactuals.png" alt="Figure 6. Housing production counterfactuals: affordable vs. market-rate scatter." onerror="handleFigureImgError(this)" />
+      </div>
+      <p class="figure-caption">
+        Affordable and market-rate production under each counterfactual
+        policy. Only the combined policy expands both; standalone mandates
+        fall below the 45-degree line.
+      </p>
+    </div>
+
+    <div class="aside">
+      <h3>An unpaired mandate has an escape hatch</h3>
+      <p>
+        Owners have another option besides redevelopment: renovate the
+        existing building instead of tearing it down. Renovation restores
+        a building's quality without adding density, and, importantly,
+        policies do not apply to it. A renovated building faces no tax
+        incentive and no affordability mandate, because it was never
+        redeveloped in the first place.
+      </p>
+      <p>
+        On its own, this option barely changes citywide housing
+        production. Owners choose renovation mainly on parcels already
+        near their zoning limit, ones that were unlikely to redevelop
+        anyway, so overall construction is largely unaffected either way.
+      </p>
+      <p>
+        But it matters for mandate design specifically. Impose an
+        affordability mandate with no paired incentive, and the share of
+        parcels that choose renovation over redevelopment rises by about 8
+        percentage points. Owners are not avoiding the policy at random,
+        they are avoiding it precisely because renovation offers a legal
+        way around it. Pair the mandate with a tax exemption or density
+        bonus, and this reverses sharply: the incentive makes
+        redevelopment worth choosing again, and reliance on renovation as
+        an escape route falls well below its no-policy baseline.
+      </p>
+      <p>
+        This is one more reason mandates work best paired with incentives:
+        without one, some of the affordable units a mandate is meant to
+        produce simply never get built, because the owner renovated
+        instead.
+      </p>
+      <div class="figure-block">
+        <div class="figure-media">
+          <img src="../resources/figures/figure-e1-renovation-probability.png" alt="Figure E1. Renovation decision and probability of action by used capacity." onerror="handleFigureImgError(this)" />
+        </div>
+        <p class="figure-caption">Renovation decision and probability of action, by used capacity.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================== 05 EXPLORE THE POLICY SPACE ============================== -->
+  <section id="explorer">
+    <p class="section-badge">05</p>
+    <h2>See what your policy choice does</h2>
+    <p class="section-intro">
+      Move the sliders to see what a given combination of incentives and
+      mandates would produce citywide: how many units, how many
+      affordable, and how rents respond.
+    </p>
+
+    <div id="explorer-root" class="explorer" aria-label="Policy explorer">
+      <!-- Populated by resources/explorer/explorer.js via explorer-config.js -->
+      <noscript>The interactive explorer requires JavaScript. The same policy points are reported as figures throughout this page.</noscript>
+    </div>
+  </section>
+
+  <!-- ============================== 06 THE COST ============================== -->
+  <section id="cost">
+    <p class="section-badge">06</p>
+    <h2>Who pays for each mandated affordable unit?</h2>
+
+    <p>
+      Below-market housing is not privately profitable, so a mandate opens
+      a gap between private return and public objective. Someone absorbs
+      it. Holding total supply fixed, each affordable unit substituted for
+      a market-rate unit costs about $59,900 under density incentive
+      zoning and about $61,200 under fiscal incentive zoning.
+    </p>
+
+    <div class="key-finding">
+      <p>Call it <strong>about $60,000 per unit</strong>. The instrument decides who pays.</p>
+    </div>
+
+    <p>
+      Under tax exemptions paired with mandates, about 90% of the cost
+      falls on the public sector through foregone tax revenue. Landowners
+      are largely held harmless.
+    </p>
+
+    <p>
+      Under density bonuses paired with mandates, the cost splits closer
+      to evenly: about 46% falls on the public sector, the rest on
+      landowners through lower land value.
+    </p>
+
+    <p>
+      Fiscal instruments are easier to pass because landowners support
+      them, but they are expensive for city budgets. Regulatory
+      instruments protect public revenue but draw stronger opposition from
+      property owners.
+    </p>
+
+    <div class="figure-block">
+      <p class="figure-group-title">Figure 12. Cost of mandated affordable housing.</p>
+      <div class="figure-grid">
+        <figure class="figure-sub">
+          <div class="figure-media">
+            <img src="../resources/figures/figure-12a-required-incentives.png" alt="Figure 12a. Required incentives." onerror="handleFigureImgError(this)" />
+          </div>
+          <figcaption>(a) Required incentives</figcaption>
+        </figure>
+        <figure class="figure-sub">
+          <div class="figure-media">
+            <img src="../resources/figures/figure-12b-cost-per-unit.png" alt="Figure 12b. Cost per unit." onerror="handleFigureImgError(this)" />
+          </div>
+          <figcaption>(b) Cost per unit</figcaption>
+        </figure>
+        <figure class="figure-sub">
+          <div class="figure-media">
+            <img src="../resources/figures/figure-12c-public-share.png" alt="Figure 12c. Share borne by public sector." onerror="handleFigureImgError(this)" />
+          </div>
+          <figcaption>(c) Share borne by public sector</figcaption>
+        </figure>
+        <figure class="figure-sub">
+          <div class="figure-media">
+            <img src="../resources/figures/figure-12d-rent-quintiles.png" alt="Figure 12d. Share of units in rent quintiles." onerror="handleFigureImgError(this)" />
+          </div>
+          <figcaption>(d) Share of units in rent quintiles</figcaption>
+        </figure>
+      </div>
+      <p class="figure-caption">Required incentives, cost per unit, public share, and rent-quintile impact, by paired instrument.</p>
+    </div>
+
+    <div class="incidence-widget">
+      <h3>See who pays, at your mandate level</h3>
+      <div class="incidence-slider-row">
+        <label for="incidence-alpha">Mandate share (&alpha;)
+          <output id="incidence-alpha-out">30%</output>
+        </label>
+        <input type="range" id="incidence-alpha" min="0" max="50" step="1" value="30" />
+      </div>
+      <p class="incidence-note">
+        <span data-out="units-note">&asymp; 48,125 affordable units substituted</span>
+      </p>
+
+      <!-- Reuses the main explorer's dot-legend pattern (resources/explorer/
+           explorer.css: .explorer-legend, .dot.affordable = red, .dot.market
+           = black), same as the academic site, not rebuilt as separate
+           cards. Colors map to density/fiscal here, matching the red/black
+           convention already used in the Figure 12 legend above. -->
+      <div class="incidence-card">
+        <div class="incidence-row">
+          <div class="incidence-row-label">Cost per affordable unit</div>
+          <div class="explorer-legend">
+            <span><span class="dot affordable"></span>Density incentive zoning, <span data-out="cost-density">$59,860</span></span>
+            <span><span class="dot market"></span>Fiscal incentive zoning, <span data-out="cost-fiscal">$61,130</span></span>
+          </div>
+        </div>
+        <div class="incidence-row">
+          <div class="incidence-row-label">Share borne by public sector</div>
+          <div class="explorer-legend">
+            <span><span class="dot affordable"></span>Density incentive zoning, <span data-out="share-density">46%</span></span>
+            <span><span class="dot market"></span>Fiscal incentive zoning, <span data-out="share-fiscal">91%</span></span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================== 07 WHERE TO TARGET ============================== -->
+  <section id="target">
+    <p class="section-badge">07</p>
+    <h2>Not all neighborhoods respond the same way</h2>
+
+    <p>
+      The same instrument produces very different outcomes depending on
+      where it is applied. We re-run the two unilateral incentives,
+      upzoning and a 20-year tax exemption, on three targeted subsets: the
+      20% of parcels with the highest rent potential, the 20% most
+      obsolete by age, and the 20% least utilized by FAR. These groups
+      barely overlap spatially: high-value parcels sit in Manhattan,
+      western Brooklyn, and Queens; the most obsolete in Brooklyn; the
+      least utilized in the Bronx.
+    </p>
+
+    <p>
+      Two rules come out of it. Density bonuses deliver most where land is
+      already valuable: targeted at the top 20% by value, upzoning
+      captures about 63% of citywide floor-space production. Tax
+      exemptions deliver most on underbuilt parcels: targeted at the least
+      utilized parcels, a tax exemption captures about 79% of citywide
+      production. Match the instrument to the parcel.
+    </p>
+
+    <p>
+      Targeting the least-utilized parcels also produces the smallest rent
+      increase of any scenario. That is the cleanest confirmation of the
+      replacement effect: those parcels are closer to vacant, so
+      redevelopment there expands the stock rather than replacing it, and
+      the upward rent pressure that defines dense-city redevelopment is
+      largely absent.
+    </p>
+
+    <div class="targeting-table-wrap">
+      <table class="targeting-table">
+        <thead>
+          <tr>
+            <th rowspan="2">Target group</th>
+            <th colspan="2">Upzoning</th>
+            <th colspan="2">Tax exemption</th>
+          </tr>
+          <tr>
+            <th>Net units</th>
+            <th>Rent</th>
+            <th>Net units</th>
+            <th>Rent</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>All parcels</td>
+            <td>+55,008</td>
+            <td>+1.31%</td>
+            <td>+77,877</td>
+            <td>+1.21%</td>
+          </tr>
+          <tr>
+            <td>Most valuable (20%)</td>
+            <td>+38,159</td>
+            <td>+1.19%</td>
+            <td>+40,341</td>
+            <td>+1.28%</td>
+          </tr>
+          <tr>
+            <td>Most obsolete (20%)</td>
+            <td>+16,918</td>
+            <td>+0.59%</td>
+            <td>+22,501</td>
+            <td>+0.66%</td>
+          </tr>
+          <tr>
+            <td>Least utilized (20%)</td>
+            <td>+27,490</td>
+            <td>+0.23%</td>
+            <td>+60,827</td>
+            <td>+0.28%</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="figure-block">
+      <div class="figure-media">
+        <img src="../resources/figures/figure-d5-targeted-parcels.png" alt="Figure D5. Targeted parcels by criterion: rent potential, age, and unused capacity." onerror="handleFigureImgError(this)" />
+      </div>
+      <p class="figure-caption">
+        Targeted parcels by criterion: top 20% by rent potential, top 20% by
+        age, bottom 20% by unused capacity.
+      </p>
+    </div>
+  </section>
+
+  <!-- ============================== 08 POLICY IMPLICATIONS ============================== -->
+  <section id="implications">
+    <p class="section-badge">08</p>
+    <h2>Policy implications</h2>
+
+    <div class="implication-grid">
+      <div class="implication-card">
+        <span class="implication-number">01</span>
+        <h3>Stack the tools</h3>
+        <p>
+          The largest gains in both market-rate and affordable units come
+          from combining tax exemptions, density bonuses, and mandates.
+          Each acts on a different margin.
+        </p>
+      </div>
+      <div class="implication-card">
+        <span class="implication-number">02</span>
+        <h3>Design for the margin</h3>
+        <p>
+          Parcels near their threshold respond to tax incentives but
+          weakly to density bonuses; high-value parcels respond to density
+          bonuses. Target the right instrument at the right parcel.
+        </p>
+      </div>
+      <div class="implication-card">
+        <span class="implication-number">03</span>
+        <h3>Mandates will not reach the lowest-rent households</h3>
+        <p>
+          Mandated units cluster in new buildings on higher-value sites,
+          above the bottom quintile. Reaching the lowest incomes means
+          preserving and improving the aging stock, not only mandating
+          affordability in new construction.
+        </p>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer class="site-footer">
+  <div class="footer-inner">
+    <div class="footer-left">
+      <p class="footer-brand">Carrot &amp; Stick</p>
+      <p class="footer-small">
+        Cornell University Housing Policy Research &middot; 2026<br />
+        Daniel Lebret &middot; Crocker H. Liu &middot; Maxence Valentin
+      </p>
+      <p class="footer-small">
+        This research is based on a forward-looking spatial model
+        calibrated to 765,305 residential parcels in New York City.
+      </p>
+    </div>
+    <div class="footer-right">
+      <a class="footer-link" href="../resources/papers/Carrot_and_Stick_Policy.pdf" target="_blank" rel="noopener" data-umami-event="policy_download_working_paper">Working Paper (PDF)</a><br />
+      <a class="footer-link" href="../resources/papers/Carrot_and_Stick_Policy.pdf#page=61" target="_blank" rel="noopener" data-umami-event="policy_download_appendix">Online Appendix (PDF)</a><br />
+      <a class="footer-link" href="../academic/index.html">Full technical paper and model details</a><br />
+      <!-- Temporary: developer/ isn't built in this repo yet, so this points
+           to the existing live developer site. Replace with
+           ../developer/index.html once that subfolder is built here. -->
+      <a class="footer-link" href="https://daniellebret.github.io/carrot-and-stick-developer">For development professionals</a>
+    </div>
+  </div>
+  <p class="footer-note">Cornell University &amp; ETH Zurich, 2026</p>
+</footer>
+
+<script>
+  // Mobile nav toggle
+  (function () {
+    var toggle = document.querySelector(".nav-toggle");
+    var links = document.querySelector(".nav-links");
+    var header = document.querySelector(".site-header");
+    if (toggle && links) {
+      toggle.addEventListener("click", function () {
+        var open = links.classList.toggle("open");
+        toggle.setAttribute("aria-expanded", open ? "true" : "false");
+      });
+    }
+    window.addEventListener("scroll", function () {
+      if (header) header.classList.toggle("scrolled", window.scrollY > 4);
+    });
+  })();
+
+  // Explore the incidence (The Cost companion widget). Same implementation
+  // as the academic site's: one slider driving four numbers, each looked up
+  // from Max's real incidence-diz.csv/incidence-fiz.csv (alpha, 0-50% in 1%
+  // steps) with linear interpolation between adjacent rows. No chart, no
+  // "approximate" caveat, this is exact data.
+  (function () {
+    var slider = document.getElementById("incidence-alpha");
+    if (!slider) return;
+
+    var dataPath = "../resources/explorer/";
+
+    function parseCSV(text) {
+      var lines = text.trim().split(/\r?\n/);
+      var headers = lines[0].split(",").map(function (h) { return h.trim(); });
+      return lines.slice(1).filter(Boolean).map(function (line) {
+        var cells = line.split(",");
+        var row = {};
+        headers.forEach(function (h, i) { row[h] = parseFloat(cells[i]); });
+        return row;
+      }).sort(function (a, b) { return a.alpha - b.alpha; });
+    }
+
+    function lookup(rows, alphaPct, key) {
+      var alpha = alphaPct / 100;
+      var first = rows[0], last = rows[rows.length - 1];
+      if (alpha <= first.alpha) return first[key];
+      if (alpha >= last.alpha) return last[key];
+      for (var i = 0; i < rows.length - 1; i++) {
+        var r0 = rows[i], r1 = rows[i + 1];
+        if (alpha >= r0.alpha && alpha <= r1.alpha) {
+          var t = r1.alpha === r0.alpha ? 0 : (alpha - r0.alpha) / (r1.alpha - r0.alpha);
+          return r0[key] + (r1[key] - r0[key]) * t;
+        }
+      }
+      return last[key];
+    }
+
+    function fmtDollar(n) {
+      return "$" + (Math.round(n / 10) * 10).toLocaleString("en-US");
+    }
+
+    var out = document.getElementById("incidence-alpha-out");
+    var costDensityEl = document.querySelector('[data-out="cost-density"]');
+    var costFiscalEl = document.querySelector('[data-out="cost-fiscal"]');
+    var shareDensityEl = document.querySelector('[data-out="share-density"]');
+    var shareFiscalEl = document.querySelector('[data-out="share-fiscal"]');
+    var unitsNoteEl = document.querySelector('[data-out="units-note"]');
+
+    var dizRows = null;
+    var fizRows = null;
+
+    function render() {
+      if (!dizRows || !fizRows) return;
+      var alphaPct = parseFloat(slider.value);
+      out.textContent = alphaPct.toFixed(0) + "%";
+
+      costDensityEl.textContent = fmtDollar(lookup(dizRows, alphaPct, "cost_per_unit"));
+      costFiscalEl.textContent = fmtDollar(lookup(fizRows, alphaPct, "cost_per_unit"));
+      shareDensityEl.textContent = Math.round(lookup(dizRows, alphaPct, "public_share_pct")) + "%";
+      shareFiscalEl.textContent = Math.round(lookup(fizRows, alphaPct, "public_share_pct")) + "%";
+
+      var units = Math.round(lookup(dizRows, alphaPct, "affordable_units"));
+      unitsNoteEl.textContent = "≈ " + units.toLocaleString("en-US") + " affordable units substituted";
+    }
+
+    slider.addEventListener("input", render);
+
+    Promise.all([
+      fetch(dataPath + "incidence-diz.csv").then(function (r) { return r.text(); }),
+      fetch(dataPath + "incidence-fiz.csv").then(function (r) { return r.text(); })
+    ]).then(function (results) {
+      dizRows = parseCSV(results[0]);
+      fizRows = parseCSV(results[1]);
+      render();
+    }).catch(function (err) {
+      console.error("Incidence widget data failed to load:", err);
+    });
+  })();
+
+  // Umami: fire once, the first time a visitor moves any slider in either
+  // the main explorer (its sliders are created dynamically by explorer.js,
+  // hence delegation on document) or the incidence widget above.
+  (function () {
+    var fired = false;
+    document.addEventListener("input", function (e) {
+      if (fired) return;
+      var el = e.target;
+      if (!el || el.tagName !== "INPUT" || el.type !== "range") return;
+      var id = el.id || "";
+      if (id.indexOf("explorer-") !== 0 && id !== "incidence-alpha") return;
+      fired = true;
+      if (typeof umami !== "undefined") {
+        umami.track("policy_explorer_interaction");
+      }
+    }, true);
+  })();
+
+  // Umami: track each major section scrolling into view, once per page load
+  // per section, measured against the viewport's own center line (see the
+  // academic site for why: a literal 50%-of-target threshold never fires
+  // for sections taller than the viewport). Deferred to DOMContentLoaded so
+  // the umami.track guard sees the real global rather than racing the
+  // <script defer> Umami tag in <head>.
+  document.addEventListener("DOMContentLoaded", function () {
+    if (!("IntersectionObserver" in window)) return;
+
+    var sectionEvents = {
+      puzzle: "policy_view_puzzle",
+      mechanism: "policy_view_mechanism",
+      carrots: "policy_view_carrots",
+      sticks: "policy_view_sticks",
+      explorer: "policy_view_explorer",
+      cost: "policy_view_cost",
+      target: "policy_view_target",
+      implications: "policy_view_implications"
+    };
+
+    var observer = new IntersectionObserver(function (entries) {
+      entries.forEach(function (entry) {
+        if (!entry.isIntersecting) return;
+        observer.unobserve(entry.target);
+        var eventName = sectionEvents[entry.target.id];
+        if (eventName && typeof umami !== "undefined") {
+          umami.track(eventName);
+        }
+      });
+    }, { rootMargin: "-50% 0px -50% 0px", threshold: 0 });
+
+    Object.keys(sectionEvents).forEach(function (id) {
+      var el = document.getElementById(id);
+      if (el) observer.observe(el);
+    });
+  });
+</script>
+<script src="../resources/explorer/explorer.js"></script>
+<script src="explorer-config.js"></script>
+
+</body>
+</html>

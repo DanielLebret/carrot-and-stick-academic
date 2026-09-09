@@ -201,9 +201,11 @@
       tau: "Tax exemption (years)",
       netUnits: "Net new units",
       rentChange: "Average expected rent change",
-      whoPays: "Public / landowner cost split"
+      whoPays: "Public / landowner cost split",
+      costSplitNote: "The public/landowner cost split (Figure 12) is not part " +
+        "of this grid yet; see Finding 3 above for the reported per-unit " +
+        "cost and incidence."
     }, config.labels || {});
-    var leadReadout = config.leadReadout || "percent"; // 'percent' | 'whoPays'
 
     container.innerHTML =
       /* Hidden unless a data-load error occurs (see the fetch .catch below);
@@ -253,10 +255,7 @@
       '<div class="explorer-readout-label">' + labels.rentChange + '</div>' +
       '<div class="explorer-readout-value" data-out="rent">—</div>' +
       "</div>" +
-      '<div class="explorer-note">' +
-      "The public/landowner cost split (Figure 12) is not part of this grid yet; " +
-      "see Finding 3 above for the reported per-unit cost and incidence." +
-      "</div>" +
+      '<div class="explorer-note">' + labels.costSplitNote + "</div>" +
       "</div>" +
       "</div>";
 
