@@ -159,13 +159,75 @@ supply-dampening effect of the stick.
 [Figure 6: Housing Production scatter. Only the combined policy expands both affordable
 and market-rate units; standalone mandates fall below the 45-degree line.]
 
+================================================================================
+05. DESIGNING THE MANDATE: THREE CHOICES THAT MATTER
+================================================================================
+
+Section intro line (short, sets up why these three belong together):
+A mandate is not one lever, it is several. How deep the discount runs, whether
+participation is required or invited, and what else owners can do instead all shape
+whether a mandate produces the affordable units it is meant to.
+
 --------------------------------------------------------------------------------
-A WRINKLE: MANDATES ALONE PUSH OWNERS TOWARD RENOVATION
+5a. HOW DEEP THE DISCOUNT MATTERS
+--------------------------------------------------------------------------------
+Heading: How deep, not just whether
+
+Body:
+The affordability discount itself, how far below market rent a mandated unit must
+rent, is a separate lever from whether a mandate exists at all, and it matters just as
+much. We test three depths: a moderate discount, a strong discount, and a deep
+discount. Under a mandatory regime, deepening the discount lowers the effective rental
+income developers earn on affordable units, which reduces the value of redevelopment
+across the board, not just on the affordable share. In several cases, total housing
+production turns negative relative to no policy at all, even while affordable
+production stays positive: the mandate still produces affordable units, but it does so
+by shrinking the market-rate stock more than it grows the affordable one. A shallow
+requirement can expand total supply; a sufficiently deep one can contract it.
+
+--------------------------------------------------------------------------------
+5b. MANDATORY OR VOLUNTARY?
+--------------------------------------------------------------------------------
+Heading: Mandatory or voluntary?
+
+Body:
+Cities do not have to make participation mandatory to get results. We also test
+voluntary versions of these policies, where a parcel only opts in if doing so raises
+its value. At moderate affordability depth, voluntary programs perform about as well
+as mandatory ones, because most parcels that would redevelop anyway also come out
+ahead by participating. About 45% of parcels would voluntarily adopt a density
+incentive program on its own, and about 45% a fiscal incentive program, with roughly
+12% of adopters differing between the two. Offer both together, and voluntary adoption
+rises sharply, to 72.1%, as 27% of parcels that wouldn't adopt either instrument alone
+opt in once both are on the table.
+
+The tradeoff is exactly the depth lever above: as the affordability requirement
+deepens, fewer parcels still clear the bar to voluntarily participate, and production
+drifts back toward the no-policy baseline. The combined incentive is the exception:
+because it raises redevelopment value on two margins at once, it keeps enough parcels
+participating to stay effective even at the deepest requirement we test, where
+single-instrument voluntary programs largely fail.
+
+For a city weighing whether to mandate or invite participation, voluntary gets you
+close to mandatory outcomes at moderate depth, with less political friction. Push the
+requirement too far on a voluntary basis, and the friction reappears differently:
+owners simply decline to participate, unless the incentive on offer is generous enough
+to keep them at the table.
+
+[Figure 8a/8b: Affordability Levels and Voluntary Policy Interventions (A: total net
+housing production, B: total affordable production), grouped by policy regime
+(mandatory/voluntary) and affordability depth (moderate/strong/deep). Substantiates
+both 5a and 5b — place once here. PENDING: propose figure-08a-affordability-levels-
+total.png and figure-08b-affordability-levels-affordable.png if Daniel has these
+exported; otherwise this subsection reads fine as text-plus-numbers alone.]
+
+--------------------------------------------------------------------------------
+5c. AN UNPAIRED MANDATE HAS AN ESCAPE HATCH
 --------------------------------------------------------------------------------
 Heading: An unpaired mandate has an escape hatch
 
 Framing note: this is a real model extension (paper's Appendix E), presented honestly
-as an extension, not a headline finding. Short subsection, not a full numbered section.
+as an extension, not a headline finding.
 
 Body:
 Owners have another option besides redevelopment: renovate the existing building
@@ -195,7 +257,7 @@ use figure-placeholder if figure-e1-renovation-probability.png is not yet in
 resources/figures/. This subsection reads fine as text-plus-numbers without a chart.]
 
 ================================================================================
-05. EXPLORE THE POLICY SPACE  (shared explorer, embedded here, policy framing)
+06. EXPLORE THE POLICY SPACE  (shared explorer, embedded here, policy framing)
 ================================================================================
 
 Heading: See what your policy choice does
@@ -219,7 +281,7 @@ this site:
   exemption / mandate share as real terms they use professionally.
 
 ================================================================================
-06. THE COST
+07. THE COST
 ================================================================================
 
 Heading: Who pays for each mandated affordable unit?
@@ -254,7 +316,7 @@ share of cost borne by the public sector. No "approximate" caveat needed, this i
 data from Max's simulation grid.
 
 ================================================================================
-07. WHERE TO TARGET (rebuilt from Table D2 — replaces the current live site's
+08. WHERE TO TARGET (rebuilt from Table D2 — replaces the current live site's
     invented three-bundle table entirely)
 ================================================================================
 
@@ -289,7 +351,7 @@ the upward rent pressure that defines dense-city redevelopment is largely absent
 these corrected numbers. Use figure-placeholder until the file lands.]
 
 ================================================================================
-08. POLICY IMPLICATIONS
+09. POLICY IMPLICATIONS
 ================================================================================
 
 01 Stack the tools. The largest gains in both market-rate and affordable units come from
@@ -323,17 +385,20 @@ residential parcels in New York City.
 ================================================================================
 OPEN ITEMS
 ================================================================================
-1. Figure 7 (2 files, upzoning and tax exemption, each map+heatmap combined) — filenames
-   proposed in
-   CLAUDE.md, confirm against Daniel's actual files before final wiring.
-2. Figure D5 (targeted parcels map) — READY, figure-d5-targeted-parcels.png, single
-   combined three-panel image (top 20% R / top 20% age / bottom 20% F-Fbar).
+1. Figure 7 — READY, figure-07a-upzoning.png, figure-07b-tax-exemption.png (confirmed
+   live on site).
+2. Figure D5 (targeted parcels map) — READY, figure-d5-targeted-parcels.png.
 3. Developer site footer link — temporary, points to the old standalone site.
-4. Figure D7 (citywide unit-size trend) — optional, supports the Mechanism section's
-   unit-size robustness callout. Not blocking; the callout works as text alone.
-5. Figure E1 (renovation probability by used capacity) — optional, supports the new
-   "mandates alone push owners toward renovation" subsection. Not blocking.
-6. Explicitly excluded from this site: the borough-level unit-size breakdown
+4. Figure D7 (citywide unit-size trend) — READY, figure-d7-unit-size-trend.png
+   (confirmed live on site).
+5. Figure E1 (renovation probability by used capacity) — READY,
+   figure-e1-renovation-probability.png (confirmed live on site).
+6. Figure 8a/8b (Affordability Levels and Voluntary Policy Interventions) — NEW,
+   supports Section 5's depth and voluntary/mandatory subsections. Propose
+   figure-08a-affordability-levels-total.png and
+   figure-08b-affordability-levels-affordable.png. Not blocking; both subsections read
+   fine as text-plus-numbers alone.
+7. Explicitly excluded from this site: the borough-level unit-size breakdown
    (Rolling_avg_sizeApt_by_boro.png). Real data, but the paper doesn't explain or test
    the borough variation, and using it risked implying an unsupported claim (e.g. about
    household size). Decided not to use it anywhere on this site.

@@ -31,15 +31,9 @@ Reused, do not rebuild:
 - `../resources/explorer/` — the same engine (explorer.js/css, grid-diz.csv,
   grid-fiz.csv, incidence-diz.csv, incidence-fiz.csv). This is REAL data (Max's grid),
   not placeholder, already verified against the paper's own reported anchors. Embed it
-  with policy-appropriate framing: plainer labels via the config object only (do not
-  fork the engine). Earlier drafts of this note described academic as leading with
-  percentages and a supply-neutral contour, with policy meant to diverge from that by
-  leading with plain unit counts instead; that academic framing was never actually
-  built. The shared engine already shows plain unit counts and a rent-change readout
-  by default, for both sites, so there is nothing to restructure here. This site's
-  "who pays" emphasis instead comes from the separate Explore the Incidence widget
-  (below, and in The Cost section), which leads with cost and public share directly,
-  not from changing the main explorer's readout order.
+  with policy-appropriate framing: plainer labels, the "who pays" / public-share readout
+  foregrounded over the percentage/supply-neutral-contour framing academic uses. Do not
+  fork the engine; extend its config object for this site's labels only.
 - Most figures already exist in `../resources/figures/` from the academic build: Figures
   1a/1b, 2a/2b, 3a/3b/3c, 4a/4b, 5a/5b, 6, 9, 10, 12a/12b/12c/12d. Reference them
   directly, no re-export needed.
@@ -65,17 +59,22 @@ New for this site:
 3. The Mechanism (the replacement effect, Fig 9). Keep concrete and short. Do NOT add
    the "why existing models miss this" / QUM section — deliberately cut for this
    audience from the very start of this project.
-4. Carrots: tax exemptions vs. density bonuses (Fig 3 a/b/c, Fig 7 a-d spatial maps).
-5. Sticks: what mandates actually deliver (Fig 6, Fig 12 supporting).
-6. **Explore the policy space** — the shared explorer, policy-framed. Earlier in the
-   page than academic's placement, this is a centerpiece feature for this audience, not
-   a "verify it yourself" afterthought.
-7. The Cost: who pays (Fig 12 panels, plus the **incidence widget** reused from
+4. Carrots: tax exemptions vs. density bonuses (Fig 3 a/b/c, Fig 7a/7b spatial maps).
+5. Sticks: what mandates actually deliver (Fig 6).
+6. **Designing the mandate: three choices that matter** — a dedicated section, not a
+   footnote, grouping the three levers that determine whether a mandate actually works:
+   (a) affordability depth (how deep the discount runs), (b) mandatory vs. voluntary
+   participation, (c) the renovation escape hatch (paper's Appendix E). Fig 8a/8b
+   supports (a) and (b) jointly; Fig E1 supports (c). This groups every "how mandate
+   design actually plays out" finding in one place before the reader reaches the
+   explorer, so they carry all three considerations into it.
+7. **Explore the policy space** — the shared explorer, policy-framed.
+8. The Cost: who pays (Fig 12 panels, plus the **incidence widget** reused from
    academic — "Explore the incidence" — same real data, policy framing).
-8. Where to Target: the rebuilt Table D2 targeting table (see content-draft.md for the
-   exact numbers, already verified against Max's raw CSV), Fig D5 (pending).
-9. Policy implications (three takeaways).
-10. Footer: authors, PDF links, cross-link to academic site ("full paper and technical
+9. Where to Target: the rebuilt Table D2 targeting table (see content-draft.md for the
+   exact numbers, already verified against Max's raw CSV), Fig D5.
+10. Policy implications (three takeaways).
+11. Footer: authors, PDF links, cross-link to academic site ("full paper and technical
     appendix") and to developer site once built.
 
 Do not include: model-in-brief, calibration/validation, scope/boundary-conditions
@@ -119,33 +118,31 @@ this site's actual section list (see Page Structure above), not academic's.
 
 ## Pending items (do not block the build on these)
 
-1. Figure 7 (2 files) — filenames given above, confirm they match Daniel's actual
-   file grouping before wiring in; use placeholders if not yet placed in
-   `../resources/figures/`.
-2. Figure D5 (targeted parcels map) — READY: `figure-d5-targeted-parcels.png`, a single
-   combined three-panel image (top 20% by rent potential / top 20% by age / bottom 20%
-   by unused capacity). No longer a placeholder once this file is in resources/figures/.
-3. Developer site cross-link — points to the old standalone developer site for now
+1. Figures 7, D5, D7, E1 — all READY, confirmed live on the site
+   (figure-07a-upzoning.png, figure-07b-tax-exemption.png,
+   figure-d5-targeted-parcels.png, figure-d7-unit-size-trend.png,
+   figure-e1-renovation-probability.png).
+2. Developer site cross-link — points to the old standalone developer site for now
    (https://daniellebret.github.io/carrot-and-stick-developer) until it's rebuilt in
    this repo's developer/ folder.
-4. Once Max's 3D grid (joint alpha/phi/tau) lands, a "Combined" explorer mode is planned
+3. Once Max's 3D grid (joint alpha/phi/tau) lands, a "Combined" explorer mode is planned
    for the ACADEMIC site only (wireframe-cube slice locator + real 2D heatmap), not this
    site. Do not build anything for that here.
-5. Two new content additions, both added to content-draft.md this session:
-   - A short subsection after Sticks ("A wrinkle: mandates alone push owners toward
-     renovation"), from the paper's Appendix E. Optional supporting figure
-     `figure-e1-renovation-probability.png`, not blocking, the subsection works as
-     text-plus-numbers alone.
-   - A short pull-quote callout inside The Mechanism section on unit-size robustness
-     (7% historical decline, holds at 20% smaller). Optional supporting figure
-     `figure-d7-unit-size-trend.png` (citywide only), not blocking.
-   Deliberately excluded: a borough-level unit-size breakdown chart was considered and
-   rejected for this site — real data, but not something the paper explains or tests,
-   and using it risked an unsupported claim. Do not add it if it surfaces later.
+4. Section 5 ("Designing the mandate: three choices that matter") is a NEW section this
+   session, restructured from a single "renovation" aside under Sticks into a full
+   section with three subsections: 5a depth, 5b mandatory/voluntary, 5c renovation.
+   New figures needed: `figure-08a-affordability-levels-total.png` and
+   `figure-08b-affordability-levels-affordable.png` (Figure 8 from the paper,
+   supporting 5a and 5b jointly). Not blocking — both subsections read fine as
+   text-plus-numbers alone if these aren't placed yet.
+5. Deliberately excluded from this site: a borough-level unit-size breakdown chart
+   (real data, but not something the paper explains or tests, and using it risked an
+   unsupported claim). Do not add it if it surfaces later.
 
 ## First-pass goal
 
 A deployable policy-site page the coauthors can review, reusing the explorer/incidence
 widget with real data from day one (no placeholder banner needed, unlike academic's
-early builds), correct current numbers throughout, and the rebuilt targeting table.
-Figures 7 and D5 can ship as clearly labeled placeholders if not yet in hand.
+early builds), correct current numbers throughout, the rebuilt targeting table, and a
+dedicated section covering all three levers that determine whether a mandate actually
+produces the affordable units it's meant to.

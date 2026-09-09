@@ -188,17 +188,26 @@ section > .section-intro {
   margin-bottom: 0;
 }
 
-/* Wrinkle subsection (inside Sticks): a plain bordered aside, not a shadowed
-   card, so it reads as "part of Sticks" rather than a competing section. */
+/* Designing the mandate (05): three lettered subsections (5a/5b/5c) inside
+   one section. .subsection-badge is a lighter-weight echo of .section-badge
+   (text, not a filled pill) so each subsection reads as part of section 05
+   rather than a peer section of its own. */
 
-.aside {
-  border: 1px solid var(--border-light);
-  border-radius: var(--radius-md);
-  padding: var(--space-3) var(--space-4);
+.subsection {
   margin-top: var(--space-4);
 }
 
-.aside h3 {
+.subsection-badge {
+  display: block;
+  color: var(--red);
+  font-weight: 700;
+  font-size: var(--font-size-small);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  margin: 0 0 4px;
+}
+
+.subsection h3 {
   margin-top: 0;
 }
 
