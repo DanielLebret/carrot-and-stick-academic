@@ -100,6 +100,10 @@ covers it.
 
 - Upzoning rent effect: 1.31% (confirmed correct in the published draft, not 1.58%; no
   inference-check flag needed, this was an old open item, now closed).
+- Citywide average rent effect, mandatory incentive bundles: Density Incentive Zoning
+  +0.11%, Fiscal Incentive Zoning -0.13% (from the paper, stated right before Figure D2
+  in the source text — used in Where to Target to anchor the spatial maps: the citywide
+  average is modest/near-zero, hiding substantial neighborhood-level variation).
 - Cost per mandated affordable unit: $59,900 (density incentive zoning), $61,200
   (fiscal incentive zoning) — from the paper's Finding 3 text, matches Max's real
   incidence data closely at the relevant alpha.

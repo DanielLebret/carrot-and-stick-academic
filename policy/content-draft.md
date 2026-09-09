@@ -344,11 +344,14 @@ specific, citywide plan, not a menu of neighborhood options to freely mix and ma
 Redirect redevelopment toward a different or smaller set of districts, and the results
 shift everywhere, not just in the newly targeted area.
 
-Under the two mandatory incentive bundles, Density Incentive Zoning and Fiscal
-Incentive Zoning, this produces a clear geographic pattern. Rents fall across large
-parts of the city, including most of Manhattan, Brooklyn, and the Bronx under Density
-Incentive Zoning, and an even broader area under Fiscal Incentive Zoning, while
-increases concentrate in the specific districts absorbing most of the new construction.
+Under the two mandatory incentive bundles, the citywide average hides just how much
+this varies underneath it. Density Incentive Zoning raises the citywide average rent by
+about 0.11%; Fiscal Incentive Zoning actually lowers it, by about 0.13% (the same two
+numbers shown in Figure 9 above). Both modest numbers cover a clear geographic pattern:
+rents fall across large parts of the city, including most of Manhattan, Brooklyn, and
+the Bronx under Density Incentive Zoning, and an even broader area under Fiscal
+Incentive Zoning, while increases concentrate in
+the specific districts absorbing most of the new construction.
 
 This is a real tradeoff a city can choose to make, not a free one. Concentrating
 redevelopment in a defined set of districts means those districts absorb the visible
