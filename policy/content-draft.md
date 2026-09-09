@@ -15,7 +15,8 @@ Title: When Redevelopment Transforms the Housing Stock: Why Building More Does N
 Always Lower Rents in NYC
 
 Subhead: New research on how housing incentives and affordability mandates work through
-the redevelopment of existing buildings, what each policy costs, and who pays.
+the redevelopment of existing buildings, what each policy costs, who pays, and how
+targeting it well can lower rents where they need to fall.
 
 Byline: Daniel Lebret, Crocker H. Liu & Maxence Valentin, Cornell University & ETH
 Zurich, 2026
@@ -79,6 +80,12 @@ less" to which parcels redevelop, when, at what density, and under what conditio
 Those are exactly the levers housing policy controls.
 
 [Figure 9: Expected Rent Decomposition]
+
+This effect is not uniform across the city. Districts where redevelopment concentrates
+feel the composition shift that pushes rents up; districts with little redevelopment
+feel mainly the citywide relief. Where a city directs redevelopment is therefore itself
+a policy choice, one that can lower rents broadly in some neighborhoods even as it
+raises them in others. See Where to Target below.
 
 Callout / pull-quote (short, muted styling, distinct from body text):
 "This holds even measured per square foot rather than per unit, and even if new
@@ -322,6 +329,40 @@ data from Max's simulation grid.
 
 Heading: Not all neighborhoods respond the same way
 
+New lead-in (precedes the existing targeting-mechanics content below):
+
+Not all neighborhoods respond the same way, and that is not only a fact about where
+units get built. It is a lever. Because the replacement effect is local, tied to the
+specific parcels that redevelop, while the citywide supply effect reaches every
+neighborhood, a district that absorbs little new construction gets mostly the citywide
+relief without the local rent increase that comes from replacing its own older stock.
+
+These patterns come from modeling the whole city at once, not neighborhood by
+neighborhood. What happens in any one district depends on how much redevelopment is
+happening everywhere else in the city at the same time. The numbers below describe one
+specific, citywide plan, not a menu of neighborhood options to freely mix and match.
+Redirect redevelopment toward a different or smaller set of districts, and the results
+shift everywhere, not just in the newly targeted area.
+
+Under the two mandatory incentive bundles, Density Incentive Zoning and Fiscal
+Incentive Zoning, this produces a clear geographic pattern. Rents fall across large
+parts of the city, including most of Manhattan, Brooklyn, and the Bronx under Density
+Incentive Zoning, and an even broader area under Fiscal Incentive Zoning, while
+increases concentrate in the specific districts absorbing most of the new construction.
+
+This is a real tradeoff a city can choose to make, not a free one. Concentrating
+redevelopment in a defined set of districts means those districts absorb the visible
+cost, rising average rents as newer, higher-rent buildings enter the mix, in exchange
+for broader relief elsewhere. The tools examined in this paper do not just add housing.
+Directed well, they can be a lever for lowering rents in specific neighborhoods, not
+only for producing more units citywide.
+
+[Figure D2c/D2d: expected rent change by community district, Density Incentive Zoning
+and Fiscal Incentive Zoning. Files: figure-d2c-rent-map-diz.png (from
+phialpha_ER_chg.png), figure-d2d-rent-map-fiz.png (from alphatau_ER_chg.png).]
+
+Existing targeting-mechanics content follows below, unchanged:
+
 The same instrument produces very different outcomes depending on where it is applied.
 We re-run the two unilateral incentives, upzoning and a 20-year tax exemption, on three
 targeted subsets: the 20% of parcels with the highest rent potential, the 20% most
@@ -398,7 +439,12 @@ OPEN ITEMS
    figure-08a-affordability-levels-total.png and
    figure-08b-affordability-levels-affordable.png. Not blocking; both subsections read
    fine as text-plus-numbers alone.
-7. Explicitly excluded from this site: the borough-level unit-size breakdown
+7. Figure D2c/D2d (expected rent change by community district, Density Incentive
+   Zoning and Fiscal Incentive Zoning) — NEW, supports the new "build elsewhere"
+   framing in Where to Target (and the short pointer in The Mechanism). Files:
+   figure-d2c-rent-map-diz.png (from phialpha_ER_chg.png), figure-d2d-rent-map-fiz.png
+   (from alphatau_ER_chg.png). Place in resources/figures/.
+8. Explicitly excluded from this site: the borough-level unit-size breakdown
    (Rolling_avg_sizeApt_by_boro.png). Real data, but the paper doesn't explain or test
    the borough variation, and using it risked implying an unsupported claim (e.g. about
    household size). Decided not to use it anywhere on this site.

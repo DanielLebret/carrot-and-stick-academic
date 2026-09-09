@@ -58,7 +58,10 @@ New for this site:
    opening works for any audience, keep it).
 3. The Mechanism (the replacement effect, Fig 9). Keep concrete and short. Do NOT add
    the "why existing models miss this" / QUM section — deliberately cut for this
-   audience from the very start of this project.
+   audience from the very start of this project. NEW this session: a short pointer
+   after the $60/$25 decomposition paragraph, noting the effect isn't uniform across
+   the city and forward-referencing "Where to Target" below — plants the targeting-as-
+   lever idea early without a full section here.
 4. Carrots: tax exemptions vs. density bonuses (Fig 3 a/b/c, Fig 7a/7b spatial maps).
 5. Sticks: what mandates actually deliver (Fig 6).
 6. **Designing the mandate: three choices that matter** — a dedicated section, not a
@@ -71,8 +74,16 @@ New for this site:
 7. **Explore the policy space** — the shared explorer, policy-framed.
 8. The Cost: who pays (Fig 12 panels, plus the **incidence widget** reused from
    academic — "Explore the incidence" — same real data, policy framing).
-9. Where to Target: the rebuilt Table D2 targeting table (see content-draft.md for the
-   exact numbers, already verified against Max's raw CSV), Fig D5.
+9. Where to Target: NOW OPENS with a new lead-in (added this session) framing targeting
+   as a genuine policy lever, not just a production-efficiency question — spatial
+   heterogeneity in rent response means directing redevelopment can lower rents broadly
+   in low-redevelopment districts while raising them in high-redevelopment ones. Uses
+   Fig D2c/D2d (community-district rent-change maps for Density and Fiscal Incentive
+   Zoning). Explicitly notes results come from modeling the whole city jointly, not
+   neighborhood-by-neighborhood, in plain language (avoid "spatial equilibrium" as a
+   term in body copy — flagged as too technical for this audience). The existing
+   targeting-mechanics content (Table D2, the three target-group breakdown, Fig D5)
+   follows this lead-in, unchanged.
 10. Policy implications (three takeaways).
 11. Footer: authors, PDF links, cross-link to academic site ("full paper and technical
     appendix") and to developer site once built.
@@ -138,6 +149,15 @@ this site's actual section list (see Page Structure above), not academic's.
 5. Deliberately excluded from this site: a borough-level unit-size breakdown chart
    (real data, but not something the paper explains or tests, and using it risked an
    unsupported claim). Do not add it if it surfaces later.
+6. Hero subhead updated this session: now ends "...what each policy costs, who pays,
+   and how targeting it well can lower rents where they need to fall" — adds the
+   targeting-as-solution angle to the very first thing a reader sees, so it isn't
+   buried until Where to Target.
+7. New figures needed: `figure-d2c-rent-map-diz.png` (from Daniel's phialpha_ER_chg.png)
+   and `figure-d2d-rent-map-fiz.png` (from alphatau_ER_chg.png) — community-district
+   rent-change maps, Figure D2 panels C and D from the paper. Support the new Where to
+   Target lead-in and the Mechanism section's forward-pointer. Place in
+   resources/figures/. Not blocking — the lead-in reads as text alone if not yet placed.
 
 ## First-pass goal
 
