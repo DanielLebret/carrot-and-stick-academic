@@ -26,7 +26,7 @@ document.addEventListener("DOMContentLoaded", function () {
       netUnits: "Net new units",
       rentChange: "Average rent effect",
       costSplitNote: "The public/landowner cost split is not part of this " +
-        "grid; see The Cost below for the per-unit cost and incidence, or " +
+        "grid; see The Cost above for the per-unit cost and incidence, or " +
         "move the mandate slider there to see it at any level."
     }
   });

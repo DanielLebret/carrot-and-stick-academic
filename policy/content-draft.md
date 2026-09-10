@@ -25,6 +25,12 @@ Buttons: Read the Working Paper (PDF) | Online Appendix (PDF)
 (Reuse the same PDF and #page=61 jump already wired up on the academic site — same file,
 ../resources/papers/Carrot_and_Stick_Policy.pdf)
 
+Jump link (new, below the buttons, lighter-weight styling than the two PDF buttons, e.g.
+a plain text link with an arrow): "Try the interactive explorer" → anchors to #explorer
+(the Explore the Policy Space section, now positioned near the end of the page). Exists
+so readers who want hands-on interaction immediately are not forced into a linear read
+just because the Explorer itself now sits later in the page for comprehension reasons.
+
 ================================================================================
 01. THE PUZZLE (with motivating facts)
 ================================================================================
@@ -164,8 +170,7 @@ This is why mandates work best paired with incentives: the carrot offsets the
 supply-dampening effect of the stick.
 
 [Figure 6: Housing Production scatter. Only the combined policy expands both affordable
-and market-rate units; standalone mandates fall below the 45-degree line. See this
-relationship for any policy combination in the explorer below.]
+and market-rate units; standalone mandates fall below the 45-degree line.]
 
 ================================================================================
 05. DESIGNING THE MANDATE: THREE CHOICES THAT MATTER
@@ -265,31 +270,7 @@ use figure-placeholder if figure-e1-renovation-probability.png is not yet in
 resources/figures/. This subsection reads fine as text-plus-numbers without a chart.]
 
 ================================================================================
-06. EXPLORE THE POLICY SPACE  (shared explorer, embedded here, policy framing)
-================================================================================
-
-Heading: See what your policy choice does
-
-Framing line (plainer than academic's "explore the policy space" framing):
-Move the sliders to see what a given combination of incentives and mandates would
-produce citywide: how many units, how many affordable, and how rents respond.
-
-Embed: ../resources/explorer/ — same engine, same real data (Max's grid, verified
-against the paper's own reported numbers) as the academic site. Config differences for
-this site:
-- Foreground the "who pays" / public-share readout more than academic does (academic
-  leads with percentages and the supply-neutral contour; this site should lead with
-  plain unit counts and, once on the mode toggle, a clear net-units-vs-rent framing).
-- Keep the heatmap-with-marker feature (Figure 11/D10 real images with calibrated
-  marker) — this is the most concrete, intuitive part of the tool and works well for
-  this audience.
-- No "illustrative data" banner needed — this is real data already.
-- Slider labels can stay technical (α, φ, τ) since the academic site already
-  established that convention and planners will encounter density bonus / tax
-  exemption / mandate share as real terms they use professionally.
-
-================================================================================
-07. THE COST
+06. THE COST
 ================================================================================
 
 Heading: Who pays for each mandated affordable unit?
@@ -324,7 +305,7 @@ share of cost borne by the public sector. No "approximate" caveat needed, this i
 data from Max's simulation grid.
 
 ================================================================================
-08. WHERE TO TARGET (rebuilt from Table D2 — replaces the current live site's
+07. WHERE TO TARGET (rebuilt from Table D2 — replaces the current live site's
     invented three-bundle table entirely)
 ================================================================================
 
@@ -402,6 +383,48 @@ the upward rent pressure that defines dense-city redevelopment is largely absent
 
 [Figure D5: targeted parcels by criterion — PENDING, needs a fresh export to match
 these corrected numbers. Use figure-placeholder until the file lands.]
+
+================================================================================
+08. EXPLORE THE POLICY SPACE  (shared explorer, embedded here, policy framing)
+================================================================================
+
+Heading: See what your policy choice does
+
+Framing line (plainer than academic's "explore the policy space" framing):
+Move the sliders to see what a given combination of incentives and mandates would
+produce citywide: how many units, how many affordable, and how rents respond, and where.
+
+Section note: positioned here deliberately, after Sticks, Mandate Design, The Cost, and
+Where to Target have all been read, so the reader already has the mechanics, the cost
+tradeoffs, and the targeting logic before touching the sliders. A hero-level jump link
+("Try the interactive explorer") gives readers who want to skip ahead direct access
+without forcing a linear read.
+
+Embed: ../resources/explorer/ — same engine, same real data (Max's grid, verified
+against the paper's own reported numbers) as the academic site. Config differences for
+this site:
+- Foreground the "who pays" / public-share readout more than academic does (academic
+  leads with percentages and the supply-neutral contour; this site should lead with
+  plain unit counts and, once on the mode toggle, a clear net-units-vs-rent framing).
+- Keep the heatmap-with-marker feature (Figure 11/D10 real images with calibrated
+  marker) — this is the most concrete, intuitive part of the tool and works well for
+  this audience.
+- No "illustrative data" banner needed — this is real data already.
+- Slider labels can stay technical (α, φ, τ) since the academic site already
+  established that convention and planners will encounter density bonus / tax
+  exemption / mandate share as real terms they use professionally.
+- IMPORTANT once built: the readout note currently reads "...see The Cost below for the
+  per-unit cost and incidence..." — this must change to "The Cost above", since The Cost
+  now precedes the Explorer in reading order (matches how the academic site already
+  phrases this as "above," since Finding 3 precedes its Explorer there too).
+
+PENDING (staged, not yet built, tracked separately): Stage A (early next week) replaces
+the two top heatmaps and the DIZ/FIZ mode toggle with the full 3D wireframe-cube-plus-
+heatmap explorer, once Max delivers the joint α/φ/τ grid. Stage B (later next week)
+adds two live community-district maps (rent change, and affordable/market units with a
+toggle) side by side, below the three sliders, above the housing-production scatter,
+once Max's per-district matrix lands. Both stages are separate follow-up work, not part
+of this reorder.
 
 ================================================================================
 09. POLICY IMPLICATIONS

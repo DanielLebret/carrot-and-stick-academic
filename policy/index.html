@@ -42,9 +42,9 @@
       <a href="#carrots">Carrots</a>
       <a href="#sticks">Sticks</a>
       <a href="#mandate-design">Mandate</a>
-      <a href="#explorer">Explorer</a>
       <a href="#cost">Cost</a>
       <a href="#target">Target</a>
+      <a href="#explorer">Explorer</a>
       <a href="#implications">Implications</a>
     </nav>
   </div>
@@ -67,6 +67,7 @@
       <a class="button button-primary" href="../resources/papers/Carrot_and_Stick_Policy.pdf" target="_blank" rel="noopener" data-umami-event="policy_download_working_paper">Read the Working Paper (PDF)</a>
       <a class="button button-secondary" href="../resources/papers/Carrot_and_Stick_Policy.pdf#page=61" target="_blank" rel="noopener" data-umami-event="policy_download_appendix">Online Appendix (PDF)</a>
     </div>
+    <a class="hero-jump-link" href="#explorer" data-umami-event="policy_hero_jump_explorer">Try the interactive explorer &rarr;</a>
   </section>
 
   <!-- ============================== 01 THE PUZZLE ============================== -->
@@ -506,25 +507,9 @@
     </div>
   </section>
 
-  <!-- ============================== 06 EXPLORE THE POLICY SPACE ============================== -->
-  <section id="explorer">
-    <p class="section-badge">06</p>
-    <h2>See what your policy choice does</h2>
-    <p class="section-intro">
-      Move the sliders to see what a given combination of incentives and
-      mandates would produce citywide: how many units, how many
-      affordable, and how rents respond.
-    </p>
-
-    <div id="explorer-root" class="explorer" aria-label="Policy explorer">
-      <!-- Populated by resources/explorer/explorer.js via explorer-config.js -->
-      <noscript>The interactive explorer requires JavaScript. The same policy points are reported as figures throughout this page.</noscript>
-    </div>
-  </section>
-
-  <!-- ============================== 07 THE COST ============================== -->
+  <!-- ============================== 06 THE COST ============================== -->
   <section id="cost">
-    <p class="section-badge">07</p>
+    <p class="section-badge">06</p>
     <h2>Who pays for each mandated affordable unit?</h2>
 
     <p>
@@ -625,9 +610,9 @@
     </div>
   </section>
 
-  <!-- ============================== 08 WHERE TO TARGET ============================== -->
+  <!-- ============================== 07 WHERE TO TARGET ============================== -->
   <section id="target">
-    <p class="section-badge">08</p>
+    <p class="section-badge">07</p>
     <h2>Not all neighborhoods respond the same way</h2>
 
     <p>
@@ -790,6 +775,22 @@
         Targeted parcels by criterion: top 20% by rent potential, top 20% by
         age, bottom 20% by unused capacity.
       </p>
+    </div>
+  </section>
+
+  <!-- ============================== 08 EXPLORE THE POLICY SPACE ============================== -->
+  <section id="explorer">
+    <p class="section-badge">08</p>
+    <h2>See what your policy choice does</h2>
+    <p class="section-intro">
+      Move the sliders to see what a given combination of incentives and
+      mandates would produce citywide: how many units, how many
+      affordable, and how rents respond, and where.
+    </p>
+
+    <div id="explorer-root" class="explorer" aria-label="Policy explorer">
+      <!-- Populated by resources/explorer/explorer.js via explorer-config.js -->
+      <noscript>The interactive explorer requires JavaScript. The same policy points are reported as figures throughout this page.</noscript>
     </div>
   </section>
 
@@ -994,9 +995,9 @@
       carrots: "policy_view_carrots",
       sticks: "policy_view_sticks",
       "mandate-design": "policy_view_mandate_design",
-      explorer: "policy_view_explorer",
       cost: "policy_view_cost",
       target: "policy_view_target",
+      explorer: "policy_view_explorer",
       implications: "policy_view_implications"
     };
 

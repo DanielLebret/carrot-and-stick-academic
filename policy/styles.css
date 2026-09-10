@@ -82,6 +82,24 @@ section > .section-intro {
   gap: var(--space-2);
 }
 
+/* Lighter-weight than the two PDF buttons above: plain text, no border or
+   fill, for readers who want to skip straight to the explorer (now
+   positioned near the end of the page, after The Cost and Where to Target)
+   without a linear read. */
+.hero-jump-link {
+  display: inline-block;
+  margin-top: var(--space-3);
+  color: var(--red);
+  font-size: var(--font-size-small);
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.hero-jump-link:hover,
+.hero-jump-link:focus {
+  text-decoration: underline;
+}
+
 /* Figures: same treatment as the academic site (capped at the text column,
    centered, images render edge to edge with no placeholder chrome unless
    handleFigureImgError actually fires). */
