@@ -156,7 +156,8 @@ carried by the units they replace, so average rents rise. We call this compositi
 and its consequences for the rent distribution the replacement effect.
 
 Within our calibration the replacement effect dominates the supply effect. Under upzoning,
-average expected rent rises by about 1.31% even as supply expands. Decomposed per unit,
+average expected rent rises by about 1.31% over the model's 10-year projection horizon,
+even as supply expands. Decomposed per unit,
 replacement adds about $60 per month while additional supply subtracts about $25. The
 result holds across the credible range of demand elasticities; only a closed-city
 elasticity would let the supply effect win.
@@ -175,8 +176,9 @@ preempt the unit-normalization objection.
 Finding 3: Mandates produce affordable units mainly by crowding out market-rate ones
 --------------------------------------------------------------------------------
 Affordability mandates raise affordable production, but primarily by displacing market-
-rate construction rather than by growing the stock. A 30% mandate yields roughly 42,000
-affordable units while reducing market-rate construction by about 58,000. Because
+rate construction rather than by growing the stock. Over the model's 10-year projection
+horizon, a 30% mandate yields roughly 42,000 affordable units while reducing market-rate
+construction by about 58,000. Because
 redevelopment under a mandate is only profitable where rents are already high, the new
 affordable units expand the middle of the rent distribution and leave the bottom quintile
 largely unchanged. Mandated units are also costly: holding total supply fixed, each

@@ -54,13 +54,13 @@
 
   <!-- ============================== HERO ============================== -->
   <section class="hero">
-    <p class="eyebrow">Cornell University, Housing Policy Research</p>
+    <p class="eyebrow">Cornell University &amp; ETH Zurich</p>
     <h1>When Redevelopment Transforms the Housing Stock: Why Building More Does Not Always Lower Rents in NYC</h1>
     <p class="subtitle">
       New research on how housing incentives and affordability mandates work
       through the redevelopment of existing buildings, what each policy
-      costs, who pays, and how targeting it well can lower rents where they
-      need to fall.
+      costs, who pays, and how the location of redevelopment shapes who
+      sees rents fall.
     </p>
     <p class="byline">Daniel Lebret, Crocker H. Liu &amp; Maxence Valentin, Cornell University &amp; ETH Zurich, 2026</p>
     <div class="hero-actions">
@@ -174,10 +174,11 @@
       Within our calibration, policies that raise construction raise
       average rents, because the replacement effect dominates the downward
       pull of added supply. Under a representative upzoning
-      counterfactual, average rent rises about 1.31%, even as supply
-      expands. Per unit, replacement adds about $60 per month while added
-      supply subtracts about $25. The net is positive because the mix of
-      the stock shifts toward newer, higher-rent units.
+      counterfactual, average rent rises about 1.31% over the model's
+      10-year projection horizon, even as supply expands. Per unit,
+      replacement adds about $60 per month while added supply subtracts
+      about $25. The net is positive because the mix of the stock shifts
+      toward newer, higher-rent units.
     </p>
 
     <p>
@@ -329,14 +330,15 @@
 
     <p>
       Mandates, requirements that a share of new units rent below market,
-      are the most direct tool for producing affordable units and the most
+      are the most used tool for producing affordable units and the most
       misunderstood.
     </p>
 
     <p>
-      What they do: they reallocate access to new construction. A 30%
-      mandate produces roughly 42,000 affordable units that genuinely
-      reach households otherwise priced out of new buildings.
+      What they do: they reallocate access to new construction. Over the
+      model's 10-year projection horizon, a 30% mandate produces roughly
+      42,000 affordable units that genuinely reach households otherwise
+      priced out of new buildings.
     </p>
 
     <p>
@@ -576,7 +578,7 @@
           </div>
           <figcaption>(c) Share borne by public sector</figcaption>
         </figure>
-        <figure class="figure-sub">
+        <figure class="figure-sub" id="figure-12d">
           <div class="figure-media">
             <img src="../resources/figures/figure-12d-rent-quintiles.png" alt="Figure 12d. Share of units in rent quintiles." onerror="handleFigureImgError(this)" />
           </div>
@@ -650,15 +652,16 @@
 
     <p>
       Under the two mandatory incentive bundles, the citywide average hides
-      just how much this varies underneath it. Density Incentive Zoning
-      raises the citywide average rent by about 0.11%; Fiscal Incentive
-      Zoning actually lowers it, by about 0.13% (the same two numbers shown
-      in Figure 9 above). Both modest numbers cover a clear geographic
-      pattern: rents fall across large parts of the city, including most
-      of Manhattan, Brooklyn, and the Bronx under Density Incentive Zoning,
-      and an even broader area under Fiscal Incentive Zoning, while
-      increases concentrate in the specific districts absorbing most of
-      the new construction.
+      just how much this varies underneath it. Over the model's 10-year
+      projection horizon, Density Incentive Zoning raises the citywide
+      average rent by about 0.11%; Fiscal Incentive Zoning actually lowers
+      it, by about 0.13% (the same two numbers shown in Figure 9 above).
+      Both modest numbers cover a clear geographic pattern: rents fall
+      across large parts of the city, including most of Manhattan,
+      Brooklyn, and the Bronx under Density Incentive Zoning, and an even
+      broader area under Fiscal Incentive Zoning, while increases
+      concentrate in the specific districts absorbing most of the new
+      construction.
     </p>
 
     <div class="figure-block">
@@ -685,9 +688,19 @@
       Concentrating redevelopment in a defined set of districts means those
       districts absorb the visible cost, rising average rents as newer,
       higher-rent buildings enter the mix, in exchange for broader relief
-      elsewhere. The tools examined in this paper do not just add housing.
-      Directed well, they can be a lever for lowering rents in specific
-      neighborhoods, not only for producing more units citywide.
+      elsewhere. The tools examined in this paper do not just add housing;
+      where they are directed shapes which neighborhoods feel the increase
+      and which get the relief.
+    </p>
+
+    <p>
+      The model is clear about this forward question: given a policy,
+      where redevelopment happens and how it affects rents there and
+      elsewhere. It does not yet answer the reverse question a
+      policymaker actually faces: given a neighborhood where you want
+      rents to fall, where should new construction happen instead, and
+      how much, to achieve it. That is a harder, genuinely open problem,
+      one this research raises rather than solves.
     </p>
 
     <p>
@@ -801,19 +814,23 @@
           Parcels near their threshold respond to tax incentives but
           weakly to density bonuses; high-value parcels respond to density
           bonuses. And because the rent effect is local, not just the
-          production effect, directing redevelopment toward specific
-          districts can lower rents broadly elsewhere in the city, not
-          only shift where units get built.
+          production effect, where redevelopment happens shapes which
+          neighborhoods feel the increase and which mainly get the
+          citywide relief. That is a real pattern worth factoring into
+          siting decisions, not yet a formula for hitting a specific rent
+          target in a specific neighborhood, see
+          <a href="#target">Where to Target</a> above.
         </p>
       </div>
       <div class="implication-card">
         <span class="implication-number">03</span>
-        <h3>Mandates will not reach the lowest-rent households</h3>
+        <h3>Do not expect mandates to reach the lowest-rent households</h3>
         <p>
           Mandated units cluster in new buildings on higher-value sites,
-          above the bottom quintile. Reaching the lowest incomes means
-          preserving and improving the aging stock, not only mandating
-          affordability in new construction.
+          above the bottom quintile (see the rent-quintile breakdown in
+          <a href="#figure-12d">Figure 12d</a>, The Cost). Reaching the
+          lowest incomes means preserving and improving the aging stock,
+          not only mandating affordability in new construction.
         </p>
       </div>
     </div>
@@ -826,8 +843,8 @@
     <div class="footer-left">
       <p class="footer-brand">Carrot &amp; Stick</p>
       <p class="footer-small">
-        Cornell University Housing Policy Research &middot; 2026<br />
-        Daniel Lebret &middot; Crocker H. Liu &middot; Maxence Valentin
+        Daniel Lebret &middot; Crocker H. Liu &middot; Maxence Valentin<br />
+        Cornell University &amp; ETH Zurich &middot; 2026
       </p>
       <p class="footer-small">
         This research is based on a forward-looking spatial model
@@ -845,7 +862,6 @@
            ../developer/index.html exists in this repo. -->
     </div>
   </div>
-  <p class="footer-note">Cornell University &amp; ETH Zurich, 2026</p>
 </footer>
 
 <script>
