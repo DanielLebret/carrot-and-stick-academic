@@ -164,7 +164,8 @@ This is why mandates work best paired with incentives: the carrot offsets the
 supply-dampening effect of the stick.
 
 [Figure 6: Housing Production scatter. Only the combined policy expands both affordable
-and market-rate units; standalone mandates fall below the 45-degree line.]
+and market-rate units; standalone mandates fall below the 45-degree line. See this
+relationship for any policy combination in the explorer below.]
 
 ================================================================================
 05. DESIGNING THE MANDATE: THREE CHOICES THAT MATTER

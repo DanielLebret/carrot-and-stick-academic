@@ -135,32 +135,66 @@
   color: var(--white);
 }
 
-.explorer-body {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: var(--space-5);
-  align-items: start;
+/* Controls row: the active fieldset's two sliders side by side, full
+   explorer width. Only one of the two fieldsets is visible at a time (the
+   other carries the `hidden` attribute), so the 2-column grid lives on the
+   fieldset itself rather than on this wrapper. */
+.explorer-controls-row {
+  margin-bottom: var(--space-4);
 }
 
-@media (max-width: 640px) {
-  .explorer-body {
-    grid-template-columns: 1fr;
-    gap: var(--space-4);
-  }
-}
-
-.explorer-controls fieldset {
+.explorer-controls-row fieldset {
   border: none;
   padding: 0;
-  margin: 0 0 var(--space-4);
+  margin: 0;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-4);
 }
 
-.explorer-controls legend {
+/* Without this, the fieldset's own `display: grid` above (a class+element
+   selector) beats the `[hidden]` attribute's UA-stylesheet `display: none`
+   default (equal-or-lower specificity), and the inactive mode's fieldset
+   renders alongside the active one instead of staying hidden. */
+.explorer-controls-row fieldset[hidden] {
+  display: none;
+}
+
+.explorer-controls-row legend {
   font-size: var(--font-size-small);
   font-weight: 600;
   color: var(--text-dark);
   margin-bottom: var(--space-1);
   padding: 0;
+}
+
+@media (max-width: 640px) {
+  .explorer-controls-row fieldset {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Readouts row: full explorer width, "Net new units" and "Average expected
+   rent change" side by side, the clarification note spanning both columns
+   underneath. */
+.explorer-readouts-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-4);
+  background: var(--white);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-md);
+  padding: var(--space-3);
+}
+
+.explorer-readouts-row .explorer-note {
+  grid-column: 1 / -1;
+}
+
+@media (max-width: 640px) {
+  .explorer-readouts-row {
+    grid-template-columns: 1fr;
+  }
 }
 
 /* Visually hidden but still announced by screen readers: the mode toggle
@@ -199,18 +233,11 @@
   accent-color: var(--red);
 }
 
-.explorer-readouts {
-  background: var(--white);
-  border: 1px solid var(--border-light);
-  border-radius: var(--radius-md);
-  padding: var(--space-3);
-}
-
+/* Bottom margin is dropped here (not just on :last-child): both readout
+   blocks now sit side by side as grid items rather than stacked, and the
+   note below them provides its own top margin for spacing, so a bottom
+   margin here would just double that gap. */
 .explorer-readout {
-  margin-bottom: var(--space-3);
-}
-
-.explorer-readout:last-child {
   margin-bottom: 0;
 }
 
@@ -320,4 +347,134 @@
   font-size: var(--font-size-small);
   color: var(--text-light);
   margin-top: var(--space-3);
+}
+
+/* Housing production tradeoff scatter, full-width panel below the
+   controls/readouts grid. */
+.explorer-scatter {
+  margin-top: var(--space-4);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-md);
+  background: var(--white);
+  padding: var(--space-3);
+}
+
+.explorer-scatter-svg {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+/* Gridlines and tick labels, every 50,000 units on both axes. */
+.explorer-scatter-gridline {
+  stroke: var(--border-light);
+  stroke-width: 1;
+}
+
+.explorer-scatter-tick {
+  font-size: 10px;
+  font-family: inherit;
+  fill: var(--text-light);
+}
+
+.explorer-scatter-tick-x {
+  text-anchor: middle;
+}
+
+.explorer-scatter-tick-y {
+  text-anchor: end;
+}
+
+.explorer-scatter-axis-title {
+  font-size: 12px;
+  font-weight: 600;
+  font-family: inherit;
+  fill: var(--text-dark);
+  text-anchor: middle;
+}
+
+/* Baseline crosshair: dashed dark guide lines from the plot edges to the
+   origin, matching Figure 6's dashed baseline lines. */
+.explorer-scatter-baseline-guide {
+  stroke: var(--text-dark);
+  stroke-width: 1;
+  stroke-dasharray: 3 3;
+  opacity: 0.45;
+}
+
+/* Net-decrease region: solid dark-red boundary line plus a light tint fill,
+   matching resources/figures/figure-06-production-counterfactuals.png. */
+.explorer-scatter-decrease-fill {
+  fill: var(--red);
+  fill-opacity: 0.14;
+  stroke: none;
+}
+
+.explorer-scatter-diagonal {
+  stroke: var(--red);
+  stroke-width: 2.5;
+}
+
+.explorer-scatter-decrease-label {
+  font-size: 12px;
+  font-weight: 600;
+  font-family: inherit;
+  fill: var(--red);
+}
+
+/* The grid-derived labeled reference points: solid red diamonds, matching
+   Figure 6's marker style. */
+.explorer-scatter-refpoint {
+  fill: var(--red);
+  stroke: var(--white);
+  stroke-width: 1.5;
+}
+
+.explorer-scatter-reflabel {
+  font-size: 11px;
+  font-family: inherit;
+  fill: var(--text-dark);
+}
+
+.explorer-scatter-baseline-label {
+  text-anchor: end;
+}
+
+/* (6) All Policies: a static, non-grid point (see SCATTER_ALL_POLICIES_POINT
+   in explorer.js), deliberately distinct from the five live-grid diamonds:
+   muted fill and a dashed outline instead of a solid one. */
+.explorer-scatter-static-point {
+  fill: var(--red);
+  fill-opacity: 0.45;
+  stroke: var(--text-dark);
+  stroke-width: 1.5;
+  stroke-dasharray: 2 2;
+}
+
+.explorer-scatter-static-label {
+  font-style: italic;
+}
+
+/* Live marker: a hollow outlined circle, deliberately distinct from the
+   solid reference diamonds above so "where I am" reads apart from the two
+   named cases. */
+.explorer-scatter-marker {
+  fill: var(--white);
+  stroke: var(--red);
+  stroke-width: 2.5;
+}
+
+.explorer-scatter-caption {
+  font-size: var(--font-size-small);
+  color: var(--text-mid);
+  text-align: center;
+  margin: var(--space-2) 0 0;
+}
+
+.explorer-scatter-note {
+  font-size: var(--font-size-small);
+  font-style: italic;
+  color: var(--text-light);
+  text-align: center;
+  margin: 2px 0 0;
 }
