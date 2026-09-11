@@ -178,7 +178,7 @@ Finding 3: Mandates produce affordable units mainly by crowding out market-rate 
 Affordability mandates raise affordable production, but primarily by displacing market-
 rate construction rather than by growing the stock. Over the model's 10-year projection
 horizon, a 30% mandate yields roughly 42,000 affordable units while reducing market-rate
-construction by about 58,000. Because
+construction by about 56,000. Because
 redevelopment under a mandate is only profitable where rents are already high, the new
 affordable units expand the middle of the rent distribution and leave the bottom quintile
 largely unchanged. Mandated units are also costly: holding total supply fixed, each
