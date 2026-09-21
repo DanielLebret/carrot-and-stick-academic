@@ -68,14 +68,22 @@
 
 /* The cube panel can end up taller than its own title+SVG content once the
    row stretches it to match the right column's height (see
-   .explorer-cube-row above); centering as a flex column distributes that
-   extra space evenly above and below the drawing instead of leaving it all
-   underneath. The cube's own size is untouched, since the SVG still sizes
-   itself the same way (width:100% / height:auto). */
+   .explorer-cube-row above). The title stays pinned to the top of the panel
+   (normal flow); only the cube drawing below it should absorb the extra
+   space, via .explorer-cube-svg-wrap (flex: 1 + justify-content: center),
+   so the extra height is distributed evenly above and below the SVG without
+   moving the title down. The cube's own size is untouched, since the SVG
+   still sizes itself the same way (width:100% / height:auto). */
 .explorer-cube-panel {
   display: flex;
   flex-direction: column;
+}
+
+.explorer-cube-svg-wrap {
+  display: flex;
+  flex-direction: column;
   justify-content: center;
+  flex: 1;
 }
 
 .explorer-right-col {

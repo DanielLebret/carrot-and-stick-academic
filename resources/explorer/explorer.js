@@ -619,6 +619,7 @@
       '<div class="explorer-cube-row">' +
       '<div class="explorer-cube-panel">' +
       '<div class="explorer-panel-title">Policy space</div>' +
+      '<div class="explorer-cube-svg-wrap">' +
       '<svg class="explorer-cube-svg" viewBox="0 0 ' + CUBE_VIEWBOX.width + " " + CUBE_VIEWBOX.height + '" ' +
       'role="img" aria-label="Three-dimensional view of the policy space, alpha vertical, phi horizontal, tau receding">' +
       '<g data-el="cube-wire"></g>' +
@@ -629,6 +630,7 @@
       '<g data-el="cube-guides"></g>' +
       '<circle data-el="cube-marker" r="5" class="explorer-cube-marker" visibility="hidden"></circle>' +
       "</svg>" +
+      "</div>" +
       "</div>" +
       '<div class="explorer-right-col">' +
       '<div class="explorer-tau-slot">' +
