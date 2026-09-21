@@ -155,8 +155,8 @@ Mandates, requirements that a share of new units rent below market, are the most
 tool for producing affordable units and the most misunderstood.
 
 What they do: they reallocate access to new construction. Over the model's 10-year
-projection horizon, a 30% mandate produces roughly 42,000 affordable units that
-genuinely reach households otherwise priced out of new buildings.
+projection horizon, a 30% mandate produces roughly 42,000 below-market units within
+new development.
 
 What they do not do: they do not expand the bottom of the rent distribution. Those same
 42,000 affordable units come with about 56,000 fewer market-rate units, because a
@@ -443,8 +443,9 @@ neighborhood, see Where to Target above.
 
 03 Do not expect mandates to reach the lowest-rent households. Mandated units cluster in
 new buildings on higher-value sites, above the bottom quintile (see the rent-quintile
-breakdown in Figure 12d, The Cost). Reaching the lowest incomes means preserving and
-improving the aging stock, not only mandating affordability in new construction.
+breakdown in Figure 12d, The Cost). Policies aimed at the lowest-rent segment therefore
+likely need to address the existing aging stock as well as affordability requirements
+in new construction.
 
 ================================================================================
 FOOTER
