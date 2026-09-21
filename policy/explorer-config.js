@@ -18,16 +18,18 @@ document.addEventListener("DOMContentLoaded", function () {
     dataPath: "../resources/explorer/",
     figuresPath: "../resources/figures/",
     labels: {
-      diz: "Density Incentive Zoning",
-      fiz: "Fiscal Incentive Zoning",
+      metricProduction: "Production",
+      metricRent: "Rent",
       alpha: "Mandate share (affordable, α)",
       phi: "Density bonus (φ)",
       tau: "Tax exemption, years (τ)",
       netUnits: "Net new units",
       rentChange: "Average rent effect",
-      costSplitNote: "The public/landowner cost split is not part of this " +
-        "grid; see The Cost above for the per-unit cost and incidence, or " +
-        "move the mandate slider there to see it at any level."
+      costSplitNote: "Reflects the full fiscal and property-value effect of " +
+        "this policy, including any change in total production. This is not " +
+        "the same as the per-unit incidence analysis in The Cost above, " +
+        "which isolates the affordable/market trade-off by holding total " +
+        "production fixed."
     }
   });
 });

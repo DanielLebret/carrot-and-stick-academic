@@ -31,75 +31,253 @@
   display: none;
 }
 
-.explorer-heatmaps {
+/* Cube (left) and the tau-slider + heatmap column (right): equal width
+   columns, matching the heatmap's previous rendered width exactly (same
+   1fr/1fr + gap formula the old two-heatmap layout used), inside the
+   existing 860px content column. A single grid row (not a 2-row area
+   template) means both columns share one row height, driven by whichever
+   side's content is naturally taller; align-items: stretch then grows the
+   shorter side's box to match. On the cube side that just adds blank space
+   below the SVG (harmless, no distortion, since it has no trailing flexible
+   content); on the right side, .explorer-right-col is itself a flex column
+   with the heatmap panel set to flex: 1, so the extra space is absorbed
+   into the heatmap panel's own box rather than left as a gap after it, and
+   its bottom border ends up aligned with the cube panel's bottom border. This
+   holds regardless of how long the tau-note / heatmap-hint captions get. */
+.explorer-cube-row {
   display: grid;
   grid-template-columns: 1fr 1fr;
+  align-items: stretch;
   gap: var(--space-3);
   margin-bottom: var(--space-2);
 }
 
 @media (max-width: 640px) {
-  .explorer-heatmaps {
+  .explorer-cube-row {
     grid-template-columns: 1fr;
   }
 }
 
-.explorer-heatmap {
-  position: relative;
+.explorer-cube-panel,
+.explorer-heatmap-panel {
   border: 1px solid var(--border-light);
   border-radius: var(--radius-sm);
-  overflow: hidden;
   background: var(--white);
-  line-height: 0; /* no inline-image gap at the bottom of the box */
+  padding: var(--space-2);
 }
 
-.explorer-heatmap img {
+/* The cube panel can end up taller than its own title+SVG content once the
+   row stretches it to match the right column's height (see
+   .explorer-cube-row above); centering as a flex column distributes that
+   extra space evenly above and below the drawing instead of leaving it all
+   underneath. The cube's own size is untouched, since the SVG still sizes
+   itself the same way (width:100% / height:auto). */
+.explorer-cube-panel {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.explorer-right-col {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.explorer-right-col .explorer-heatmap-panel {
+  flex: 1;
+}
+
+.explorer-tau-slot .explorer-slider-row {
+  margin-bottom: 0;
+}
+
+.explorer-tau-note {
+  font-size: 11px;
+  color: var(--text-light);
+  margin: 6px 0 0;
+}
+
+.explorer-cube-svg,
+.explorer-heatmap-svg {
   display: block;
   width: 100%;
   height: auto;
 }
 
-/* Positioned via left/top (%) in JS; zero-size anchor, children offset from
-   it so the crosshair and dot stay centered on the exact calibrated point
-   regardless of the image's rendered size. */
-.explorer-heatmap-marker {
+/* Panel titles above each SVG, naming the currently-colored outcome. */
+.explorer-panel-title {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-dark);
+  text-align: center;
+  margin-bottom: var(--space-1);
+}
+
+/* The cube's colored slice stays translucent so the wireframe edges and the
+   alpha/phi/tau axis lines it passes through remain readable rather than
+   being mostly hidden underneath it; the flat heatmap keeps full opacity
+   since it has no geometry to show through. */
+.explorer-cube-panel [data-el="cube-surface"] {
+  opacity: 0.32;
+}
+
+.explorer-heatmap-svg {
+  cursor: crosshair;
+  touch-action: none; /* pointer drag handles panning, not the browser */
+}
+
+/* Cube wireframe: light, recedes visually behind the colored slice and axis
+   lines so it reads as a bounding volume, not the focal element. */
+.explorer-cube-wire {
+  stroke: var(--gray-300);
+  stroke-width: 1;
+  fill: none;
+}
+
+/* The three primary axes from the (0,0,0) corner: bolder and darker than the
+   rest of the wireframe so alpha/phi/tau orientation is legible at a glance. */
+.explorer-cube-axis {
+  stroke: var(--text-mid);
+  stroke-width: 1.5;
+  fill: none;
+}
+
+.explorer-cube-ticklabel {
+  font-size: 9px;
+  font-family: inherit;
+  fill: var(--text-light);
+}
+
+.explorer-cube-axistitle {
+  font-size: 12px;
+  font-weight: 600;
+  font-family: inherit;
+  fill: var(--text-dark);
+}
+
+/* Dashed drop-guides from the (alpha, phi, tau) marker down to the slice
+   floor, then across to the tau axis, tracing the point's coordinates. */
+.explorer-cube-guide {
+  stroke: var(--red);
+  stroke-width: 1;
+  stroke-dasharray: 3 3;
+  opacity: 0.6;
+}
+
+.explorer-cube-marker {
+  fill: var(--red);
+  stroke: var(--white);
+  stroke-width: 1.5;
+}
+
+/* Shared by both panels: the zero-value indifference contour traced across
+   the current slice via marching squares. Kept light: the white band built
+   into the color scale itself already shows "little to no change", so this
+   is a subtle guide rather than a bold marker. */
+.explorer-contour-line {
+  stroke: var(--gray-300);
+  stroke-width: 1;
+  stroke-dasharray: 4 3;
+  opacity: 0.9;
+}
+
+.explorer-heatmap-axislabel {
+  font-size: 9px;
+  font-family: inherit;
+  fill: var(--text-light);
+}
+
+.explorer-heatmap-axistitle {
+  font-size: 10px;
+  font-weight: 600;
+  font-family: inherit;
+  fill: var(--text-dark);
+}
+
+.explorer-heatmap-guide {
+  stroke: var(--white);
+  stroke-width: 1;
+  stroke-dasharray: 2 2;
+  opacity: 0.85;
+}
+
+.explorer-heatmap-marker-dot {
+  fill: var(--red);
+  stroke: var(--white);
+  stroke-width: 1.5;
+}
+
+/* The one color-scale legend for both panels: the cube shares this same
+   red/gray scale, so it does not repeat its own legend (see explorer.js). */
+.explorer-heatmap-legend {
+  margin-top: 8px;
+}
+
+.explorer-heatmap-legend-title {
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--text-mid);
+  text-align: center;
+  margin-bottom: 5px;
+}
+
+.explorer-heatmap-legend-scale {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.explorer-heatmap-legend-bar-wrap {
+  position: relative;
+  flex: 1;
+  /* Room below the bar for the zero tick's "0" label. */
+  padding-bottom: 11px;
+}
+
+.explorer-heatmap-legend-bar {
+  display: block;
+  height: 8px;
+  border-radius: var(--radius-sm);
+  background: linear-gradient(to right, #555555, #ffffff, #b31b1b);
+  border: 1px solid var(--border-light);
+}
+
+/* Marks the domain's true zero, always the bar's exact horizontal midpoint
+   since the color domain is computed symmetrically (-maxAbs to +maxAbs). */
+.explorer-heatmap-legend-zero-tick {
   position: absolute;
-  width: 0;
-  height: 0;
-  pointer-events: none;
+  left: 50%;
+  top: -2px;
+  width: 1px;
+  height: 12px;
+  background: var(--text-mid);
+  transform: translateX(-50%);
 }
 
-.explorer-heatmap-marker .line-h,
-.explorer-heatmap-marker .line-v {
+.explorer-heatmap-legend-zero-tick::after {
+  content: "0";
   position: absolute;
-  background: rgba(255, 255, 255, 0.95);
-  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.35);
+  top: 13px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 9px;
+  color: var(--text-light);
 }
 
-.explorer-heatmap-marker .line-h {
-  left: -13px;
-  top: -1px;
-  width: 26px;
-  height: 2px;
+.explorer-heatmap-legend-label {
+  font-size: 10px;
+  color: var(--text-light);
+  white-space: nowrap;
 }
 
-.explorer-heatmap-marker .line-v {
-  left: -1px;
-  top: -13px;
-  width: 2px;
-  height: 26px;
-}
-
-.explorer-heatmap-marker .dot {
-  position: absolute;
-  left: -5px;
-  top: -5px;
-  width: 10px;
-  height: 10px;
-  border-radius: 50%;
-  background: var(--red);
-  border: 2px solid var(--white);
-  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.4);
+/* Small, deliberately unobtrusive: makes the click/drag interaction
+   discoverable without competing with the legend above it. */
+.explorer-heatmap-hint {
+  font-size: 10px;
+  color: var(--text-light);
+  text-align: center;
+  margin: 6px 0 0;
 }
 
 .explorer-heatmap-caption {
@@ -135,10 +313,10 @@
   color: var(--white);
 }
 
-/* Controls row: the active fieldset's two sliders side by side, full
-   explorer width. Only one of the two fieldsets is visible at a time (the
-   other carries the `hidden` attribute), so the 2-column grid lives on the
-   fieldset itself rather than on this wrapper. */
+/* Controls row: the three always-live sliders (alpha, phi, tau) side by
+   side, full explorer width. There is no mode toggle any more (the top
+   switch now only selects which outcome is colored), so a single fieldset
+   covers all three instruments at once. */
 .explorer-controls-row {
   margin-bottom: var(--space-4);
 }
@@ -152,12 +330,10 @@
   gap: var(--space-4);
 }
 
-/* Without this, the fieldset's own `display: grid` above (a class+element
-   selector) beats the `[hidden]` attribute's UA-stylesheet `display: none`
-   default (equal-or-lower specificity), and the inactive mode's fieldset
-   renders alongside the active one instead of staying hidden. */
-.explorer-controls-row fieldset[hidden] {
-  display: none;
+@media (max-width: 640px) {
+  .explorer-controls-row fieldset {
+    grid-template-columns: 1fr;
+  }
 }
 
 .explorer-controls-row legend {
@@ -166,12 +342,6 @@
   color: var(--text-dark);
   margin-bottom: var(--space-1);
   padding: 0;
-}
-
-@media (max-width: 640px) {
-  .explorer-controls-row fieldset {
-    grid-template-columns: 1fr;
-  }
 }
 
 /* Readouts row: full explorer width, "Net new units" and "Average expected
@@ -197,10 +367,10 @@
   }
 }
 
-/* Visually hidden but still announced by screen readers: the mode toggle
-   above already shows Density/Fiscal Incentive Zoning, so the fieldset
-   legend (kept for its accessible-name semantics) shouldn't repeat it on
-   screen. */
+/* Visually hidden but still announced by screen readers: the three slider
+   labels below already name each instrument, so the fieldset legend (kept
+   for its accessible-name semantics) shouldn't repeat "Policy instruments"
+   on screen. */
 .sr-only {
   position: absolute;
   width: 1px;
@@ -440,21 +610,6 @@
   text-anchor: end;
 }
 
-/* (6) All Policies: a static, non-grid point (see SCATTER_ALL_POLICIES_POINT
-   in explorer.js), deliberately distinct from the five live-grid diamonds:
-   muted fill and a dashed outline instead of a solid one. */
-.explorer-scatter-static-point {
-  fill: var(--red);
-  fill-opacity: 0.45;
-  stroke: var(--text-dark);
-  stroke-width: 1.5;
-  stroke-dasharray: 2 2;
-}
-
-.explorer-scatter-static-label {
-  font-style: italic;
-}
-
 /* Live marker: a hollow outlined circle, deliberately distinct from the
    solid reference diamonds above so "where I am" reads apart from the two
    named cases. */
@@ -469,12 +624,4 @@
   color: var(--text-mid);
   text-align: center;
   margin: var(--space-2) 0 0;
-}
-
-.explorer-scatter-note {
-  font-size: var(--font-size-small);
-  font-style: italic;
-  color: var(--text-light);
-  text-align: center;
-  margin: 2px 0 0;
 }

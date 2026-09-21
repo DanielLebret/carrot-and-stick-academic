@@ -4,83 +4,46 @@
   this file per site; site-specific framing goes through the config object passed
   to CarrotStickExplorer.init().
 
-  Data contract (see academic/CLAUDE.md and resources/explorer/grid-diz.csv,
-  grid-fiz.csv):
-    DIZ grid columns: alpha, phi, d_units_net, d_units_affordable, d_units_market,
-      d_rent_pct
-    FIZ grid columns: alpha, tau, d_units_net, d_units_affordable, d_units_market,
-      d_rent_pct
-  All d_* values are deltas versus the no-policy baseline (alpha=0, phi=0, tau=0),
-  which is 0 net units and 0% rent change by construction.
+  Data contract (see academic/CLAUDE.md and resources/explorer/grid-full.csv):
+    Full factorial grid columns (as of 2026-09-21): alpha, phi, tau, Aff, Apt,
+    AptNet, AptNet_market, E_apt, Erent, Tax, PV, Density, Q1-Q5, Erent_chg,
+    Erent_chg_perc, AptNet_chg, Aff_chg, Density_chg, Tax_chg, PV_chg.
+    16 alpha levels (0-0.75, step 0.05) x 21 phi levels (0-1.0, step 0.05) x 13
+    tau levels (0-30, step 2.5) = 4,368 rows, one row per exact combination.
+    This module reads Aff_chg (affordable units, level change vs. the
+    alpha=phi=tau=0 baseline), AptNet_chg (net units, level change),
+    Erent_chg_perc (fractional rent change), Tax_chg (fractional tax revenue
+    change), and PV_chg (fractional landowner property value change) directly
+    off each row; market-rate units change is derived as AptNet_chg - Aff_chg.
+    Tax_chg/PV_chg match Table 5's fractional-change convention, so they are
+    formatted as percentages the same way Erent_chg_perc is.
 
-  STATUS: real simulation output from Max, as of 2026-09-03, replacing the
-  earlier illustrative placeholder grid. Alpha/phi/tau now natively cover the
-  same 0-75%/0-100%/0-30yr range as the heatmap figures below (see
-  ALPHA_UI_MAX etc.), so the slider caps and the interpolate() clamp are no
-  longer masking any gap between the grid and the sliders; they're kept as
-  defensive floors in case a future grid update is narrower again.
+    Sliders snap to the grid's exact discrete levels (index-based, no
+    interpolation in any of the three dimensions) since the grid is a full
+    factorial cube, not a pair of 2-D slices to interpolate across.
 
-  Heatmap panels (top of the explorer, above the mode toggle): these are the
-  real paper figures (11a/b for Density Incentive Zoning, D10a/b for Fiscal
-  Incentive Zoning), read from config.figuresPath. Each is a static
-  2400x1350 image with a marker overlaid at the current slider position via
-  a fixed pixel calibration (HEATMAP_CONFIG / Y_CALIBRATION below),
-  converted to percentages of image width/height so it tracks correctly
-  regardless of the image's rendered size.
+  STATUS: as of 2026-09-21, replaced the earlier two-slice DIZ/FIZ design
+  (separate grid-diz.csv/grid-fiz.csv, bilinear interpolation, a DIZ/FIZ mode
+  toggle) with a full 3-D cube view. The top switch now toggles which outcome
+  (net units vs. rent) colors the cube slice and heatmap, not which policy
+  grid is active; alpha, phi, and tau are all always live together via three
+  sliders. See resources/explorer/explorer.css for the cube/heatmap panel
+  styling and academic/CLAUDE.md's former "Open question" note (now
+  resolved: the grid is a full cube).
+
+  The scatter panel below the readouts (production tradeoff, styled after
+  Figure 6) sources all six named reference points, including "All
+  Policies", directly from grid-full.csv via exact (alpha, phi, tau)
+  coordinate lookups, rendered once at init; none are hardcoded static
+  values any more.
 */
 
 (function (global) {
   "use strict";
 
-  var IMG_WIDTH = 2400;
-  var IMG_HEIGHT = 1350;
-
-  // Shared y-axis (alpha, mandate share) calibration, identical across all
-  // four heatmap images. alpha is a fraction (0.25 = 25%); the calibration
-  // itself is expressed in percentage points because that's how the paper
-  // labeled the axis. Linear, extrapolated beyond the alpha=60% anchor for
-  // the slider's 75% max.
-  var Y_CALIBRATION = { alpha0Pct: 0, y0: 1130, alpha1Pct: 60, y1: 289 };
-
-  var ALPHA_UI_MAX = 0.75; // was 0.4 (placeholder grid's max); see explorer.js header comment
-  var PHI_UI_MAX = 1.0;    // was 0.6
-  var TAU_UI_MAX = 30;     // was 25
-
-  // axisMax must be in the same unit as the slider value it pairs with
-  // (phi is a 0-1 fraction, tau is already in years), so value/axisMax is a
-  // plain 0-1 ratio regardless of which unit is in play.
-  var HEATMAP_CONFIG = {
-    diz: {
-      axisMax: PHI_UI_MAX,
-      units: { file: "figure-11a-explorer-phi-units.png", x0: 294, x1: 1930 },
-      rent: { file: "figure-11b-explorer-phi-rent.png", x0: 292, x1: 1890 }
-    },
-    fiz: {
-      axisMax: TAU_UI_MAX,
-      units: { file: "figure-d10a-explorer-tau-units.png", x0: 294, x1: 1930 },
-      rent: { file: "figure-d10b-explorer-tau-rent.png", x0: 292, x1: 1890 }
-    }
-  };
-
-  function calibratedPixel(x0, x1, value, axisMax) {
-    return x0 + (value / axisMax) * (x1 - x0);
-  }
-
-  function alphaToYPercent(alpha) {
-    var alphaPct = alpha * 100;
-    var t = (alphaPct - Y_CALIBRATION.alpha0Pct) / (Y_CALIBRATION.alpha1Pct - Y_CALIBRATION.alpha0Pct);
-    var yPx = Y_CALIBRATION.y0 + t * (Y_CALIBRATION.y1 - Y_CALIBRATION.y0);
-    return (yPx / IMG_HEIGHT) * 100;
-  }
-
-  function xValueToXPercent(x0, x1, value, axisMax) {
-    var xPx = calibratedPixel(x0, x1, value, axisMax);
-    return (xPx / IMG_WIDTH) * 100;
-  }
-
   function parseCSV(text) {
     var lines = text.trim().split(/\r?\n/);
-    var headers = lines[0].split(",").map(function (h) { return h.trim(); });
+    var headers = lines[0].split(",").map(function (h) { return h.trim().replace(/^"|"$/g, ""); });
     return lines.slice(1).filter(Boolean).map(function (line) {
       var cells = line.split(",");
       var row = {};
@@ -105,72 +68,6 @@
     return out;
   }
 
-  /*
-    Builds a lookup grid keyed by rounded (a, b) coordinates plus the sorted axis
-    values, so bilinear interpolation can find the four surrounding grid points for
-    any (a, b) inside the simulated support.
-  */
-  function buildGrid(rows, aKey, bKey, valueKeys) {
-    var aVals = uniqueSorted(rows.map(function (r) { return r[aKey]; }));
-    var bVals = uniqueSorted(rows.map(function (r) { return r[bKey]; }));
-    var lookup = {};
-    rows.forEach(function (r) {
-      lookup[r[aKey] + "|" + r[bKey]] = r;
-    });
-    return {
-      aVals: aVals,
-      bVals: bVals,
-      aMin: aVals[0],
-      aMax: aVals[aVals.length - 1],
-      bMin: bVals[0],
-      bMax: bVals[bVals.length - 1],
-      valueKeys: valueKeys,
-      get: function (a, b) {
-        return lookup[a + "|" + b];
-      }
-    };
-  }
-
-  function neighborBounds(axisVals, x) {
-    var lo = axisVals[0];
-    var hi = axisVals[axisVals.length - 1];
-    for (var i = 0; i < axisVals.length - 1; i++) {
-      if (x >= axisVals[i] && x <= axisVals[i + 1]) {
-        lo = axisVals[i];
-        hi = axisVals[i + 1];
-        break;
-      }
-    }
-    return [lo, hi];
-  }
-
-  /* Bilinear interpolation, clamped to the grid's support (never extrapolates). */
-  function interpolate(grid, a, b) {
-    var ca = Math.min(Math.max(a, grid.aMin), grid.aMax);
-    var cb = Math.min(Math.max(b, grid.bMin), grid.bMax);
-
-    var aBounds = neighborBounds(grid.aVals, ca);
-    var bBounds = neighborBounds(grid.bVals, cb);
-    var a0 = aBounds[0], a1 = aBounds[1];
-    var b0 = bBounds[0], b1 = bBounds[1];
-
-    var q11 = grid.get(a0, b0);
-    var q21 = grid.get(a1, b0);
-    var q12 = grid.get(a0, b1);
-    var q22 = grid.get(a1, b1);
-
-    var tA = a1 === a0 ? 0 : (ca - a0) / (a1 - a0);
-    var tB = b1 === b0 ? 0 : (cb - b0) / (b1 - b0);
-
-    var result = {};
-    grid.valueKeys.forEach(function (key) {
-      var top = q11[key] + (q21[key] - q11[key]) * tA;
-      var bottom = q12[key] + (q22[key] - q12[key]) * tA;
-      result[key] = top + (bottom - top) * tB;
-    });
-    return result;
-  }
-
   function fmtUnits(n) {
     var sign = n > 0 ? "+" : n < 0 ? "−" : "";
     return sign + Math.abs(Math.round(n)).toLocaleString("en-US");
@@ -187,43 +84,137 @@
     return "";
   }
 
-  var VALUE_KEYS = ["d_units_net", "d_units_affordable", "d_units_market", "d_rent_pct"];
+  /* ------------------------------------------------------------------ */
+  /* 3-D grid: exact index lookups, no interpolation                     */
+  /* ------------------------------------------------------------------ */
 
-  /*
-    Housing production tradeoff scatter (below the controls/readouts grid),
-    styled to match the static Figure 6 (resources/figures/figure-06-
-    production-counterfactuals.png): a solid net-zero reference line with
-    the "net decrease" region shaded below/left of it, labeled reference
-    points as filled diamonds (numbered to match the paper's Table D3), and
-    a live marker tracking the sliders.
+  function indexMap(levels) {
+    var m = {};
+    levels.forEach(function (v, i) { m[v.toFixed(4)] = i; });
+    return m;
+  }
 
-    X = d_units_affordable, Y = d_units_market. The domain is fixed and
-    shared across DIZ/FIZ (never rescales on mode switch), verified against
-    both grids' extremes: DIZ affordable 0-139,654, market -115,128 to
-    88,935; FIZ affordable 0-169,249, market -129,516 to 96,280.
+  function buildGrid3D(rows, alphaLevels, phiLevels, tauLevels) {
+    var aMap = indexMap(alphaLevels), pMap = indexMap(phiLevels), tMap = indexMap(tauLevels);
+    var grid = [];
+    for (var i = 0; i < alphaLevels.length; i++) {
+      grid.push([]);
+      for (var j = 0; j < phiLevels.length; j++) {
+        grid[i].push(new Array(tauLevels.length));
+      }
+    }
+    rows.forEach(function (r) {
+      r.marketChg = r.AptNet_chg - r.Aff_chg;
+      r.rentPct = r.Erent_chg_perc * 100;
+      r.taxPct = r.Tax_chg * 100;
+      r.pvPct = r.PV_chg * 100;
+      var ai = aMap[r.alpha.toFixed(4)], pj = pMap[r.phi.toFixed(4)], tk = tMap[r.tau.toFixed(4)];
+      grid[ai][pj][tk] = r;
+    });
+    return grid;
+  }
 
-    Deliberately no background point cloud (a full parameter sweep); this is
-    a clean chart matching Figure 6's register rather than the 961-row grid.
+  function globalAbsMax(rows, key) {
+    var m = 0;
+    rows.forEach(function (r) {
+      var v = Math.abs(r[key]);
+      if (v > m) m = v;
+    });
+    return m;
+  }
 
-    Reference-point coordinates are exact grid points (alpha, phi/tau) so
-    grid.get() returns real rows, never an interpolated or invented value;
-    if a future grid update removes one of these exact points, that
-    reference point is silently skipped rather than approximated. All five
-    grid-derived points below are verified exact matches against the paper's
-    Table D3 (dist=0.0 in all cases).
-  */
-  var SCATTER_DOMAIN_X = { min: -5000, max: 175000 };   // d_units_affordable
-  var SCATTER_DOMAIN_Y = { min: -135000, max: 100000 }; // d_units_market
+  /* Cell boundaries for a heatmap tiling: N grid points -> N cells -> N+1
+     edges in normalized [0,1] axis space, midpoint-split between adjacent
+     points and extended to the true 0/1 ends so the tiling covers the full
+     plane with no gaps. */
+  function cellEdges(n) {
+    var e = [0];
+    for (var i = 1; i < n; i++) e.push((i - 0.5) / (n - 1));
+    e.push(1);
+    return e;
+  }
 
-  // Margins reserve room for axis titles and tick labels around the plot
-  // area. The plot area's own width:height ratio is fixed at 2.04:1,
-  // matching Figure 6's own proportions, not derived from the data domain's
-  // range ratio (235,000 tall vs 180,000 wide) the way the previous build
-  // did; Figure 6 itself doesn't preserve true geometric angles either, so
-  // the net-zero diagonal here is stretched the same way Figure 6's is.
+  var METRICS = {
+    production: { key: "AptNet_chg", fmt: fmtUnits, legendTitle: "Chg. Units", panelTitle: "Change in Units" },
+    rent: { key: "rentPct", fmt: fmtPct, legendTitle: "Chg E. Rent", panelTitle: "Change in Rent" }
+  };
+
+  function colorRGB(v, maxAbs) {
+    if (!maxAbs) return [255, 255, 255];
+    var t = Math.max(-1, Math.min(1, v / maxAbs));
+    var white = [255, 255, 255], red = [179, 27, 27], gray = [85, 85, 85];
+    return t >= 0 ? lerpColor(white, red, t) : lerpColor(white, gray, -t);
+  }
+
+  function colorForValue(v, maxAbs) {
+    var c = colorRGB(v, maxAbs);
+    return "rgb(" + c[0] + "," + c[1] + "," + c[2] + ")";
+  }
+
+  function lerpColor(a, b, t) {
+    return [
+      Math.round(a[0] + (b[0] - a[0]) * t),
+      Math.round(a[1] + (b[1] - a[1]) * t),
+      Math.round(a[2] + (b[2] - a[2]) * t)
+    ];
+  }
+
+  /* Marching squares over a 16x21-ish scalar grid, tracing the v=0 contour.
+     proj(aiFrac, pjFrac) maps fractional grid-index coordinates to a screen
+     point; the caller supplies whatever projection (flat heatmap or a
+     tau-offset cube slice) applies. */
+  function marchingSquaresZero(values, proj) {
+    var segs = [];
+    var nA = values.length, nP = values[0].length;
+
+    function crossing(vA, vB, aA, pA, aB, pB) {
+      if (vA === vB) return null;
+      if ((vA < 0 && vB < 0) || (vA > 0 && vB > 0)) return null;
+      var t = vA / (vA - vB);
+      return proj(aA + (aB - aA) * t, pA + (pB - pA) * t);
+    }
+
+    for (var ai = 0; ai < nA - 1; ai++) {
+      for (var pj = 0; pj < nP - 1; pj++) {
+        var v00 = values[ai][pj], v10 = values[ai + 1][pj], v01 = values[ai][pj + 1], v11 = values[ai + 1][pj + 1];
+        var pts = [];
+        var c1 = crossing(v00, v10, ai, pj, ai + 1, pj);
+        var c2 = crossing(v10, v11, ai + 1, pj, ai + 1, pj + 1);
+        var c3 = crossing(v11, v01, ai + 1, pj + 1, ai, pj + 1);
+        var c4 = crossing(v01, v00, ai, pj + 1, ai, pj);
+        if (c1) pts.push(c1);
+        if (c2) pts.push(c2);
+        if (c3) pts.push(c3);
+        if (c4) pts.push(c4);
+        if (pts.length === 2) {
+          segs.push({ x1: pts[0].x, y1: pts[0].y, x2: pts[1].x, y2: pts[1].y });
+        } else if (pts.length === 4) {
+          var center = (v00 + v10 + v01 + v11) / 4;
+          if (center >= 0) {
+            segs.push({ x1: pts[0].x, y1: pts[0].y, x2: pts[1].x, y2: pts[1].y });
+            segs.push({ x1: pts[2].x, y1: pts[2].y, x2: pts[3].x, y2: pts[3].y });
+          } else {
+            segs.push({ x1: pts[0].x, y1: pts[0].y, x2: pts[3].x, y2: pts[3].y });
+            segs.push({ x1: pts[1].x, y1: pts[1].y, x2: pts[2].x, y2: pts[2].y });
+          }
+        }
+      }
+    }
+    return segs;
+  }
+
+  /* ------------------------------------------------------------------ */
+  /* Housing production tradeoff scatter: all six named reference points  */
+  /* (including "All Policies") are exact grid-derived (alpha, phi, tau)  */
+  /* lookups against grid-full.csv; see file header comment.              */
+  /* ------------------------------------------------------------------ */
+
+  var SCATTER_DOMAIN_X = { min: -5000, max: 175000 };   // affordable units change
+  var SCATTER_DOMAIN_Y = { min: -135000, max: 100000 }; // market-rate units change
+
   var SCATTER_MARGIN = { left: 70, right: 20, top: 20, bottom: 55 };
   var SCATTER_PLOT_WIDTH = 700;
-  var SCATTER_PLOT_HEIGHT = 343; // 700 / 343 = 2.04
+  var SCATTER_PLOT_HEIGHT = 343; // 700 / 343 = 2.04, matching Figure 6's proportions
 
   var SCATTER_VIEWBOX = {
     width: SCATTER_PLOT_WIDTH + SCATTER_MARGIN.left + SCATTER_MARGIN.right,
@@ -237,32 +228,19 @@
     bottom: SCATTER_MARGIN.top + SCATTER_PLOT_HEIGHT
   };
 
-  // (1) and (2) are single-instrument points that only exist on their own
-  // grid (phi belongs to DIZ, tau to FIZ); (3) is identical on both grids
-  // (phi=0/tau=0 is the same underlying no-incentive-instrument scenario);
-  // (4)/(5) are the paper's named DIZ/FIZ scenarios, replacing the
-  // previous build's arbitrary alpha=0.2 "Combined policy" point. (6) All
-  // Policies is added separately below as a static, mode-independent point
-  // (see buildScatterAllPoliciesMarkup), since it isn't on either 2-D grid.
-  var SCATTER_REF_POINTS = {
-    diz: [
-      { label: "(1) Upzoning", a: 0.0, b: 0.5 },
-      { label: "(3) Affordability mandate", a: 0.3, b: 0.0 },
-      { label: "(4) Density Incentive Zoning", a: 0.3, b: 0.5 }
-    ],
-    fiz: [
-      { label: "(2) Tax exemption", a: 0.0, b: 20.0 },
-      { label: "(3) Affordability mandate", a: 0.3, b: 0.0 },
-      { label: "(5) Fiscal Incentive Zoning", a: 0.3, b: 20.0 }
-    ]
-  };
-
-  // Table D3's reported "All Policies" scenario: net=152,897,
-  // affordable=121,681, so market = 152,897 - 121,681 = 31,216. Not on
-  // either 2-D grid (it requires all three instruments at once), so this is
-  // a static point plotted from the paper's reported value directly, not a
-  // grid.get() lookup, and it doesn't change with the mode toggle.
-  var SCATTER_ALL_POLICIES_POINT = { label: "(6) All Policies", affordable: 121681, market: 31216 };
+  // All six named policy points are exact (alpha, phi, tau) grid
+  // coordinates looked up directly from grid-full.csv, never interpolated.
+  // "All Policies" was previously a static hardcoded value but is a real
+  // grid point like the other five (Aff_chg=121,680.6, AptNet_chg=152,896.8,
+  // matching the paper's reported figure exactly).
+  var SCATTER_REF_POINTS = [
+    { label: "(1) Upzoning", alpha: 0.0, phi: 0.5, tau: 0.0 },
+    { label: "(2) Tax exemption", alpha: 0.0, phi: 0.0, tau: 20.0 },
+    { label: "(3) Affordability mandate", alpha: 0.3, phi: 0.0, tau: 0.0 },
+    { label: "(4) Density Incentive Zoning", alpha: 0.3, phi: 0.5, tau: 0.0 },
+    { label: "(5) Fiscal Incentive Zoning", alpha: 0.3, phi: 0.0, tau: 20.0 },
+    { label: "(6) All Policies", alpha: 0.3, phi: 0.5, tau: 20.0 }
+  ];
 
   function scatterXPixel(value) {
     var d = SCATTER_DOMAIN_X;
@@ -281,19 +259,13 @@
       cx + "," + (cy + r) + " " + (cx - r) + "," + cy;
   }
 
-  // Ticks at every multiple of `step` inside the domain, e.g. [0, 50000,
-  // 100000, 150000] for SCATTER_DOMAIN_X with step 50000.
   function scatterTicks(domain, step) {
     var start = Math.ceil(domain.min / step) * step;
     var ticks = [];
-    for (var v = start; v <= domain.max + 1e-6; v += step) {
-      ticks.push(Math.round(v));
-    }
+    for (var v = start; v <= domain.max + 1e-6; v += step) ticks.push(Math.round(v));
     return ticks;
   }
 
-  // Matches Figure 6's number formatting: a space as thousands separator,
-  // e.g. 100000 -> "100 000", -50000 -> "-50 000".
   function fmtScatterTick(n) {
     var sign = n < 0 ? "-" : "";
     var digits = String(Math.abs(n));
@@ -306,10 +278,8 @@
     return sign + groups.join(" ");
   }
 
-  // Light gray gridlines plus tick labels, every 50,000 units on both axes.
   function buildScatterGridMarkup() {
     var markup = "";
-
     scatterTicks(SCATTER_DOMAIN_X, 50000).forEach(function (v) {
       var x = scatterXPixel(v);
       markup += '<line class="explorer-scatter-gridline" x1="' + x + '" y1="' + SCATTER_PLOT.top +
@@ -317,7 +287,6 @@
       markup += '<text class="explorer-scatter-tick explorer-scatter-tick-x" x="' + x +
         '" y="' + (SCATTER_PLOT.bottom + 16) + '">' + fmtScatterTick(v) + "</text>";
     });
-
     scatterTicks(SCATTER_DOMAIN_Y, 50000).forEach(function (v) {
       var y = scatterYPixel(v);
       markup += '<line class="explorer-scatter-gridline" x1="' + SCATTER_PLOT.left + '" y1="' + y +
@@ -325,63 +294,39 @@
       markup += '<text class="explorer-scatter-tick explorer-scatter-tick-y" x="' + (SCATTER_PLOT.left - 8) +
         '" y="' + (y + 3.5) + '">' + fmtScatterTick(v) + "</text>";
     });
-
     return markup;
   }
 
-  // Axis titles, matching Figure 6's wording exactly.
   function buildScatterAxisTitlesMarkup() {
     var xTitleX = (SCATTER_PLOT.left + SCATTER_PLOT.right) / 2;
     var xTitleY = SCATTER_VIEWBOX.height - 6;
     var yTitleX = 14;
     var yTitleY = (SCATTER_PLOT.top + SCATTER_PLOT.bottom) / 2;
-
     return '<text class="explorer-scatter-axis-title" x="' + xTitleX + '" y="' + xTitleY + '">' +
       "Change in affordable units</text>" +
       '<text class="explorer-scatter-axis-title" x="' + yTitleX + '" y="' + yTitleY +
       '" transform="rotate(-90 ' + yTitleX + " " + yTitleY + ')">Change in market-rate units</text>';
   }
 
-  /*
-    The net-zero reference line (d_units_affordable + d_units_market = 0,
-    i.e. y = -x) and the "net decrease" shading below/left of it, clipped to
-    the fixed domain rectangle. For this specific domain the line enters
-    through the left edge (x = xMin) and exits through the bottom edge
-    (y = yMin); this is verified against the SCATTER_DOMAIN_X/Y constants
-    above, not a general-purpose line-clipping routine.
-  */
   function buildScatterDecreaseRegionMarkup() {
     var xMin = SCATTER_DOMAIN_X.min, xMax = SCATTER_DOMAIN_X.max;
     var yMin = SCATTER_DOMAIN_Y.min, yMax = SCATTER_DOMAIN_Y.max;
-
     var lineTop = { x: xMin, y: Math.min(-xMin, yMax) };
     var lineBottom = { x: Math.min(-yMin, xMax), y: yMin };
-
     var p1x = scatterXPixel(lineTop.x), p1y = scatterYPixel(lineTop.y);
     var p2x = scatterXPixel(lineBottom.x), p2y = scatterYPixel(lineBottom.y);
     var blx = scatterXPixel(xMin), bly = scatterYPixel(yMin);
-
     var polygonPts = p1x + "," + p1y + " " + p2x + "," + p2y + " " + blx + "," + bly;
-
-    // Placed well inside the shaded triangle, lower-left, matching Figure
-    // 6's placement of its "Net decrease in units" label.
     var labelX = scatterXPixel(15000);
     var labelY = scatterYPixel(-100000);
-
     return '<polygon class="explorer-scatter-decrease-fill" points="' + polygonPts + '"></polygon>' +
       '<line class="explorer-scatter-diagonal" x1="' + p1x + '" y1="' + p1y +
       '" x2="' + p2x + '" y2="' + p2y + '"></line>' +
       '<text class="explorer-scatter-decrease-label" x="' + labelX + '" y="' + labelY + '">Net decrease in units</text>';
   }
 
-  // Baseline (alpha=0, phi=0, tau=0), which is exactly (0, 0) by
-  // construction, so it needs no grid lookup and is drawn once as static
-  // markup rather than as a mode-dependent reference point. Dashed
-  // crosshair guide lines from the plot edges to the origin, matching
-  // Figure 6.
   function buildScatterBaselineMarkup() {
     var ox = scatterXPixel(0), oy = scatterYPixel(0);
-
     return '<line class="explorer-scatter-baseline-guide" x1="' + ox + '" y1="' + SCATTER_PLOT.top +
       '" x2="' + ox + '" y2="' + SCATTER_PLOT.bottom + '"></line>' +
       '<line class="explorer-scatter-baseline-guide" x1="' + SCATTER_PLOT.left + '" y1="' + oy +
@@ -391,25 +336,10 @@
       '" y="' + (oy + 16) + '">Baseline</text>';
   }
 
-  // (6) All Policies: a static point (not a grid.get() lookup, see the
-  // SCATTER_ALL_POLICIES_POINT comment above), shown in both modes since
-  // it's the same fixed value either way. Styled distinctly (muted fill,
-  // dashed outline, asterisked label) so it doesn't read as a sixth
-  // live-grid point.
-  function buildScatterAllPoliciesMarkup() {
-    var ref = SCATTER_ALL_POLICIES_POINT;
-    var cx = scatterXPixel(ref.affordable), cy = scatterYPixel(ref.market);
-
-    return '<polygon class="explorer-scatter-static-point" points="' + diamondPoints(cx, cy, 6) + '"></polygon>' +
-      '<text class="explorer-scatter-reflabel explorer-scatter-static-label" x="' + (cx + 9) +
-      '" y="' + (cy - 9) + '">' + ref.label + "*</text>";
-  }
-
   function buildScatterStaticMarkup() {
     return buildScatterGridMarkup() +
       buildScatterDecreaseRegionMarkup() +
       buildScatterBaselineMarkup() +
-      buildScatterAllPoliciesMarkup() +
       buildScatterAxisTitlesMarkup();
   }
 
@@ -421,52 +351,321 @@
     return el;
   }
 
+  /* ------------------------------------------------------------------ */
+  /* Heatmap panel: 16x21 alpha/phi color surface at the current tau,    */
+  /* redrawn whenever tau or the metric changes. viewBox keeps the exact */
+  /* 16:9 aspect ratio the old static figure images used (2400x1350),    */
+  /* just at a smaller, arbitrary SVG scale, so the panel's rendered      */
+  /* pixel size is unchanged from before (same CSS grid column, same     */
+  /* width:100%/height:auto mechanics).                                  */
+  /* ------------------------------------------------------------------ */
+
+  // Left/bottom margins carry dedicated rows for full axis titles (see
+  // addHeatmapAxisLabels) in addition to the tick-value labels; the viewBox
+  // grows by the same amount so the plotted surface area itself (HEATMAP_PLOT)
+  // is unchanged from the original 356x193.
+  var HEATMAP_VIEWBOX = { width: 426, height: 243 };
+  var HEATMAP_MARGIN = { left: 60, right: 10, top: 10, bottom: 40 };
+  var HEATMAP_PLOT = {
+    x0: HEATMAP_MARGIN.left,
+    y0: HEATMAP_VIEWBOX.height - HEATMAP_MARGIN.bottom,
+    w: HEATMAP_VIEWBOX.width - HEATMAP_MARGIN.left - HEATMAP_MARGIN.right,
+    h: HEATMAP_VIEWBOX.height - HEATMAP_MARGIN.top - HEATMAP_MARGIN.bottom
+  };
+
+  function heatmapProjector() {
+    return function (aT, pT) {
+      return { x: HEATMAP_PLOT.x0 + pT * HEATMAP_PLOT.w, y: HEATMAP_PLOT.y0 - aT * HEATMAP_PLOT.h };
+    };
+  }
+
+  /* ------------------------------------------------------------------ */
+  /* Cube panel: isometric-style projection, alpha vertical, phi          */
+  /* horizontal, tau receding diagonally (30 degrees) toward the upper    */
+  /* right. Since alpha and phi are both screen-orthogonal axes and only  */
+  /* tau is skewed, a fixed-tau slice is a plain axis-aligned rectangle   */
+  /* translated by a constant tau offset, so the same cell/contour        */
+  /* drawing code as the heatmap panel applies, just with that offset.    */
+  /* ------------------------------------------------------------------ */
+
+  // Plot/tau dimensions are ~10% larger than the cube's original 270x324/80x46
+  // footprint, within the same overall viewBox (so the panel's rendered size
+  // is unchanged but the cube fills more of it). Margins shrink to make room,
+  // which is affordable now that the depth-axis tick labels below render
+  // horizontally instead of needing room for a rotated diagonal run.
+  var CUBE_VIEWBOX = { width: 480, height: 460 };
+  var CUBE_MARGIN = { left: 52, right: 43, top: 18, bottom: 35 };
+  var CUBE_TAU_DX = 88;
+  var CUBE_TAU_DY = Math.round(88 * Math.tan(30 * Math.PI / 180)); // 30deg receding depth
+  var CUBE_PLOT = {
+    x0: CUBE_MARGIN.left,
+    y0: CUBE_VIEWBOX.height - CUBE_MARGIN.bottom,
+    w: CUBE_VIEWBOX.width - CUBE_MARGIN.left - CUBE_MARGIN.right - CUBE_TAU_DX,
+    h: CUBE_VIEWBOX.height - CUBE_MARGIN.top - CUBE_MARGIN.bottom - CUBE_TAU_DY
+  };
+
+  function cubeProjector() {
+    return function (aT, pT, tT) {
+      tT = tT || 0;
+      return {
+        x: CUBE_PLOT.x0 + pT * CUBE_PLOT.w + tT * CUBE_TAU_DX,
+        y: CUBE_PLOT.y0 - aT * CUBE_PLOT.h - tT * CUBE_TAU_DY
+      };
+    };
+  }
+
+  // Plain "+" concatenation of three 0/1 numbers is not safe here: JS adds
+  // adjacent numeric operands arithmetically before ever reaching a string
+  // (e.g. a+p+"0" sums a+p numerically first), so a dedicated string-join
+  // avoids silently wrong/undefined corner lookups.
+  function cornerKey(a, p, t) {
+    return String(a) + String(p) + String(t);
+  }
+
+  function cubeCorners(project) {
+    var c = {};
+    [0, 1].forEach(function (a) {
+      [0, 1].forEach(function (p) {
+        [0, 1].forEach(function (t) {
+          c[cornerKey(a, p, t)] = project(a, p, t);
+        });
+      });
+    });
+    return c;
+  }
+
+  function buildWireframeEdges(c) {
+    var edges = [];
+    [0, 1].forEach(function (p) { [0, 1].forEach(function (t) { edges.push([c[cornerKey(0, p, t)], c[cornerKey(1, p, t)]]); }); });
+    [0, 1].forEach(function (a) { [0, 1].forEach(function (t) { edges.push([c[cornerKey(a, 0, t)], c[cornerKey(a, 1, t)]]); }); });
+    [0, 1].forEach(function (a) { [0, 1].forEach(function (p) { edges.push([c[cornerKey(a, p, 0)], c[cornerKey(a, p, 1)]]); }); });
+    return edges;
+  }
+
+  /* Surface color is rendered as a single raster image sampled once per real
+     grid point (one canvas pixel per alpha/phi level, exactly matching the
+     grid's own even spacing), then stretched to the plot rectangle. Letting
+     the browser's own image scaling do the resampling gives a continuous
+     bilinear-interpolated gradient between real grid values instead of
+     flat-filled discrete cells, with no change to the underlying data or any
+     interaction logic (still the same values2D grid feeding both the color
+     and the marching-squares contour below). */
+  function buildSurfaceImageHref(values2D, maxAbs) {
+    var nA = values2D.length, nP = values2D[0].length;
+    var canvas = document.createElement("canvas");
+    canvas.width = nP;
+    canvas.height = nA;
+    var ctx = canvas.getContext("2d");
+    var imgData = ctx.createImageData(nP, nA);
+    for (var ai = 0; ai < nA; ai++) {
+      // Flip vertically: canvas row 0 is the image top, but alpha increases
+      // upward on screen (higher alpha = smaller y), so the top row must
+      // hold the highest-alpha values.
+      var destRow = nA - 1 - ai;
+      for (var pj = 0; pj < nP; pj++) {
+        var rgb = colorRGB(values2D[ai][pj], maxAbs);
+        var idx = (destRow * nP + pj) * 4;
+        imgData.data[idx] = rgb[0];
+        imgData.data[idx + 1] = rgb[1];
+        imgData.data[idx + 2] = rgb[2];
+        imgData.data[idx + 3] = 255;
+      }
+    }
+    ctx.putImageData(imgData, 0, 0);
+    return canvas.toDataURL();
+  }
+
+  function renderSurface(group, values2D, maxAbs, x, y, w, h) {
+    group.textContent = "";
+    var href = buildSurfaceImageHref(values2D, maxAbs);
+    var img = svgEl("image", {
+      x: x, y: y, width: w, height: h,
+      preserveAspectRatio: "none"
+    });
+    img.setAttribute("href", href);
+    img.setAttributeNS("http://www.w3.org/1999/xlink", "href", href);
+    group.appendChild(img);
+  }
+
+  function renderContour(group, values2D, project, tT) {
+    group.textContent = "";
+    var nA = values2D.length, nP = values2D[0].length;
+    var segments = marchingSquaresZero(values2D, function (aiF, pjF) {
+      return project(aiF / (nA - 1), pjF / (nP - 1), tT);
+    });
+    var frag = document.createDocumentFragment();
+    segments.forEach(function (s) {
+      frag.appendChild(svgEl("line", { x1: s.x1, y1: s.y1, x2: s.x2, y2: s.y2, class: "explorer-contour-line" }));
+    });
+    group.appendChild(frag);
+  }
+
+  function fmtAlpha(v) { return Math.round(v * 100) + "%"; }
+  function fmtPhi(v) { return Math.round(v * 100) + "%"; }
+  function fmtTau(v) { return Math.round(v) + "y"; }
+
+  function addHeatmapAxisLabels(group, alphaLevels, phiLevels, project) {
+    group.textContent = "";
+    var frag = document.createDocumentFragment();
+    [0, 0.5, 1].forEach(function (t) {
+      var alphaIdx = Math.round(t * (alphaLevels.length - 1));
+      var p = project(alphaIdx / (alphaLevels.length - 1), 0);
+      frag.appendChild(svgEl("text", {
+        x: HEATMAP_MARGIN.left - 5, y: p.y + 3, class: "explorer-heatmap-axislabel", "text-anchor": "end"
+      })).textContent = fmtAlpha(alphaLevels[alphaIdx]);
+    });
+    [0, 0.5, 1].forEach(function (t) {
+      var phiIdx = Math.round(t * (phiLevels.length - 1));
+      var p = project(0, phiIdx / (phiLevels.length - 1));
+      frag.appendChild(svgEl("text", {
+        x: p.x, y: HEATMAP_PLOT.y0 + 14, class: "explorer-heatmap-axislabel", "text-anchor": "middle"
+      })).textContent = fmtPhi(phiLevels[phiIdx]);
+    });
+
+    // Full descriptive axis titles (matching the original static heatmaps),
+    // each on its own dedicated row/column separated from the tick values
+    // rather than a bare Greek letter crammed into a plot corner.
+    var yTitleX = 14, yTitleY = HEATMAP_MARGIN.top + HEATMAP_PLOT.h / 2;
+    frag.appendChild(svgEl("text", {
+      x: yTitleX, y: yTitleY, class: "explorer-heatmap-axistitle", "text-anchor": "middle",
+      transform: "rotate(-90 " + yTitleX + " " + yTitleY + ")"
+    })).textContent = "Affordable mandate share (alpha)";
+
+    var xTitleX = HEATMAP_MARGIN.left + HEATMAP_PLOT.w / 2, xTitleY = HEATMAP_VIEWBOX.height - 6;
+    frag.appendChild(svgEl("text", {
+      x: xTitleX, y: xTitleY, class: "explorer-heatmap-axistitle", "text-anchor": "middle"
+    })).textContent = "Density bonuses (phi)";
+    group.appendChild(frag);
+  }
+
+  function addCubeAxisLabels(group, alphaLevels, phiLevels, tauLevels, project) {
+    group.textContent = "";
+    var frag = document.createDocumentFragment();
+
+    [0, 0.5, 1].forEach(function (t) {
+      var idx = Math.round(t * (alphaLevels.length - 1));
+      var p = project(idx / (alphaLevels.length - 1), 0, 0);
+      var txt = svgEl("text", { x: p.x - 8, y: p.y + 4, class: "explorer-cube-ticklabel", "text-anchor": "end" });
+      txt.textContent = fmtAlpha(alphaLevels[idx]);
+      frag.appendChild(txt);
+    });
+    [0, 0.5, 1].forEach(function (t) {
+      var idx = Math.round(t * (phiLevels.length - 1));
+      var p = project(0, idx / (phiLevels.length - 1), 0);
+      var txt = svgEl("text", { x: p.x, y: p.y + 16, class: "explorer-cube-ticklabel", "text-anchor": "middle" });
+      txt.textContent = fmtPhi(phiLevels[idx]);
+      frag.appendChild(txt);
+    });
+    // Depth (tau) tick labels: rendered horizontally rather than following
+    // the receding diagonal, each offset to the right of its point on the
+    // axis, with dedicated room (the wider right margin above) so the
+    // top-most tick and the axis title below don't collide.
+    var tauLabelPositions = [];
+    [0, 0.5, 1].forEach(function (t) {
+      var idx = Math.round(t * (tauLevels.length - 1));
+      var p = project(0, 0, idx / (tauLevels.length - 1));
+      var lx = p.x + 8, ly = p.y + 3;
+      var txt = svgEl("text", { x: lx, y: ly, class: "explorer-cube-ticklabel", "text-anchor": "start" });
+      txt.textContent = fmtTau(tauLevels[idx]);
+      frag.appendChild(txt);
+      tauLabelPositions.push({ x: lx, y: ly });
+    });
+
+    var aTop = project(1, 0, 0);
+    frag.appendChild(svgEl("text", { x: aTop.x - 8, y: aTop.y - 10, class: "explorer-cube-axistitle", "text-anchor": "end" })).textContent = "α";
+    var pRight = project(0, 1, 0);
+    frag.appendChild(svgEl("text", { x: pRight.x, y: pRight.y + 30, class: "explorer-cube-axistitle", "text-anchor": "middle" })).textContent = "φ";
+    var topTauLabel = tauLabelPositions[tauLabelPositions.length - 1];
+    frag.appendChild(svgEl("text", {
+      x: topTauLabel.x, y: topTauLabel.y + 16, class: "explorer-cube-axistitle", "text-anchor": "start"
+    })).textContent = "τ";
+
+    group.appendChild(frag);
+  }
+
+  /* ------------------------------------------------------------------ */
+
   function init(container, config) {
     config = config || {};
     var dataPath = config.dataPath || "./";
-    var figuresPath = config.figuresPath || "./";
     var labels = Object.assign({
-      diz: "Density Incentive Zoning",
-      fiz: "Fiscal Incentive Zoning",
+      metricProduction: "Production",
+      metricRent: "Rent",
       alpha: "Affordable share (mandate)",
       phi: "Density bonus",
       tau: "Tax exemption (years)",
       netUnits: "Net new units",
       rentChange: "Average expected rent change",
       whoPays: "Public / landowner cost split",
-      costSplitNote: "The public/landowner cost split (Figure 12) is not part " +
-        "of this grid yet; see Finding 3 above for the reported per-unit " +
-        "cost and incidence."
+      taxImpact: "Tax revenue impact",
+      landownerImpact: "Landowner property value impact",
+      tauNote: "Set by New York State; density bonuses and mandate share are " +
+        "the levers a city planner controls.",
+      heatmapHint: "Click or drag on the heatmap to set a policy directly.",
+      costSplitNote: "Reflects the full fiscal and property-value effect of " +
+        "this policy, including any change in total production; not the " +
+        "same as a per-unit incidence analysis that holds total production " +
+        "fixed."
     }, config.labels || {});
 
     container.innerHTML =
-      /* Hidden unless a data-load error occurs (see the fetch .catch below);
-         no default "illustrative data" text now that real data backs this. */
       '<div class="explorer-banner" role="note" hidden></div>' +
-      '<div class="explorer-modes" role="tablist" aria-label="Policy mode">' +
-      '<button type="button" class="explorer-mode-btn" data-mode="diz" ' +
-      'role="tab" aria-pressed="true">' + labels.diz + "</button>" +
-      '<button type="button" class="explorer-mode-btn" data-mode="fiz" ' +
-      'role="tab" aria-pressed="false">' + labels.fiz + "</button>" +
+      '<div class="explorer-modes" role="tablist" aria-label="Colored outcome">' +
+      '<button type="button" class="explorer-mode-btn" data-metric="production" ' +
+      'role="tab" aria-pressed="true">' + labels.metricProduction + "</button>" +
+      '<button type="button" class="explorer-mode-btn" data-metric="rent" ' +
+      'role="tab" aria-pressed="false">' + labels.metricRent + "</button>" +
       "</div>" +
-      '<div class="explorer-heatmaps">' +
-      heatmapPanel("units", "Net new units") +
-      heatmapPanel("rent", "Average expected rent change") +
+      '<div class="explorer-cube-row">' +
+      '<div class="explorer-cube-panel">' +
+      '<div class="explorer-panel-title">Policy space</div>' +
+      '<svg class="explorer-cube-svg" viewBox="0 0 ' + CUBE_VIEWBOX.width + " " + CUBE_VIEWBOX.height + '" ' +
+      'role="img" aria-label="Three-dimensional view of the policy space, alpha vertical, phi horizontal, tau receding">' +
+      '<g data-el="cube-wire"></g>' +
+      '<g data-el="cube-surface"></g>' +
+      '<g data-el="cube-contour"></g>' +
+      '<g data-el="cube-axis-wire"></g>' +
+      '<g data-el="cube-labels"></g>' +
+      '<g data-el="cube-guides"></g>' +
+      '<circle data-el="cube-marker" r="5" class="explorer-cube-marker" visibility="hidden"></circle>' +
+      "</svg>" +
+      "</div>" +
+      '<div class="explorer-right-col">' +
+      '<div class="explorer-tau-slot">' +
+      sliderRow("tau", labels.tau) +
+      '<p class="explorer-tau-note">' + labels.tauNote + "</p>" +
+      "</div>" +
+      '<div class="explorer-heatmap-panel">' +
+      '<div class="explorer-panel-title" data-out="heatmap-title">—</div>' +
+      '<svg class="explorer-heatmap-svg" viewBox="0 0 ' + HEATMAP_VIEWBOX.width + " " + HEATMAP_VIEWBOX.height + '" ' +
+      'role="img" aria-label="Heatmap of the selected outcome across affordable share and density bonus at the current tax exemption" ' +
+      'data-el="heatmap-svg">' +
+      '<g data-el="heatmap-surface"></g>' +
+      '<g data-el="heatmap-contour"></g>' +
+      '<g data-el="heatmap-labels"></g>' +
+      '<g data-el="heatmap-marker"></g>' +
+      "</svg>" +
+      '<div class="explorer-heatmap-legend">' +
+      '<div class="explorer-heatmap-legend-title" data-out="legend-title">—</div>' +
+      '<div class="explorer-heatmap-legend-scale">' +
+      '<span class="explorer-heatmap-legend-label" data-out="legend-min">—</span>' +
+      '<div class="explorer-heatmap-legend-bar-wrap">' +
+      '<span class="explorer-heatmap-legend-bar"></span>' +
+      '<span class="explorer-heatmap-legend-zero-tick"></span>' +
+      "</div>" +
+      '<span class="explorer-heatmap-legend-label" data-out="legend-max">—</span>' +
+      "</div>" +
+      "</div>" +
+      '<p class="explorer-heatmap-hint">' + labels.heatmapHint + "</p>" +
+      "</div>" +
+      "</div>" +
       "</div>" +
       '<p class="explorer-heatmap-caption" data-out="heatmap-caption">—</p>' +
       '<div class="explorer-controls-row">' +
-      '<fieldset data-fieldset="diz">' +
-      /* The mode toggle above already shows which mode is active; the
-         legend stays for screen readers (fieldset semantics) without
-         repeating the heading visually. */
-      '<legend class="sr-only">' + labels.diz + '</legend>' +
-      sliderRow("alpha-diz", labels.alpha) +
+      '<fieldset>' +
+      '<legend class="sr-only">Policy instruments</legend>' +
+      sliderRow("alpha", labels.alpha) +
       sliderRow("phi", labels.phi) +
-      "</fieldset>" +
-      '<fieldset data-fieldset="fiz" hidden>' +
-      '<legend class="sr-only">' + labels.fiz + '</legend>' +
-      sliderRow("alpha-fiz", labels.alpha) +
-      sliderRow("tau", labels.tau) +
       "</fieldset>" +
       "</div>" +
       '<div class="explorer-readouts-row" aria-live="polite">' +
@@ -486,6 +685,14 @@
       '<div class="explorer-readout-label">' + labels.rentChange + '</div>' +
       '<div class="explorer-readout-value" data-out="rent">—</div>' +
       "</div>" +
+      '<div class="explorer-readout">' +
+      '<div class="explorer-readout-label">' + labels.taxImpact + '</div>' +
+      '<div class="explorer-readout-value" data-out="tax">—</div>' +
+      "</div>" +
+      '<div class="explorer-readout">' +
+      '<div class="explorer-readout-label">' + labels.landownerImpact + '</div>' +
+      '<div class="explorer-readout-value" data-out="pv">—</div>' +
+      "</div>" +
       '<div class="explorer-note">' + labels.costSplitNote + "</div>" +
       "</div>" +
       '<div class="explorer-scatter">' +
@@ -496,8 +703,7 @@
       '<circle class="explorer-scatter-marker" data-el="live-marker" r="6" visibility="hidden"></circle>' +
       "</svg>" +
       "</div>" +
-      '<p class="explorer-scatter-caption">X-axis is the change in affordable units, y-axis is the change in market-rate units; the diagonal marks where total units are unchanged from baseline; the shaded area is a net decrease.</p>' +
-      '<p class="explorer-scatter-note">*All Policies is shown using the paper\'s reported value; a live version will be added once the full three-instrument grid is available.</p>';
+      '<p class="explorer-scatter-caption">X-axis is the change in affordable units, y-axis is the change in market-rate units; the diagonal marks where total units are unchanged from baseline; the shaded area is a net decrease.</p>';
 
     function sliderRow(key, label) {
       return '<div class="explorer-slider-row" data-slider-row="' + key + '">' +
@@ -507,205 +713,271 @@
         "</div>";
     }
 
-    function heatmapPanel(kind, label) {
-      return '<div class="explorer-heatmap">' +
-        '<img data-heatmap="' + kind + '" alt="' + label + ', by mandate share and policy instrument" />' +
-        '<div class="explorer-heatmap-marker" data-marker="' + kind + '">' +
-        '<span class="line-h"></span><span class="line-v"></span><span class="dot"></span>' +
-        "</div>" +
-        "</div>";
+    var state = {
+      metric: "production",
+      alphaIdx: 0, phiIdx: 0, tauIdx: 0,
+      alphaLevels: null, phiLevels: null, tauLevels: null,
+      alphaEdges: null, phiEdges: null,
+      grid3D: null,
+      domain: { production: 0, rent: 0 }
+    };
+
+    var heatProject = heatmapProjector();
+    var cubeProject = cubeProjector();
+
+    var modeButtons = container.querySelectorAll(".explorer-mode-btn");
+    var alphaInput = container.querySelector("#explorer-alpha");
+    var phiInput = container.querySelector("#explorer-phi");
+    var tauInput = container.querySelector("#explorer-tau");
+
+    function currentRow() {
+      return state.grid3D[state.alphaIdx][state.phiIdx][state.tauIdx];
     }
 
-    function currentGrid() {
-      return state.mode === "diz" ? state.dizGrid : state.fizGrid;
+    function sliceValues(tauIdx, metricKey) {
+      var out = [];
+      for (var ai = 0; ai < state.alphaLevels.length; ai++) {
+        var row = [];
+        for (var pj = 0; pj < state.phiLevels.length; pj++) {
+          row.push(state.grid3D[ai][pj][tauIdx][METRICS[metricKey].key]);
+        }
+        out.push(row);
+      }
+      return out;
     }
 
-    // The mode's three labeled reference points (a single-instrument point,
-    // the affordability mandate, and the paper's named DIZ/FIZ scenario),
-    // replotted whenever the mode changes (the fixed domain itself never
-    // changes). Looked up by exact (a, b) grid coordinate via grid.get(),
-    // so the plotted values are real simulated output, not an
-    // interpolation. Styled as filled diamonds, matching Figure 6.
-    function renderScatterRefPoints() {
-      var grid = currentGrid();
-      var refGroup = container.querySelector('[data-el="ref-points"]');
-      refGroup.textContent = "";
-      if (!grid) return;
+    function renderSlice() {
+      var metric = METRICS[state.metric];
+      var maxAbs = state.domain[state.metric];
+      var values = sliceValues(state.tauIdx, state.metric);
+      var tT = state.tauIdx / (state.tauLevels.length - 1);
 
-      SCATTER_REF_POINTS[state.mode].forEach(function (ref) {
-        var row = grid.get(ref.a, ref.b);
-        if (!row) return;
-        var cx = scatterXPixel(row.d_units_affordable);
-        var cy = scatterYPixel(row.d_units_market);
+      container.querySelector('[data-out="legend-min"]').textContent = metric.fmt(-maxAbs);
+      container.querySelector('[data-out="legend-max"]').textContent = metric.fmt(maxAbs);
+      container.querySelector('[data-out="legend-title"]').textContent = metric.legendTitle;
+      container.querySelector('[data-out="heatmap-title"]').textContent = metric.panelTitle;
 
-        refGroup.appendChild(svgEl("polygon", {
-          class: "explorer-scatter-refpoint",
-          points: diamondPoints(cx, cy, 6)
-        }));
+      renderSurface(
+        container.querySelector('[data-el="heatmap-surface"]'),
+        values, maxAbs,
+        HEATMAP_PLOT.x0, HEATMAP_PLOT.y0 - HEATMAP_PLOT.h, HEATMAP_PLOT.w, HEATMAP_PLOT.h
+      );
+      renderContour(container.querySelector('[data-el="heatmap-contour"]'), values, heatProject, 0);
+      addHeatmapAxisLabels(container.querySelector('[data-el="heatmap-labels"]'), state.alphaLevels, state.phiLevels, heatProject);
 
-        var text = svgEl("text", {
-          class: "explorer-scatter-reflabel",
-          x: cx + 9, y: cy - 9
-        });
-        text.textContent = ref.label;
-        refGroup.appendChild(text);
+      var cubeSliceX = CUBE_PLOT.x0 + tT * CUBE_TAU_DX;
+      var cubeSliceY = CUBE_PLOT.y0 - tT * CUBE_TAU_DY - CUBE_PLOT.h;
+      renderSurface(
+        container.querySelector('[data-el="cube-surface"]'),
+        values, maxAbs,
+        cubeSliceX, cubeSliceY, CUBE_PLOT.w, CUBE_PLOT.h
+      );
+      renderContour(container.querySelector('[data-el="cube-contour"]'), values, cubeProject, tT);
+    }
+
+    function renderWireframe() {
+      var corners = cubeCorners(cubeProject);
+      var wireGroup = container.querySelector('[data-el="cube-wire"]');
+      wireGroup.textContent = "";
+      var frag = document.createDocumentFragment();
+      buildWireframeEdges(corners).forEach(function (e) {
+        frag.appendChild(svgEl("line", { x1: e[0].x, y1: e[0].y, x2: e[1].x, y2: e[1].y, class: "explorer-cube-wire" }));
       });
+      wireGroup.appendChild(frag);
+
+      var axisGroup = container.querySelector('[data-el="cube-axis-wire"]');
+      axisGroup.textContent = "";
+      var origin = cubeProject(0, 0, 0);
+      var aAxis = svgEl("line", { x1: origin.x, y1: origin.y, x2: cubeProject(1, 0, 0).x, y2: cubeProject(1, 0, 0).y, class: "explorer-cube-axis" });
+      var pAxis = svgEl("line", { x1: origin.x, y1: origin.y, x2: cubeProject(0, 1, 0).x, y2: cubeProject(0, 1, 0).y, class: "explorer-cube-axis" });
+      var tAxis = svgEl("line", { x1: origin.x, y1: origin.y, x2: cubeProject(0, 0, 1).x, y2: cubeProject(0, 0, 1).y, class: "explorer-cube-axis" });
+      axisGroup.appendChild(aAxis);
+      axisGroup.appendChild(pAxis);
+      axisGroup.appendChild(tAxis);
+
+      addCubeAxisLabels(container.querySelector('[data-el="cube-labels"]'), state.alphaLevels, state.phiLevels, state.tauLevels, cubeProject);
     }
 
-    // Updates only the live marker; called on every render(), same
-    // frequency as the heatmap marker and the readouts. A hollow outlined
-    // circle, deliberately distinct from the two solid reference diamonds.
-    function renderScatterMarker(dAffordable, dMarket) {
-      var marker = container.querySelector('[data-el="live-marker"]');
-      marker.setAttribute("cx", scatterXPixel(dAffordable));
-      marker.setAttribute("cy", scatterYPixel(dMarket));
+    function renderMarker() {
+      var aT = state.alphaIdx / (state.alphaLevels.length - 1);
+      var pT = state.phiIdx / (state.phiLevels.length - 1);
+      var tT = state.tauIdx / (state.tauLevels.length - 1);
+
+      var hp = heatProject(aT, pT, 0);
+      var heatMarkerGroup = container.querySelector('[data-el="heatmap-marker"]');
+      heatMarkerGroup.textContent = "";
+      heatMarkerGroup.appendChild(svgEl("line", { x1: HEATMAP_PLOT.x0, y1: hp.y, x2: HEATMAP_PLOT.x0 + HEATMAP_PLOT.w, y2: hp.y, class: "explorer-heatmap-guide" }));
+      heatMarkerGroup.appendChild(svgEl("line", { x1: hp.x, y1: HEATMAP_PLOT.y0 - HEATMAP_PLOT.h, x2: hp.x, y2: HEATMAP_PLOT.y0, class: "explorer-heatmap-guide" }));
+      heatMarkerGroup.appendChild(svgEl("circle", { cx: hp.x, cy: hp.y, r: 4, class: "explorer-heatmap-marker-dot" }));
+
+      var cp = cubeProject(aT, pT, tT);
+      var floorP = cubeProject(0, pT, tT);
+      var axisP = cubeProject(0, 0, tT);
+      var guideGroup = container.querySelector('[data-el="cube-guides"]');
+      guideGroup.textContent = "";
+      guideGroup.appendChild(svgEl("line", { x1: cp.x, y1: cp.y, x2: floorP.x, y2: floorP.y, class: "explorer-cube-guide" }));
+      guideGroup.appendChild(svgEl("line", { x1: floorP.x, y1: floorP.y, x2: axisP.x, y2: axisP.y, class: "explorer-cube-guide" }));
+
+      var marker = container.querySelector('[data-el="cube-marker"]');
+      marker.setAttribute("cx", cp.x);
+      marker.setAttribute("cy", cp.y);
       marker.removeAttribute("visibility");
     }
 
-    var state = {
-      mode: "diz",
-      dizGrid: null, fizGrid: null
-    };
-
-    var modeButtons = container.querySelectorAll(".explorer-mode-btn");
-    var dizFieldset = container.querySelector('[data-fieldset="diz"]');
-    var fizFieldset = container.querySelector('[data-fieldset="fiz"]');
-
-    function setupSlider(id, axisVals, step, maxOverride) {
-      var input = container.querySelector("#explorer-" + id);
-      input.min = axisVals[0];
-      input.max = maxOverride != null ? maxOverride : axisVals[axisVals.length - 1];
-      input.step = step;
-      input.value = axisVals[0];
-      return input;
+    function renderScatterMarker(row) {
+      var marker = container.querySelector('[data-el="live-marker"]');
+      marker.setAttribute("cx", scatterXPixel(row.Aff_chg));
+      marker.setAttribute("cy", scatterYPixel(row.marketChg));
+      marker.removeAttribute("visibility");
     }
 
-    function axisStep(axisVals) {
-      if (axisVals.length < 2) return 1;
-      var diffs = [];
-      for (var i = 1; i < axisVals.length; i++) {
-        diffs.push(Math.abs(axisVals[i] - axisVals[i - 1]));
-      }
-      return Math.min.apply(null, diffs);
-    }
-
-    function renderHeatmaps(alpha, xValue) {
-      var cfg = HEATMAP_CONFIG[state.mode];
-      var yPercent = alphaToYPercent(alpha);
-
-      ["units", "rent"].forEach(function (kind) {
-        var panelCfg = cfg[kind];
-        var img = container.querySelector('[data-heatmap="' + kind + '"]');
-        if (img.dataset.file !== panelCfg.file) {
-          img.src = figuresPath + panelCfg.file;
-          img.dataset.file = panelCfg.file;
-        }
-        var xPercent = xValueToXPercent(panelCfg.x0, panelCfg.x1, xValue, cfg.axisMax);
-        var marker = container.querySelector('[data-marker="' + kind + '"]');
-        marker.style.left = xPercent + "%";
-        marker.style.top = yPercent + "%";
-      });
-
-      var captionEl = container.querySelector('[data-out="heatmap-caption"]');
-      var alphaText = "α = " + Math.round(alpha * 100) + "%";
-      var xText = state.mode === "diz"
-        ? "φ = " + Math.round(xValue * 100) + "%"
-        : "τ = " + Math.round(xValue) + " years";
-      captionEl.textContent = alphaText + ", " + xText;
-    }
-
-    function render() {
-      // switchMode("diz") below runs synchronously, before the CSV fetch
-      // resolves; skip until both grids are actually built (the fetch's own
-      // .then() calls render() again once they are).
-      if (!state.dizGrid || !state.fizGrid) return;
-
-      var out;
-      var alpha, xValue;
-      if (state.mode === "diz") {
-        alpha = parseFloat(container.querySelector("#explorer-alpha-diz").value);
-        xValue = parseFloat(container.querySelector("#explorer-phi").value);
-        container.querySelector("#explorer-alpha-diz-out").textContent = alpha.toFixed(2);
-        container.querySelector("#explorer-phi-out").textContent = xValue.toFixed(2);
-        out = interpolate(state.dizGrid, alpha, xValue);
-      } else {
-        alpha = parseFloat(container.querySelector("#explorer-alpha-fiz").value);
-        xValue = parseFloat(container.querySelector("#explorer-tau").value);
-        container.querySelector("#explorer-alpha-fiz-out").textContent = alpha.toFixed(2);
-        container.querySelector("#explorer-tau-out").textContent = xValue.toFixed(0) + " yrs";
-        out = interpolate(state.fizGrid, alpha, xValue);
-      }
-
-      renderHeatmaps(alpha, xValue);
-      renderScatterMarker(out.d_units_affordable, out.d_units_market);
-
+    function renderReadouts(row) {
       var netEl = container.querySelector('[data-out="net"]');
-      netEl.textContent = fmtUnits(out.d_units_net);
-      netEl.className = "explorer-readout-value " + signClass(out.d_units_net);
+      netEl.textContent = fmtUnits(row.AptNet_chg);
+      netEl.className = "explorer-readout-value " + signClass(row.AptNet_chg);
 
       var rentEl = container.querySelector('[data-out="rent"]');
-      rentEl.textContent = fmtPct(out.d_rent_pct);
-      rentEl.className = "explorer-readout-value " + signClass(out.d_rent_pct);
+      rentEl.textContent = fmtPct(row.rentPct);
+      rentEl.className = "explorer-readout-value " + signClass(row.rentPct);
 
-      container.querySelector('[data-out="affordable-num"]').textContent =
-        fmtUnits(out.d_units_affordable);
-      container.querySelector('[data-out="market-num"]').textContent =
-        fmtUnits(out.d_units_market);
+      var taxEl = container.querySelector('[data-out="tax"]');
+      taxEl.textContent = fmtPct(row.taxPct);
+      taxEl.className = "explorer-readout-value " + signClass(row.taxPct);
 
-      var total = Math.abs(out.d_units_affordable) + Math.abs(out.d_units_market);
-      var affPct = total === 0 ? 0 : (Math.abs(out.d_units_affordable) / total) * 100;
+      var pvEl = container.querySelector('[data-out="pv"]');
+      pvEl.textContent = fmtPct(row.pvPct);
+      pvEl.className = "explorer-readout-value " + signClass(row.pvPct);
+
+      container.querySelector('[data-out="affordable-num"]').textContent = fmtUnits(row.Aff_chg);
+      container.querySelector('[data-out="market-num"]').textContent = fmtUnits(row.marketChg);
+
+      var total = Math.abs(row.Aff_chg) + Math.abs(row.marketChg);
+      var affPct = total === 0 ? 0 : (Math.abs(row.Aff_chg) / total) * 100;
       container.querySelector('[data-out="split-affordable"]').style.width = affPct + "%";
       container.querySelector('[data-out="split-market"]').style.width = (100 - affPct) + "%";
     }
 
-    function switchMode(mode) {
-      state.mode = mode;
-      modeButtons.forEach(function (btn) {
-        btn.setAttribute("aria-pressed", btn.dataset.mode === mode ? "true" : "false");
-      });
-      dizFieldset.hidden = mode !== "diz";
-      fizFieldset.hidden = mode !== "fiz";
-      renderScatterRefPoints();
+    function renderCaption() {
+      var alpha = state.alphaLevels[state.alphaIdx];
+      var phi = state.phiLevels[state.phiIdx];
+      var tau = state.tauLevels[state.tauIdx];
+      container.querySelector('[data-out="heatmap-caption"]').textContent =
+        "α = " + fmtAlpha(alpha) + ", φ = " + fmtPhi(phi) + ", τ = " + Math.round(tau) + " years";
+    }
+
+    function render() {
+      if (!state.grid3D) return;
+      alphaInput.value = state.alphaIdx;
+      phiInput.value = state.phiIdx;
+      tauInput.value = state.tauIdx;
+      container.querySelector("#explorer-alpha-out").textContent = fmtAlpha(state.alphaLevels[state.alphaIdx]);
+      container.querySelector("#explorer-phi-out").textContent = fmtPhi(state.phiLevels[state.phiIdx]);
+      container.querySelector("#explorer-tau-out").textContent = fmtTau(state.tauLevels[state.tauIdx]);
+
+      renderSlice();
+      renderMarker();
+      var row = currentRow();
+      renderReadouts(row);
+      renderScatterMarker(row);
+      renderCaption();
+    }
+
+    function nearestIndex(levels, value) {
+      var best = 0, bestDist = Infinity;
+      for (var i = 0; i < levels.length; i++) {
+        var d = Math.abs(levels[i] - value);
+        if (d < bestDist) { bestDist = d; best = i; }
+      }
+      return best;
+    }
+
+    function setFromHeatmapEvent(evt) {
+      var svg = container.querySelector('[data-el="heatmap-svg"]');
+      var pt = svg.createSVGPoint();
+      pt.x = evt.clientX;
+      pt.y = evt.clientY;
+      var ctm = svg.getScreenCTM();
+      if (!ctm) return;
+      var local = pt.matrixTransform(ctm.inverse());
+      var pT = (local.x - HEATMAP_PLOT.x0) / HEATMAP_PLOT.w;
+      var aT = (HEATMAP_PLOT.y0 - local.y) / HEATMAP_PLOT.h;
+      pT = Math.max(0, Math.min(1, pT));
+      aT = Math.max(0, Math.min(1, aT));
+      state.alphaIdx = Math.round(aT * (state.alphaLevels.length - 1));
+      state.phiIdx = Math.round(pT * (state.phiLevels.length - 1));
       render();
     }
 
+    var heatmapSvg = container.querySelector('[data-el="heatmap-svg"]');
+    var dragging = false;
+    heatmapSvg.addEventListener("pointerdown", function (evt) {
+      dragging = true;
+      heatmapSvg.setPointerCapture(evt.pointerId);
+      setFromHeatmapEvent(evt);
+    });
+    heatmapSvg.addEventListener("pointermove", function (evt) {
+      if (dragging) setFromHeatmapEvent(evt);
+    });
+    heatmapSvg.addEventListener("pointerup", function (evt) {
+      dragging = false;
+      heatmapSvg.releasePointerCapture(evt.pointerId);
+    });
+
     modeButtons.forEach(function (btn) {
       btn.addEventListener("click", function () {
-        switchMode(btn.dataset.mode);
+        state.metric = btn.dataset.metric;
+        modeButtons.forEach(function (b) {
+          b.setAttribute("aria-pressed", b.dataset.metric === state.metric ? "true" : "false");
+        });
+        render();
       });
     });
 
-    Promise.all([
-      fetch(dataPath + "grid-diz.csv").then(function (r) { return r.text(); }),
-      fetch(dataPath + "grid-fiz.csv").then(function (r) { return r.text(); })
-    ]).then(function (results) {
-      var dizRows = parseCSV(results[0]);
-      var fizRows = parseCSV(results[1]);
+    alphaInput.addEventListener("input", function () { state.alphaIdx = parseInt(alphaInput.value, 10); render(); });
+    phiInput.addEventListener("input", function () { state.phiIdx = parseInt(phiInput.value, 10); render(); });
+    tauInput.addEventListener("input", function () { state.tauIdx = parseInt(tauInput.value, 10); render(); });
 
-      state.dizGrid = buildGrid(dizRows, "alpha", "phi", VALUE_KEYS);
-      state.fizGrid = buildGrid(fizRows, "alpha", "tau", VALUE_KEYS);
-
-      // Sliders are capped to ALPHA_UI_MAX/PHI_UI_MAX/TAU_UI_MAX, matching
-      // the heatmap figures' plotted range; the real grid now covers that
-      // same range natively (state.*Grid.aVals/bVals), so this cap and
-      // interpolate()'s own clamp-to-grid-edge are just defensive floors,
-      // not live constraints, unless a future grid update is narrower.
-      var dizAlphaInput = setupSlider("alpha-diz", state.dizGrid.aVals, axisStep(state.dizGrid.aVals), ALPHA_UI_MAX);
-      var phiInput = setupSlider("phi", state.dizGrid.bVals, axisStep(state.dizGrid.bVals), PHI_UI_MAX);
-      var fizAlphaInput = setupSlider("alpha-fiz", state.fizGrid.aVals, axisStep(state.fizGrid.aVals), ALPHA_UI_MAX);
-      var tauInput = setupSlider("tau", state.fizGrid.bVals, axisStep(state.fizGrid.bVals), TAU_UI_MAX);
-
-      // Start on an illustrative non-baseline point so the readouts are legible
-      // immediately rather than showing an all-zero baseline on load.
-      dizAlphaInput.value = 0;
-      phiInput.value = state.dizGrid.bVals[Math.floor(state.dizGrid.bVals.length / 2)];
-      fizAlphaInput.value = 0;
-      tauInput.value = state.fizGrid.bVals[Math.floor(state.fizGrid.bVals.length / 2)];
-
-      [dizAlphaInput, phiInput, fizAlphaInput, tauInput].forEach(function (input) {
-        input.addEventListener("input", render);
+    function renderScatterRefPoints() {
+      var refGroup = container.querySelector('[data-el="ref-points"]');
+      refGroup.textContent = "";
+      var frag = document.createDocumentFragment();
+      SCATTER_REF_POINTS.forEach(function (ref) {
+        var ai = nearestIndex(state.alphaLevels, ref.alpha);
+        var pj = nearestIndex(state.phiLevels, ref.phi);
+        var tk = nearestIndex(state.tauLevels, ref.tau);
+        var row = state.grid3D[ai][pj][tk];
+        if (!row) return;
+        var cx = scatterXPixel(row.Aff_chg), cy = scatterYPixel(row.marketChg);
+        frag.appendChild(svgEl("polygon", { class: "explorer-scatter-refpoint", points: diamondPoints(cx, cy, 6) }));
+        var text = svgEl("text", { class: "explorer-scatter-reflabel", x: cx + 9, y: cy - 9 });
+        text.textContent = ref.label;
+        frag.appendChild(text);
       });
+      refGroup.appendChild(frag);
+    }
 
+    fetch(dataPath + "grid-full.csv").then(function (r) { return r.text(); }).then(function (text) {
+      var rows = parseCSV(text);
+      state.alphaLevels = uniqueSorted(rows.map(function (r) { return r.alpha; }));
+      state.phiLevels = uniqueSorted(rows.map(function (r) { return r.phi; }));
+      state.tauLevels = uniqueSorted(rows.map(function (r) { return r.tau; }));
+      state.alphaEdges = cellEdges(state.alphaLevels.length);
+      state.phiEdges = cellEdges(state.phiLevels.length);
+      state.grid3D = buildGrid3D(rows, state.alphaLevels, state.phiLevels, state.tauLevels);
+      state.domain.production = globalAbsMax(rows, "AptNet_chg");
+      state.domain.rent = globalAbsMax(rows, "rentPct");
+
+      alphaInput.min = 0; alphaInput.max = state.alphaLevels.length - 1; alphaInput.step = 1;
+      phiInput.min = 0; phiInput.max = state.phiLevels.length - 1; phiInput.step = 1;
+      tauInput.min = 0; tauInput.max = state.tauLevels.length - 1; tauInput.step = 1;
+
+      // Illustrative non-baseline default: the paper's 30% mandate scenario,
+      // density bonus at the midpoint, no tax exemption.
+      state.alphaIdx = nearestIndex(state.alphaLevels, 0.3);
+      state.phiIdx = Math.floor(state.phiLevels.length / 2);
+      state.tauIdx = 0;
+
+      renderWireframe();
       renderScatterRefPoints();
       render();
     }).catch(function (err) {
@@ -714,10 +986,8 @@
       banner.textContent =
         "Explorer data failed to load (" + err.message + "). If you opened this " +
         "file directly, serve the site over http:// instead of file:// so the " +
-        "CSV grids can be fetched.";
+        "CSV grid can be fetched.";
     });
-
-    switchMode("diz");
   }
 
   global.CarrotStickExplorer = {
