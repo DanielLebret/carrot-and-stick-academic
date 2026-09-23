@@ -567,9 +567,9 @@
       '<div class="explorer-banner" role="note" hidden></div>' +
       '<div class="explorer-modes" role="tablist" aria-label="Colored outcome">' +
       '<button type="button" class="explorer-mode-btn" data-metric="production" ' +
-      'role="tab" aria-pressed="true">' + labels.metricProduction + "</button>" +
+      'role="tab" aria-pressed="false">' + labels.metricProduction + "</button>" +
       '<button type="button" class="explorer-mode-btn" data-metric="rent" ' +
-      'role="tab" aria-pressed="false">' + labels.metricRent + "</button>" +
+      'role="tab" aria-pressed="true">' + labels.metricRent + "</button>" +
       "</div>" +
       '<div class="explorer-cube-row">' +
       '<div class="explorer-cube-panel" data-el="cube-panel">' +
@@ -681,7 +681,7 @@
     }
 
     var state = {
-      metric: "production",
+      metric: "rent",
       alphaIdx: 0, phiIdx: 0, tauIdx: 0,
       alphaLevels: null, phiLevels: null, tauLevels: null,
       alphaEdges: null, phiEdges: null,
@@ -989,10 +989,11 @@
       tauInput.min = 0; tauInput.max = state.tauLevels.length - 1; tauInput.step = 1;
 
       // Illustrative non-baseline default: the paper's 30% mandate scenario,
-      // density bonus at the midpoint, no tax exemption.
+      // density bonus at the midpoint, 10-year tax exemption (an exact grid
+      // level, not interpolated).
       state.alphaIdx = nearestIndex(state.alphaLevels, 0.3);
       state.phiIdx = Math.floor(state.phiLevels.length / 2);
-      state.tauIdx = 0;
+      state.tauIdx = nearestIndex(state.tauLevels, 10);
 
       renderWireframe();
       renderScatterRefPoints();
