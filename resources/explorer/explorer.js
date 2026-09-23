@@ -41,6 +41,8 @@
 (function (global) {
   "use strict";
 
+  var explorerInstanceCount = 0;
+
   function parseCSV(text) {
     var lines = text.trim().split(/\r?\n/);
     var headers = lines[0].split(",").map(function (h) { return h.trim().replace(/^"|"$/g, ""); });
@@ -352,51 +354,21 @@
   }
 
   /* ------------------------------------------------------------------ */
-  /* Heatmap panel: 16x21 alpha/phi color surface at the current tau,    */
-  /* redrawn whenever tau or the metric changes. viewBox keeps the exact */
-  /* 16:9 aspect ratio the old static figure images used (2400x1350),    */
-  /* just at a smaller, arbitrary SVG scale, so the panel's rendered      */
-  /* pixel size is unchanged from before (same CSS grid column, same     */
-  /* width:100%/height:auto mechanics).                                  */
-  /* ------------------------------------------------------------------ */
-
-  // Left/bottom margins carry dedicated rows for full axis titles (see
-  // addHeatmapAxisLabels) in addition to the tick-value labels; the viewBox
-  // grows by the same amount so the plotted surface area itself (HEATMAP_PLOT)
-  // is unchanged from the original 356x193.
-  var HEATMAP_VIEWBOX = { width: 426, height: 243 };
-  var HEATMAP_MARGIN = { left: 60, right: 10, top: 10, bottom: 40 };
-  var HEATMAP_PLOT = {
-    x0: HEATMAP_MARGIN.left,
-    y0: HEATMAP_VIEWBOX.height - HEATMAP_MARGIN.bottom,
-    w: HEATMAP_VIEWBOX.width - HEATMAP_MARGIN.left - HEATMAP_MARGIN.right,
-    h: HEATMAP_VIEWBOX.height - HEATMAP_MARGIN.top - HEATMAP_MARGIN.bottom
-  };
-
-  function heatmapProjector() {
-    return function (aT, pT) {
-      return { x: HEATMAP_PLOT.x0 + pT * HEATMAP_PLOT.w, y: HEATMAP_PLOT.y0 - aT * HEATMAP_PLOT.h };
-    };
-  }
-
-  /* ------------------------------------------------------------------ */
   /* Cube panel: isometric-style projection, alpha vertical, phi          */
   /* horizontal, tau receding diagonally (30 degrees) toward the upper    */
-  /* right. Since alpha and phi are both screen-orthogonal axes and only  */
-  /* tau is skewed, a fixed-tau slice is a plain axis-aligned rectangle   */
-  /* translated by a constant tau offset, so the same cell/contour        */
-  /* drawing code as the heatmap panel applies, just with that offset.    */
+  /* right. This is the single merged panel (the old separate flat        */
+  /* heatmap panel was removed; the cube's own front alpha-phi slice is   */
+  /* now the sole interactive surface, click/drag included).              */
   /* ------------------------------------------------------------------ */
 
-  // Plot/tau dimensions are ~10% larger than the cube's original 270x324/80x46
-  // footprint, within the same overall viewBox (so the panel's rendered size
-  // is unchanged but the cube fills more of it). Margins shrink to make room,
-  // which is affordable now that the depth-axis tick labels below render
-  // horizontally instead of needing room for a rotated diagonal run.
-  var CUBE_VIEWBOX = { width: 480, height: 460 };
+  // Flattened/widened relative to the old two-panel cube: roughly as wide as
+  // the old flat heatmap (426) plus room for the receding depth axis, and
+  // shorter than the old cube's tall 480x460 footprint since it no longer
+  // needs to match a stacked right column's height.
+  var CUBE_VIEWBOX = { width: 620, height: 340 };
   var CUBE_MARGIN = { left: 52, right: 43, top: 18, bottom: 35 };
-  var CUBE_TAU_DX = 88;
-  var CUBE_TAU_DY = Math.round(88 * Math.tan(30 * Math.PI / 180)); // 30deg receding depth
+  var CUBE_TAU_DX = 100;
+  var CUBE_TAU_DY = Math.round(100 * Math.tan(30 * Math.PI / 180)); // 30deg receding depth
   var CUBE_PLOT = {
     x0: CUBE_MARGIN.left,
     y0: CUBE_VIEWBOX.height - CUBE_MARGIN.bottom,
@@ -434,11 +406,21 @@
     return c;
   }
 
+  // The alpha=0 face (bottom of the cube) is drawn separately, always
+  // visible, via buildFloorEdges below; excluded here to avoid double-drawing
+  // it under the "Show guide lines" toggle.
   function buildWireframeEdges(c) {
     var edges = [];
     [0, 1].forEach(function (p) { [0, 1].forEach(function (t) { edges.push([c[cornerKey(0, p, t)], c[cornerKey(1, p, t)]]); }); });
-    [0, 1].forEach(function (a) { [0, 1].forEach(function (t) { edges.push([c[cornerKey(a, 0, t)], c[cornerKey(a, 1, t)]]); }); });
-    [0, 1].forEach(function (a) { [0, 1].forEach(function (p) { edges.push([c[cornerKey(a, p, 0)], c[cornerKey(a, p, 1)]]); }); });
+    [0, 1].forEach(function (t) { edges.push([c[cornerKey(1, 0, t)], c[cornerKey(1, 1, t)]]); });
+    [0, 1].forEach(function (p) { edges.push([c[cornerKey(1, p, 0)], c[cornerKey(1, p, 1)]]); });
+    return edges;
+  }
+
+  function buildFloorEdges(c) {
+    var edges = [];
+    [0, 1].forEach(function (t) { edges.push([c[cornerKey(0, 0, t)], c[cornerKey(0, 1, t)]]); });
+    [0, 1].forEach(function (p) { edges.push([c[cornerKey(0, p, 0)], c[cornerKey(0, p, 1)]]); });
     return edges;
   }
 
@@ -504,40 +486,6 @@
   function fmtPhi(v) { return Math.round(v * 100) + "%"; }
   function fmtTau(v) { return Math.round(v) + "y"; }
 
-  function addHeatmapAxisLabels(group, alphaLevels, phiLevels, project) {
-    group.textContent = "";
-    var frag = document.createDocumentFragment();
-    [0, 0.5, 1].forEach(function (t) {
-      var alphaIdx = Math.round(t * (alphaLevels.length - 1));
-      var p = project(alphaIdx / (alphaLevels.length - 1), 0);
-      frag.appendChild(svgEl("text", {
-        x: HEATMAP_MARGIN.left - 5, y: p.y + 3, class: "explorer-heatmap-axislabel", "text-anchor": "end"
-      })).textContent = fmtAlpha(alphaLevels[alphaIdx]);
-    });
-    [0, 0.5, 1].forEach(function (t) {
-      var phiIdx = Math.round(t * (phiLevels.length - 1));
-      var p = project(0, phiIdx / (phiLevels.length - 1));
-      frag.appendChild(svgEl("text", {
-        x: p.x, y: HEATMAP_PLOT.y0 + 14, class: "explorer-heatmap-axislabel", "text-anchor": "middle"
-      })).textContent = fmtPhi(phiLevels[phiIdx]);
-    });
-
-    // Full descriptive axis titles (matching the original static heatmaps),
-    // each on its own dedicated row/column separated from the tick values
-    // rather than a bare Greek letter crammed into a plot corner.
-    var yTitleX = 14, yTitleY = HEATMAP_MARGIN.top + HEATMAP_PLOT.h / 2;
-    frag.appendChild(svgEl("text", {
-      x: yTitleX, y: yTitleY, class: "explorer-heatmap-axistitle", "text-anchor": "middle",
-      transform: "rotate(-90 " + yTitleX + " " + yTitleY + ")"
-    })).textContent = "Affordable mandate share (alpha)";
-
-    var xTitleX = HEATMAP_MARGIN.left + HEATMAP_PLOT.w / 2, xTitleY = HEATMAP_VIEWBOX.height - 6;
-    frag.appendChild(svgEl("text", {
-      x: xTitleX, y: xTitleY, class: "explorer-heatmap-axistitle", "text-anchor": "middle"
-    })).textContent = "Density bonuses (phi)";
-    group.appendChild(frag);
-  }
-
   function addCubeAxisLabels(group, alphaLevels, phiLevels, tauLevels, project) {
     group.textContent = "";
     var frag = document.createDocumentFragment();
@@ -588,6 +536,7 @@
   function init(container, config) {
     config = config || {};
     var dataPath = config.dataPath || "./";
+    explorerInstanceCount += 1;
     var labels = Object.assign({
       metricProduction: "Production",
       metricRent: "Rent",
@@ -601,7 +550,13 @@
       landownerImpact: "Landowner property value impact",
       tauNote: "Set by New York State; density bonuses and mandate share are " +
         "the levers a city planner controls.",
-      heatmapHint: "Click or drag on the heatmap to set a policy directly.",
+      heatmapHint: "Click or drag on the surface to set a policy directly.",
+      cubeExplainer: "New York City has over 765,000 residential parcels. Each one " +
+        "independently decides whether this policy makes redevelopment worth it. " +
+        "This box shows the combined result of all those decisions. The tax " +
+        "exemption slider picks a cross-section of the full policy space; the " +
+        "colored slice shows how the outcome changes as the mandate share and " +
+        "density bonus vary within that cross-section.",
       costSplitNote: "Reflects the full fiscal and property-value effect of " +
         "this policy, including any change in total production; not the " +
         "same as a per-unit incidence analysis that holds total production " +
@@ -617,36 +572,28 @@
       'role="tab" aria-pressed="false">' + labels.metricRent + "</button>" +
       "</div>" +
       '<div class="explorer-cube-row">' +
-      '<div class="explorer-cube-panel">' +
+      '<div class="explorer-cube-panel" data-el="cube-panel">' +
+      '<div class="explorer-cube-panel-header">' +
       '<div class="explorer-panel-title">Policy space</div>' +
-      '<div class="explorer-cube-svg-wrap">' +
-      '<svg class="explorer-cube-svg" viewBox="0 0 ' + CUBE_VIEWBOX.width + " " + CUBE_VIEWBOX.height + '" ' +
-      'role="img" aria-label="Three-dimensional view of the policy space, alpha vertical, phi horizontal, tau receding">' +
+      "</div>" +
+      '<div class="explorer-cube-svg-wrap" data-el="cube-svg-wrap">' +
+      '<svg class="explorer-cube-svg" data-el="cube-svg" viewBox="0 0 ' + CUBE_VIEWBOX.width + " " + CUBE_VIEWBOX.height + '" ' +
+      'role="img" aria-label="Three-dimensional view of the policy space, alpha vertical, phi horizontal, tau receding, ' +
+      'the front slice is clickable to set a policy directly">' +
       '<g data-el="cube-wire"></g>' +
       '<g data-el="cube-surface"></g>' +
       '<g data-el="cube-contour"></g>' +
+      '<g data-el="cube-floor"></g>' +
       '<g data-el="cube-axis-wire"></g>' +
       '<g data-el="cube-labels"></g>' +
       '<g data-el="cube-guides"></g>' +
       '<circle data-el="cube-marker" r="5" class="explorer-cube-marker" visibility="hidden"></circle>' +
       "</svg>" +
       "</div>" +
+      '<div class="explorer-cube-guides-toggle-row">' +
+      '<button type="button" class="explorer-guides-toggle" data-el="cube-guides-toggle" ' +
+      'aria-pressed="false">Show guide lines</button>' +
       "</div>" +
-      '<div class="explorer-right-col">' +
-      '<div class="explorer-tau-slot">' +
-      sliderRow("tau", labels.tau) +
-      '<p class="explorer-tau-note">' + labels.tauNote + "</p>" +
-      "</div>" +
-      '<div class="explorer-heatmap-panel">' +
-      '<div class="explorer-panel-title" data-out="heatmap-title">—</div>' +
-      '<svg class="explorer-heatmap-svg" viewBox="0 0 ' + HEATMAP_VIEWBOX.width + " " + HEATMAP_VIEWBOX.height + '" ' +
-      'role="img" aria-label="Heatmap of the selected outcome across affordable share and density bonus at the current tax exemption" ' +
-      'data-el="heatmap-svg">' +
-      '<g data-el="heatmap-surface"></g>' +
-      '<g data-el="heatmap-contour"></g>' +
-      '<g data-el="heatmap-labels"></g>' +
-      '<g data-el="heatmap-marker"></g>' +
-      "</svg>" +
       '<div class="explorer-heatmap-legend">' +
       '<div class="explorer-heatmap-legend-title" data-out="legend-title">—</div>' +
       '<div class="explorer-heatmap-legend-scale">' +
@@ -660,6 +607,12 @@
       "</div>" +
       '<p class="explorer-heatmap-hint">' + labels.heatmapHint + "</p>" +
       "</div>" +
+      '<div class="explorer-cube-sidebar">' +
+      '<div class="explorer-tau-slot">' +
+      sliderRow("tau", labels.tau) +
+      '<p class="explorer-tau-note">' + labels.tauNote + "</p>" +
+      "</div>" +
+      '<div class="explorer-cube-explainer"><p>' + labels.cubeExplainer + "</p></div>" +
       "</div>" +
       "</div>" +
       '<p class="explorer-heatmap-caption" data-out="heatmap-caption">—</p>' +
@@ -686,14 +639,17 @@
       '<div class="explorer-readout">' +
       '<div class="explorer-readout-label">' + labels.rentChange + '</div>' +
       '<div class="explorer-readout-value" data-out="rent">—</div>' +
+      divergingBar("rent") +
       "</div>" +
       '<div class="explorer-readout">' +
       '<div class="explorer-readout-label">' + labels.taxImpact + '</div>' +
       '<div class="explorer-readout-value" data-out="tax">—</div>' +
+      divergingBar("tax") +
       "</div>" +
       '<div class="explorer-readout">' +
       '<div class="explorer-readout-label">' + labels.landownerImpact + '</div>' +
       '<div class="explorer-readout-value" data-out="pv">—</div>' +
+      divergingBar("pv") +
       "</div>" +
       '<div class="explorer-note">' + labels.costSplitNote + "</div>" +
       "</div>" +
@@ -715,6 +671,15 @@
         "</div>";
     }
 
+    function divergingBar(key) {
+      return '<div class="explorer-diverging-bar" aria-hidden="true">' +
+        '<span class="explorer-diverging-bar-track">' +
+        '<span class="explorer-diverging-bar-fill" data-out="' + key + '-bar-fill"></span>' +
+        "</span>" +
+        '<span class="explorer-diverging-bar-zero"></span>' +
+        "</div>";
+    }
+
     var state = {
       metric: "production",
       alphaIdx: 0, phiIdx: 0, tauIdx: 0,
@@ -724,7 +689,6 @@
       domain: { production: 0, rent: 0 }
     };
 
-    var heatProject = heatmapProjector();
     var cubeProject = cubeProjector();
 
     var modeButtons = container.querySelectorAll(".explorer-mode-btn");
@@ -757,15 +721,6 @@
       container.querySelector('[data-out="legend-min"]').textContent = metric.fmt(-maxAbs);
       container.querySelector('[data-out="legend-max"]').textContent = metric.fmt(maxAbs);
       container.querySelector('[data-out="legend-title"]').textContent = metric.legendTitle;
-      container.querySelector('[data-out="heatmap-title"]').textContent = metric.panelTitle;
-
-      renderSurface(
-        container.querySelector('[data-el="heatmap-surface"]'),
-        values, maxAbs,
-        HEATMAP_PLOT.x0, HEATMAP_PLOT.y0 - HEATMAP_PLOT.h, HEATMAP_PLOT.w, HEATMAP_PLOT.h
-      );
-      renderContour(container.querySelector('[data-el="heatmap-contour"]'), values, heatProject, 0);
-      addHeatmapAxisLabels(container.querySelector('[data-el="heatmap-labels"]'), state.alphaLevels, state.phiLevels, heatProject);
 
       var cubeSliceX = CUBE_PLOT.x0 + tT * CUBE_TAU_DX;
       var cubeSliceY = CUBE_PLOT.y0 - tT * CUBE_TAU_DY - CUBE_PLOT.h;
@@ -787,6 +742,14 @@
       });
       wireGroup.appendChild(frag);
 
+      var floorGroup = container.querySelector('[data-el="cube-floor"]');
+      floorGroup.textContent = "";
+      var floorFrag = document.createDocumentFragment();
+      buildFloorEdges(corners).forEach(function (e) {
+        floorFrag.appendChild(svgEl("line", { x1: e[0].x, y1: e[0].y, x2: e[1].x, y2: e[1].y, class: "explorer-cube-floor" }));
+      });
+      floorGroup.appendChild(floorFrag);
+
       var axisGroup = container.querySelector('[data-el="cube-axis-wire"]');
       axisGroup.textContent = "";
       var origin = cubeProject(0, 0, 0);
@@ -804,13 +767,6 @@
       var aT = state.alphaIdx / (state.alphaLevels.length - 1);
       var pT = state.phiIdx / (state.phiLevels.length - 1);
       var tT = state.tauIdx / (state.tauLevels.length - 1);
-
-      var hp = heatProject(aT, pT, 0);
-      var heatMarkerGroup = container.querySelector('[data-el="heatmap-marker"]');
-      heatMarkerGroup.textContent = "";
-      heatMarkerGroup.appendChild(svgEl("line", { x1: HEATMAP_PLOT.x0, y1: hp.y, x2: HEATMAP_PLOT.x0 + HEATMAP_PLOT.w, y2: hp.y, class: "explorer-heatmap-guide" }));
-      heatMarkerGroup.appendChild(svgEl("line", { x1: hp.x, y1: HEATMAP_PLOT.y0 - HEATMAP_PLOT.h, x2: hp.x, y2: HEATMAP_PLOT.y0, class: "explorer-heatmap-guide" }));
-      heatMarkerGroup.appendChild(svgEl("circle", { cx: hp.x, cy: hp.y, r: 4, class: "explorer-heatmap-marker-dot" }));
 
       var cp = cubeProject(aT, pT, tT);
       var floorP = cubeProject(0, pT, tT);
@@ -856,7 +812,28 @@
       var total = Math.abs(row.Aff_chg) + Math.abs(row.marketChg);
       var affPct = total === 0 ? 0 : (Math.abs(row.Aff_chg) / total) * 100;
       container.querySelector('[data-out="split-affordable"]').style.width = affPct + "%";
-      container.querySelector('[data-out="split-market"]').style.width = (100 - affPct) + "%";
+      var marketEl = container.querySelector('[data-out="split-market"]');
+      marketEl.style.width = (100 - affPct) + "%";
+      var marketPositive = row.marketChg > 0;
+      marketEl.classList.toggle("positive", marketPositive);
+      var marketDot = container.querySelector('.explorer-legend .dot.market');
+      if (marketDot) marketDot.classList.toggle("positive", marketPositive);
+
+      renderDivergingBar("rent", row.rentPct, state.domain.rent);
+      renderDivergingBar("tax", row.taxPct, state.domain.tax);
+      renderDivergingBar("pv", row.pvPct, state.domain.pv);
+    }
+
+    // Bar is centered on a zero baseline (50% of the track); each half maps
+    // 0..maxAbs to 0..50% of the track width, so the bar's scale reflects the
+    // real range that value can take across the whole grid, not a fixed scale.
+    function renderDivergingBar(key, value, maxAbs) {
+      var fill = container.querySelector('[data-out="' + key + '-bar-fill"]');
+      if (!fill) return;
+      var halfPct = maxAbs ? Math.min(1, Math.abs(value) / maxAbs) * 50 : 0;
+      fill.className = "explorer-diverging-bar-fill " + (value < 0 ? "negative" : "positive");
+      fill.style.left = (value < 0 ? 50 - halfPct : 50) + "%";
+      fill.style.width = halfPct + "%";
     }
 
     function renderCaption() {
@@ -893,16 +870,22 @@
       return best;
     }
 
-    function setFromHeatmapEvent(evt) {
-      var svg = container.querySelector('[data-el="heatmap-svg"]');
+    // Inverse of cubeProjector()'s forward formula, solved for (aT, pT) at the
+    // currently displayed tau depth (tT), so click/drag lands on the front
+    // slice's own plane rather than always treating clicks as depth zero:
+    //   x = CUBE_PLOT.x0 + pT*CUBE_PLOT.w + tT*CUBE_TAU_DX
+    //   y = CUBE_PLOT.y0 - aT*CUBE_PLOT.h - tT*CUBE_TAU_DY
+    function setFromCubeEvent(evt) {
+      var svg = container.querySelector('[data-el="cube-svg"]');
       var pt = svg.createSVGPoint();
       pt.x = evt.clientX;
       pt.y = evt.clientY;
       var ctm = svg.getScreenCTM();
       if (!ctm) return;
       var local = pt.matrixTransform(ctm.inverse());
-      var pT = (local.x - HEATMAP_PLOT.x0) / HEATMAP_PLOT.w;
-      var aT = (HEATMAP_PLOT.y0 - local.y) / HEATMAP_PLOT.h;
+      var tT = state.tauIdx / (state.tauLevels.length - 1);
+      var pT = (local.x - CUBE_PLOT.x0 - tT * CUBE_TAU_DX) / CUBE_PLOT.w;
+      var aT = (CUBE_PLOT.y0 - tT * CUBE_TAU_DY - local.y) / CUBE_PLOT.h;
       pT = Math.max(0, Math.min(1, pT));
       aT = Math.max(0, Math.min(1, aT));
       state.alphaIdx = Math.round(aT * (state.alphaLevels.length - 1));
@@ -910,19 +893,49 @@
       render();
     }
 
-    var heatmapSvg = container.querySelector('[data-el="heatmap-svg"]');
+    var cubeSvg = container.querySelector('[data-el="cube-svg"]');
     var dragging = false;
-    heatmapSvg.addEventListener("pointerdown", function (evt) {
+    cubeSvg.addEventListener("pointerdown", function (evt) {
       dragging = true;
-      heatmapSvg.setPointerCapture(evt.pointerId);
-      setFromHeatmapEvent(evt);
+      cubeSvg.setPointerCapture(evt.pointerId);
+      setFromCubeEvent(evt);
     });
-    heatmapSvg.addEventListener("pointermove", function (evt) {
-      if (dragging) setFromHeatmapEvent(evt);
+    cubeSvg.addEventListener("pointermove", function (evt) {
+      if (dragging) setFromCubeEvent(evt);
     });
-    heatmapSvg.addEventListener("pointerup", function (evt) {
+    cubeSvg.addEventListener("pointerup", function (evt) {
       dragging = false;
-      heatmapSvg.releasePointerCapture(evt.pointerId);
+      cubeSvg.releasePointerCapture(evt.pointerId);
+    });
+
+    var cubePanel = container.querySelector('[data-el="cube-panel"]');
+    var cubeSvgWrap = container.querySelector('[data-el="cube-svg-wrap"]');
+    var guidesToggle = container.querySelector('[data-el="cube-guides-toggle"]');
+
+    var guidesPinned = false;
+    var guidesHovering = false;
+    function updateGuidesVisibility() {
+      cubePanel.classList.toggle("explorer-guides-visible", guidesPinned || guidesHovering);
+    }
+
+    // Hover reveals the guide lines on pointer devices; touch pointers skip
+    // this (no reliable hover state) and rely on the toggle button below.
+    cubeSvgWrap.addEventListener("pointerenter", function (evt) {
+      if (evt.pointerType === "touch") return;
+      guidesHovering = true;
+      updateGuidesVisibility();
+    });
+    cubeSvgWrap.addEventListener("pointerleave", function (evt) {
+      if (evt.pointerType === "touch") return;
+      guidesHovering = false;
+      updateGuidesVisibility();
+    });
+
+    guidesToggle.addEventListener("click", function () {
+      guidesPinned = !guidesPinned;
+      guidesToggle.setAttribute("aria-pressed", guidesPinned ? "true" : "false");
+      guidesToggle.textContent = guidesPinned ? "Hide guide lines" : "Show guide lines";
+      updateGuidesVisibility();
     });
 
     modeButtons.forEach(function (btn) {
@@ -968,6 +981,8 @@
       state.grid3D = buildGrid3D(rows, state.alphaLevels, state.phiLevels, state.tauLevels);
       state.domain.production = globalAbsMax(rows, "AptNet_chg");
       state.domain.rent = globalAbsMax(rows, "rentPct");
+      state.domain.tax = globalAbsMax(rows, "taxPct");
+      state.domain.pv = globalAbsMax(rows, "pvPct");
 
       alphaInput.min = 0; alphaInput.max = state.alphaLevels.length - 1; alphaInput.step = 1;
       phiInput.min = 0; phiInput.max = state.phiLevels.length - 1; phiInput.step = 1;

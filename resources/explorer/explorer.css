@@ -31,22 +31,16 @@
   display: none;
 }
 
-/* Cube (left) and the tau-slider + heatmap column (right): equal width
-   columns, matching the heatmap's previous rendered width exactly (same
-   1fr/1fr + gap formula the old two-heatmap layout used), inside the
-   existing 860px content column. A single grid row (not a 2-row area
-   template) means both columns share one row height, driven by whichever
-   side's content is naturally taller; align-items: stretch then grows the
-   shorter side's box to match. On the cube side that just adds blank space
-   below the SVG (harmless, no distortion, since it has no trailing flexible
-   content); on the right side, .explorer-right-col is itself a flex column
-   with the heatmap panel set to flex: 1, so the extra space is absorbed
-   into the heatmap panel's own box rather than left as a gap after it, and
-   its bottom border ends up aligned with the cube panel's bottom border. This
-   holds regardless of how long the tau-note / heatmap-hint captions get. */
+/* Single merged panel: the cube panel takes roughly 2/3 of the row width
+   (its fixed aspect ratio shrinks its rendered height along with it, which
+   is intended, keeping the explorer vertically compact); the freed 1/3-width
+   side column holds the tau slider and the permanent plain-language
+   explainer. The color legend, zero tick, and caption stay directly under
+   the cube panel itself (see .explorer-heatmap-legend / -hint / -caption
+   below), not in the side column. */
 .explorer-cube-row {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: 2fr 1fr;
   align-items: stretch;
   gap: var(--space-3);
   margin-bottom: var(--space-2);
@@ -58,8 +52,13 @@
   }
 }
 
-.explorer-cube-panel,
-.explorer-heatmap-panel {
+.explorer-cube-sidebar {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.explorer-cube-panel {
   border: 1px solid var(--border-light);
   border-radius: var(--radius-sm);
   background: var(--white);
@@ -86,16 +85,6 @@
   flex: 1;
 }
 
-.explorer-right-col {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-3);
-}
-
-.explorer-right-col .explorer-heatmap-panel {
-  flex: 1;
-}
-
 .explorer-tau-slot .explorer-slider-row {
   margin-bottom: 0;
 }
@@ -106,8 +95,7 @@
   margin: 6px 0 0;
 }
 
-.explorer-cube-svg,
-.explorer-heatmap-svg {
+.explorer-cube-svg {
   display: block;
   width: 100%;
   height: auto;
@@ -122,22 +110,107 @@
   margin-bottom: var(--space-1);
 }
 
-/* The cube's colored slice stays translucent so the wireframe edges and the
-   alpha/phi/tau axis lines it passes through remain readable rather than
-   being mostly hidden underneath it; the flat heatmap keeps full opacity
-   since it has no geometry to show through. */
-.explorer-cube-panel [data-el="cube-surface"] {
-  opacity: 0.32;
+/* Cube panel title row: the title plus the small "what is this" info toggle
+   sit centered together, so the title itself keeps no bottom margin (the
+   row supplies it instead). */
+.explorer-cube-panel-header {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  margin-bottom: var(--space-1);
 }
 
-.explorer-heatmap-svg {
+.explorer-cube-panel-header .explorer-panel-title {
+  margin-bottom: 0;
+}
+
+/* Permanent plain-language explainer, always visible in the side column
+   (no longer a dismissible popover under the cube panel's title). White fill
+   to match the readouts panel and other content boxes, not the page's gray
+   background. margin-top: auto pins it to the bottom of the sidebar, which
+   .explorer-cube-row's align-items: stretch now stretches to match the cube
+   panel's full height, so the tau slot above stays pinned to the shared top
+   edge (unchanged) and this box's bottom edge lines up with the cube panel's
+   bottom edge; the leftover space becomes empty gap above this box rather
+   than stretching either block's own height. */
+.explorer-cube-explainer {
+  margin-top: auto;
+  font-size: 11px;
+  line-height: 1.5;
+  color: var(--text-mid);
+  background: var(--white);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-sm);
+  padding: var(--space-2);
+}
+
+.explorer-cube-explainer p {
+  margin: 0;
+}
+
+/* Guide-line visibility toggle, for touch devices (and anyone else) where
+   hover isn't available; see .explorer-guides-visible below for the actual
+   show/hide mechanics shared with hover. */
+.explorer-cube-guides-toggle-row {
+  display: flex;
+  justify-content: center;
+  margin-top: 6px;
+}
+
+.explorer-guides-toggle {
+  border: 1px solid var(--gray-300);
+  border-radius: var(--radius-pill);
+  background: var(--white);
+  color: var(--text-mid);
+  font-size: 10px;
+  font-weight: 600;
+  padding: 3px 10px;
+  cursor: pointer;
+  transition: background-color var(--transition-fast), color var(--transition-fast),
+    border-color var(--transition-fast);
+}
+
+.explorer-guides-toggle[aria-pressed="true"] {
+  background: var(--red);
+  border-color: var(--red);
+  color: var(--white);
+}
+
+/* The cube's colored slice stays translucent enough that the wireframe
+   edges, the always-visible floor plane, and the axis lines it passes
+   through remain readable through it. */
+.explorer-cube-panel [data-el="cube-surface"] {
+  opacity: 0.62;
+}
+
+.explorer-cube-svg {
   cursor: crosshair;
   touch-action: none; /* pointer drag handles panning, not the browser */
 }
 
 /* Cube wireframe: light, recedes visually behind the colored slice and axis
-   lines so it reads as a bounding volume, not the focal element. */
+   lines so it reads as a bounding volume, not the focal element. Hidden by
+   default along with the guide lines (only the three labeled axes stay
+   always visible, via .explorer-cube-axis below); shown together with the
+   guides on hover or via the same toggle, see .explorer-guides-visible. */
 .explorer-cube-wire {
+  stroke: var(--gray-300);
+  stroke-width: 1;
+  fill: none;
+  opacity: 0;
+  transition: opacity var(--transition-fast);
+}
+
+.explorer-cube-panel.explorer-guides-visible .explorer-cube-wire {
+  opacity: 1;
+}
+
+/* The alpha=0 floor plane (bottom face of the cube): stays visible by
+   default, not gated behind "Show guide lines" like the rest of the
+   wireframe above, so there's always a stable reference plane to read the
+   colored slice against. */
+.explorer-cube-floor {
   stroke: var(--gray-300);
   stroke-width: 1;
   fill: none;
@@ -165,11 +238,18 @@
 }
 
 /* Dashed drop-guides from the (alpha, phi, tau) marker down to the slice
-   floor, then across to the tau axis, tracing the point's coordinates. */
+   floor, then across to the tau axis, tracing the point's coordinates.
+   Hidden by default (the marker alone stays always visible) and revealed
+   only on hover or via the toggle button, see .explorer-guides-visible. */
 .explorer-cube-guide {
   stroke: var(--red);
   stroke-width: 1;
   stroke-dasharray: 3 3;
+  opacity: 0;
+  transition: opacity var(--transition-fast);
+}
+
+.explorer-cube-panel.explorer-guides-visible .explorer-cube-guide {
   opacity: 0.6;
 }
 
@@ -190,34 +270,8 @@
   opacity: 0.9;
 }
 
-.explorer-heatmap-axislabel {
-  font-size: 9px;
-  font-family: inherit;
-  fill: var(--text-light);
-}
-
-.explorer-heatmap-axistitle {
-  font-size: 10px;
-  font-weight: 600;
-  font-family: inherit;
-  fill: var(--text-dark);
-}
-
-.explorer-heatmap-guide {
-  stroke: var(--white);
-  stroke-width: 1;
-  stroke-dasharray: 2 2;
-  opacity: 0.85;
-}
-
-.explorer-heatmap-marker-dot {
-  fill: var(--red);
-  stroke: var(--white);
-  stroke-width: 1.5;
-}
-
-/* The one color-scale legend for both panels: the cube shares this same
-   red/gray scale, so it does not repeat its own legend (see explorer.js). */
+/* The one color-scale legend, shared by the merged cube panel (see
+   explorer.js). */
 .explorer-heatmap-legend {
   margin-top: 8px;
 }
@@ -445,6 +499,18 @@
   color: var(--red);
 }
 
+/* Net new units and Average rent effect are headline totals, not a
+   right/wrong outcome the way the Tax revenue / Landowner impact readouts
+   below them are (those keep the green/red sign coloring above, untouched).
+   The "+"/"-" prefix and the bar underneath already carry the sign, so both
+   states render in the same neutral dark color here. */
+.explorer-readout-value[data-out="net"].positive,
+.explorer-readout-value[data-out="net"].negative,
+.explorer-readout-value[data-out="rent"].positive,
+.explorer-readout-value[data-out="rent"].negative {
+  color: var(--text-dark);
+}
+
 .explorer-readout-sub {
   font-size: var(--font-size-small);
   color: var(--text-light);
@@ -469,6 +535,65 @@
 }
 
 .explorer-split-bar .market {
+  background: var(--text-dark);
+}
+
+.explorer-split-bar .market.positive {
+  background: var(--text-light);
+}
+
+/* Diverging bar for the rent/tax/property-value readouts: centered on a
+   zero baseline, filling right (red) for a positive value or left (gray)
+   for a negative one. Each half maps 0..domain-max to 0..50% of the track,
+   so the scale reflects the real range that value takes across the full
+   grid (see state.domain.rent/tax/pv in explorer.js), and both `left` and
+   `width` are transitioned so the fill visibly grows, shrinks, or flips
+   side as the sliders move rather than jumping straight to place. */
+.explorer-diverging-bar {
+  position: relative;
+  height: 10px;
+  margin-top: 6px;
+}
+
+/* Track and fill are clipped to the rounded track shape; the zero tick sits
+   outside that clip so it can protrude top and bottom the same way the
+   heatmap legend's own zero tick does (see
+   .explorer-heatmap-legend-zero-tick), rather than being flush with the
+   bar's own edge where it would be unreadable against the fill. */
+.explorer-diverging-bar-track {
+  position: absolute;
+  inset: 0;
+  border-radius: var(--radius-sm);
+  background: var(--gray-200);
+  overflow: hidden;
+}
+
+.explorer-diverging-bar-zero {
+  position: absolute;
+  top: -2px;
+  left: 50%;
+  width: 1px;
+  height: 14px;
+  background: var(--text-mid);
+  transform: translateX(-50%);
+  z-index: 1;
+}
+
+.explorer-diverging-bar-fill {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 0;
+  left: 50%;
+  transition: left var(--transition-base), width var(--transition-base),
+    background-color var(--transition-fast);
+}
+
+.explorer-diverging-bar-fill.positive {
+  background: var(--red);
+}
+
+.explorer-diverging-bar-fill.negative {
   background: var(--text-dark);
 }
 
@@ -519,6 +644,10 @@
 
 .explorer-legend .dot.market {
   background: var(--text-dark);
+}
+
+.explorer-legend .dot.market.positive {
+  background: var(--text-light);
 }
 
 .explorer-note {
